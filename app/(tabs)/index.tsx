@@ -33,7 +33,7 @@ export default function HojeScreen() {
       </Card>
 
       <Button
-        label={completedToday ? 'Fazer mais um momento' : 'Começar meu momento'}
+        label={completedToday ? 'Fazer mais um devocional' : 'Começar meu devocional'}
         variant={completedToday ? 'ghost' : 'primary'}
         onPress={() => router.push('/devocional')}
       />

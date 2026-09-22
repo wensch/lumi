@@ -33,7 +33,7 @@ export default function DevocionalScreen() {
   if (loading) {
     return (
       <ScreenContainer style={styles.centered}>
-        <Text style={typography.body}>Preparando seu momento…</Text>
+        <Text style={typography.body}>Preparando seu devocional…</Text>
       </ScreenContainer>
     );
   }
@@ -106,7 +106,7 @@ export default function DevocionalScreen() {
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       <Button
-        label="Concluir meu momento"
+        label="Concluir meu devocional"
         onPress={handleComplete}
         disabled={completing || !session}
       />

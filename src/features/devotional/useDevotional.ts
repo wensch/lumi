@@ -66,7 +66,7 @@ export function useDevotional() {
       .single();
 
     if (insertError || !newSession) {
-      setError(insertError?.message ?? 'Não foi possível iniciar o momento devocional.');
+      setError(insertError?.message ?? 'Não foi possível iniciar o devocional.');
       setState({ content, session: null });
       setLoading(false);
       return;
@@ -101,7 +101,7 @@ export function useDevotional() {
       setCompleting(false);
 
       if (rpcError || !data?.[0]) {
-        setError(rpcError?.message ?? 'Não foi possível concluir o momento.');
+        setError(rpcError?.message ?? 'Não foi possível concluir o devocional.');
         return null;
       }
 

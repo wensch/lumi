@@ -37,15 +37,16 @@ type LumiMascotProps = {
 /**
  * Arte oficial do Lumi (ilustrado, fundo transparente, 512x512 fonte).
  * Mapeamento aproximado — a arte ainda não cobre 1:1 as 5 variantes do
- * MVP: "celebrating" reaproveita a imagem feliz (a mais festiva
- * disponível) e "waiting" reaproveita a expressão neutra/séria, até
- * termos ilustrações dedicadas para esses dois estados.
+ * MVP: "normal", "celebrating" e "waiting" reaproveitam a imagem feliz
+ * (a mais acolhedora disponível; a alternativa "sassy" tem expressão
+ * emburrada demais para telas neutras como auth/onboarding), até
+ * termos ilustrações dedicadas para esses estados.
  */
 const IMAGE_BY_VARIANT: Record<LumiMoodVariant, ImageSourcePropType> = {
-  normal: require('../../../assets/lumi/lumi-sassy.png'),
+  normal: require('../../../assets/lumi/lumi-happy.png'),
   happy: require('../../../assets/lumi/lumi-happy.png'),
   celebrating: require('../../../assets/lumi/lumi-happy.png'),
-  waiting: require('../../../assets/lumi/lumi-sassy.png'),
+  waiting: require('../../../assets/lumi/lumi-happy.png'),
   missing_you: require('../../../assets/lumi/lumi-sad.png'),
 };
 

@@ -11,8 +11,8 @@ const ALTERNATE_DELAY_HOURS = 4;
  *   - Lembrete alternativo é mais leve, nunca soa como cobrança.
  */
 const DAILY_MESSAGES = [
-  'Seu momento com o Lumi está esperando. 🐑',
-  'Hora do seu momento diário — não precisa ser longo, só constante.',
+  'Seu devocional com o Lumi está esperando. 🐑',
+  'Hora do seu devocional diário — não precisa ser longo, só constante.',
   'Bora? Alguns minutos são suficientes pra hoje.',
 ];
 

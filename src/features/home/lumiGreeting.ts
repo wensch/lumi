@@ -24,7 +24,7 @@ export function lumiGreeting(daysSinceLastCompleted: number | null) {
     return {
       mood,
       title: 'Oi! Eu sou o Lumi.',
-      subtitle: 'Seu primeiro momento está esperando. Bora começar?',
+      subtitle: 'Seu primeiro devocional está esperando. Bora começar?',
     };
   }
 
@@ -40,7 +40,7 @@ export function lumiGreeting(daysSinceLastCompleted: number | null) {
     return {
       mood,
       title: 'Bora hoje?',
-      subtitle: 'Seu momento de hoje ainda não começou. Bora?',
+      subtitle: 'Seu devocional de hoje ainda não começou. Bora?',
     };
   }
 
