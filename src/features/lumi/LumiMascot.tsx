@@ -1,7 +1,19 @@
 import Svg, { Circle, Ellipse, Path } from 'react-native-svg';
 import { colors } from '@/theme';
+import type { LumiMood } from '@/lib/supabase';
 
 export type LumiMoodVariant = 'normal' | 'happy';
+
+const HAPPY_MOODS: LumiMood[] = ['happy', 'celebrating', 'proud', 'surprised'];
+
+/**
+ * lumi_state.mood tem 13 valores (briefing §8.6); LumiMascot ainda só
+ * desenha 2 variantes visuais. Mapeia os demais estados para o mais
+ * próximo disponível até a Fase 1.7/2 expandir a ilustração.
+ */
+export function lumiMoodToVariant(mood: LumiMood): LumiMoodVariant {
+  return HAPPY_MOODS.includes(mood) ? 'happy' : 'normal';
+}
 
 type LumiMascotProps = {
   mood?: LumiMoodVariant;

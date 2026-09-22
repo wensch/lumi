@@ -196,7 +196,15 @@ export interface Database {
         Relationships: [];
       };
     };
-    Views: Record<string, never>;
+    Views: {
+      xp_totals: {
+        Row: {
+          user_id: string;
+          total_xp: number;
+        };
+        Relationships: [];
+      };
+    };
     Functions: Record<string, never>;
   };
 }
