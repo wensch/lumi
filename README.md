@@ -5,9 +5,12 @@ Bíblia, com o mascote Lumi (cordeiro). Contexto completo do produto em
 [docs/lumi-briefing.md](docs/lumi-briefing.md).
 
 > **Status:** Fase 0 quase completa (identidade, shell de UI, Supabase
-> conectado, auth funcional, mascote placeholder). Dados de produto (streak,
-> XP, devocional) ainda são mock. Sem integração com YouVersion, IA ou
-> notificações push. Arte final do Lumi pendente (produzida à parte).
+> conectado, auth funcional, mascote placeholder). YouVersion integrada via
+> SDK oficial (leitura de passagens). Sem IA ou notificações push ainda.
+> Arte final do Lumi pendente (produzida à parte).
+>
+> ⚠️ **Requer development build** — o SDK YouVersion não funciona no Expo
+> Go. Ver [Integração YouVersion](#integração-youversion) abaixo.
 
 ## Stack
 
@@ -121,3 +124,29 @@ Magic link e confirmação de email exigem a Redirect URL configurada no
 painel Supabase (Authentication > URL Configuration) apontando para o
 scheme do app (`lumi://`, já definido em `app.json`). OAuth (Google/Apple)
 ainda não está implementado — ver `supabase/README.md`.
+
+## Integração YouVersion
+
+Usa o SDK oficial (`@youversion/platform-react-native-expo-ui` +
+`-core`), client-side — é o padrão suportado pela própria YouVersion para
+leitura de conteúdo bíblico (diferente da regra "sempre backend" que vale
+para IA). A App Key vai em `EXPO_PUBLIC_YOUVERSION_APP_KEY` no `.env`
+(pegue em platform.youversion.com), configurada no `YouVersionProvider` em
+`app/_layout.tsx`.
+
+**Development build obrigatório**: o SDK não roda no Expo Go. Para testar:
+
+```bash
+npx expo prebuild
+npx expo run:android   # ou run:ios (requer macOS)
+```
+
+O SDK exige oficialmente Expo SDK 56; estamos no 57. Foi instalado com
+`--legacy-peer-deps` e o bundle compila (Android e o bundle DOM auxiliar),
+mas sem garantia oficial de suporte — revisar quando o SDK anunciar
+compatibilidade com SDK 57.
+
+**Pendente de confirmação com a YouVersion** (doc pública não especifica):
+política de cache/retenção do texto retornado pela API. Não assumir
+armazenamento de longo prazo do conteúdo bíblico até confirmar nos Termos
+de Uso (platform.youversion.com/?tos=1) ou com o suporte oficial.

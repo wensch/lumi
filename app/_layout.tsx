@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { Redirect, Slot, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { YouVersionProvider } from '@youversion/platform-react-native-expo-ui';
 import {
   useFonts,
   Nunito_400Regular,
@@ -13,6 +15,8 @@ import { AuthProvider, useAuth } from '@/features/auth';
 import { useProfile } from '@/features/onboarding';
 
 SplashScreen.preventAutoHideAsync();
+
+const youVersionAppKey = process.env.EXPO_PUBLIC_YOUVERSION_APP_KEY;
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -33,10 +37,14 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <StatusBar style="dark" />
-      <RootNavigation />
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <YouVersionProvider appKey={youVersionAppKey} theme="system">
+        <AuthProvider>
+          <StatusBar style="dark" />
+          <RootNavigation />
+        </AuthProvider>
+      </YouVersionProvider>
+    </GestureHandlerRootView>
   );
 }
 
