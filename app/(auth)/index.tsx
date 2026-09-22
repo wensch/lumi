@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useYVAuth } from '@youversion/platform-react-native-expo-core';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
 import { isValidEmail, translateAuthError, useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
@@ -10,6 +11,12 @@ type Method = 'password' | 'magic_link';
 
 export default function AuthScreen() {
   const { signInWithPassword, signUpWithPassword, signInWithMagicLink } = useAuth();
+  const {
+    signIn: signInWithYouVersion,
+    isAuthenticated: yvAuthenticated,
+    userInfo: yvUserInfo,
+    error: yvAuthError,
+  } = useYVAuth();
 
   const [mode, setMode] = useState<Mode>('sign_in');
   const [method, setMethod] = useState<Method>('password');
@@ -19,6 +26,58 @@ export default function AuthScreen() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [youVersionError, setYouVersionError] = useState<string | null>(null);
+  const bridgedYvUserId = useRef<string | null>(null);
+
+  const handleYouVersionSignIn = async () => {
+    setYouVersionError(null);
+    setError(null);
+    setSubmitting(true);
+    try {
+      await signInWithYouVersion();
+      // userInfo só fica disponível no estado do hook depois que signIn()
+      // resolve e o provider re-renderiza — a ponte pro Supabase acontece
+      // no useEffect abaixo, reagindo a yvAuthenticated/yvUserInfo.
+    } catch {
+      setYouVersionError('Não foi possível conectar com a YouVersion. Tente de novo.');
+      setSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (yvAuthError) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza com erro reportado pelo SDK YouVersion (sistema externo)
+      setYouVersionError('Não foi possível conectar com a YouVersion. Tente de novo.');
+      setSubmitting(false);
+      return;
+    }
+
+    if (!yvAuthenticated) return;
+
+    if (!yvUserInfo?.email) {
+      setYouVersionError(
+        'Sua conta YouVersion não retornou um email. Tente outro método de login.',
+      );
+      setSubmitting(false);
+      return;
+    }
+
+    // Evita repetir a ponte pro Supabase toda vez que o hook re-renderiza
+    // com o mesmo usuário já autenticado.
+    if (bridgedYvUserId.current === yvUserInfo.id) return;
+    bridgedYvUserId.current = yvUserInfo.id ?? yvUserInfo.email;
+
+    (async () => {
+      const { error: authError } = await signInWithMagicLink(yvUserInfo.email as string);
+      setSubmitting(false);
+      if (authError) {
+        setError(translateAuthError(authError));
+        return;
+      }
+      setEmail(yvUserInfo.email as string);
+      setMagicLinkSent(true);
+    })();
+  }, [yvAuthenticated, yvUserInfo, yvAuthError, signInWithMagicLink]);
 
   const handleSubmit = async () => {
     setError(null);
@@ -154,6 +213,19 @@ export default function AuthScreen() {
           />
         </View>
       ) : null}
+
+      <Card style={styles.card}>
+        {youVersionError ? <Text style={styles.errorText}>{youVersionError}</Text> : null}
+        <Button
+          variant="ghost"
+          label="Entrar com YouVersion"
+          onPress={handleYouVersionSignIn}
+          disabled={submitting}
+        />
+        <Text style={[typography.caption, styles.subtitle]}>
+          Enviamos um link de confirmação para o email da sua conta YouVersion.
+        </Text>
+      </Card>
     </ScreenContainer>
   );
 }

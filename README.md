@@ -147,6 +147,22 @@ política de cache/retenção do texto retornado pela API. Não assumir
 armazenamento de longo prazo do conteúdo bíblico até confirmar nos Termos
 de Uso (platform.youversion.com/?tos=1) ou com o suporte oficial.
 
+### Login com YouVersion
+
+Botão "Entrar com YouVersion" na tela de auth usa `useYVAuth()`
+(`@youversion/platform-react-native-expo-core`) para autenticar com a
+conta YouVersion do usuário, depois faz a ponte para uma sessão Supabase
+real via magic link automático no email retornado (`useYVAuth` e o
+Supabase Auth são sistemas independentes — não existe SSO direto entre
+eles). Login "num toque só" exigiria uma Edge Function validando o token
+YouVersion e emitindo sessão Supabase via admin API; adiado por
+simplicidade — ver `app/(auth)/index.tsx`.
+
+**Ação necessária no painel da YouVersion**: o redirect URI `lumi://callback`
+(configurado em `app/_layout.tsx`, `youVersionAuthConfig`) precisa estar
+registrado em platform.youversion.com para o fluxo de login funcionar —
+sem isso o `signIn()` falha no callback.
+
 ## Notificações
 
 Lembretes locais via `expo-notifications` (sem backend/push remoto ainda —

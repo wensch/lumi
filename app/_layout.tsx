@@ -20,6 +20,13 @@ configureNotificationHandler();
 
 const youVersionAppKey = process.env.EXPO_PUBLIC_YOUVERSION_APP_KEY;
 
+// Redirect URI precisa estar registrado no console da YouVersion Platform
+// (platform.youversion.com) para o fluxo de login (useYVAuth) funcionar.
+const youVersionAuthConfig = {
+  redirectUri: 'lumi://callback',
+  scopes: ['profile', 'email'] as const,
+};
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Nunito_400Regular,
@@ -40,7 +47,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <YouVersionProvider appKey={youVersionAppKey} theme="system">
+      <YouVersionProvider appKey={youVersionAppKey} theme="system" auth={youVersionAuthConfig}>
         <AuthProvider>
           <StatusBar style="dark" />
           <RootNavigation />
