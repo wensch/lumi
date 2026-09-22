@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { Button, Card, ScreenContainer, StreakBadge, XPBadge } from '@/components';
 import { useHomeData } from '@/features/home';
 import { LumiMascot, lumiMoodToVariant } from '@/features/lumi';
@@ -22,7 +23,7 @@ export default function HojeScreen() {
         </Text>
       </Card>
 
-      <Button label="Começar meu momento" onPress={() => {}} />
+      <Button label="Começar meu momento" onPress={() => router.push('/devocional')} />
     </ScreenContainer>
   );
 }

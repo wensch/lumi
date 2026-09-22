@@ -81,6 +81,7 @@ export interface Database {
           body: string;
           passage_reference: string | null;
           bible_source_id: string | null;
+          youversion_version_id: number | null;
           published_at: string | null;
           created_at: string;
         };
@@ -205,6 +206,18 @@ export interface Database {
         Relationships: [];
       };
     };
-    Functions: Record<string, never>;
+    Functions: {
+      complete_devotional_session: {
+        Args: {
+          p_session_id: string;
+          p_reflection_text?: string | null;
+        };
+        Returns: {
+          current_streak: number;
+          longest_streak: number;
+          xp_awarded: number;
+        }[];
+      };
+    };
   };
 }
