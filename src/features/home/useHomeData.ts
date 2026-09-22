@@ -7,13 +7,25 @@ type HomeData = {
   currentStreak: number;
   totalXp: number;
   lumiMood: LumiMood;
+  /** Dias desde a última conclusão, ou null se nunca completou nenhuma. 0 = hoje. */
+  daysSinceLastCompleted: number | null;
 };
 
 const DEFAULT_HOME_DATA: HomeData = {
   currentStreak: 0,
   totalXp: 0,
   lumiMood: 'normal',
+  daysSinceLastCompleted: null,
 };
+
+function calculateDaysSince(dateString: string | null): number | null {
+  if (!dateString) return null;
+  const last = new Date(`${dateString}T00:00:00`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffMs = today.getTime() - last.getTime();
+  return Math.round(diffMs / (1000 * 60 * 60 * 24));
+}
 
 export function useHomeData() {
   const { session } = useAuth();
@@ -24,7 +36,11 @@ export function useHomeData() {
     setLoading(true);
 
     const [streakResult, xpResult, lumiResult] = await Promise.all([
-      supabase.from('streaks').select('current_streak').eq('user_id', userId).single(),
+      supabase
+        .from('streaks')
+        .select('current_streak, last_completed_date')
+        .eq('user_id', userId)
+        .single(),
       supabase.from('xp_totals').select('total_xp').eq('user_id', userId).maybeSingle(),
       supabase.from('lumi_state').select('mood').eq('user_id', userId).single(),
     ]);
@@ -33,6 +49,7 @@ export function useHomeData() {
       currentStreak: streakResult.data?.current_streak ?? 0,
       totalXp: xpResult.data?.total_xp ?? 0,
       lumiMood: lumiResult.data?.mood ?? 'normal',
+      daysSinceLastCompleted: calculateDaysSince(streakResult.data?.last_completed_date ?? null),
     });
     setLoading(false);
   }, []);

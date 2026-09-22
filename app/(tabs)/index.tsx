@@ -1,12 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, ScreenContainer, StreakBadge, XPBadge } from '@/components';
-import { useHomeData } from '@/features/home';
+import { lumiGreeting, useHomeData } from '@/features/home';
 import { LumiMascot, lumiMoodToVariant } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
 export default function HojeScreen() {
-  const { currentStreak, totalXp, lumiMood } = useHomeData();
+  const { currentStreak, totalXp, lumiMood, daysSinceLastCompleted } = useHomeData();
+  const greeting = lumiGreeting(daysSinceLastCompleted);
+  const completedToday = daysSinceLastCompleted === 0;
 
   return (
     <ScreenContainer>
@@ -17,13 +19,15 @@ export default function HojeScreen() {
 
       <Card style={styles.heroCard}>
         <LumiMascot mood={lumiMoodToVariant(lumiMood)} size={140} />
-        <Text style={typography.heading}>Oi! Eu sou o Lumi.</Text>
-        <Text style={[typography.body, styles.subtitle]}>
-          Seu momento de hoje ainda não começou. Bora?
-        </Text>
+        <Text style={typography.heading}>{greeting.title}</Text>
+        <Text style={[typography.body, styles.subtitle]}>{greeting.subtitle}</Text>
       </Card>
 
-      <Button label="Começar meu momento" onPress={() => router.push('/devocional')} />
+      <Button
+        label={completedToday ? 'Fazer mais um momento' : 'Começar meu momento'}
+        variant={completedToday ? 'ghost' : 'primary'}
+        onPress={() => router.push('/devocional')}
+      />
     </ScreenContainer>
   );
 }
