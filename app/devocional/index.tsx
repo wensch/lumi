@@ -3,19 +3,30 @@ import { StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { BibleCard } from '@youversion/platform-react-native-expo-ui';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
+import { ACHIEVEMENT_LABELS } from '@/features/achievements';
 import { useDevotional } from '@/features/devotional';
 import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
+type Result = {
+  streak: number;
+  xp: number;
+  unlockedCodes: string[];
+};
+
 export default function DevocionalScreen() {
   const { content, session, loading, completing, error, complete } = useDevotional();
   const [reflection, setReflection] = useState('');
-  const [result, setResult] = useState<{ streak: number; xp: number } | null>(null);
+  const [result, setResult] = useState<Result | null>(null);
 
   const handleComplete = async () => {
     const outcome = await complete(reflection.trim() || undefined);
     if (outcome) {
-      setResult({ streak: outcome.current_streak, xp: outcome.xp_awarded });
+      setResult({
+        streak: outcome.current_streak,
+        xp: outcome.xp_awarded,
+        unlockedCodes: outcome.unlocked_achievement_codes ?? [],
+      });
     }
   };
 
@@ -47,6 +58,18 @@ export default function DevocionalScreen() {
             ? `+${result.xp} XP · sequência de ${result.streak} ${result.streak === 1 ? 'dia' : 'dias'}`
             : `Sequência de ${result.streak} ${result.streak === 1 ? 'dia' : 'dias'}`}
         </Text>
+
+        {result.unlockedCodes.map((code) => {
+          const achievement = ACHIEVEMENT_LABELS[code];
+          if (!achievement) return null;
+          return (
+            <Card key={code} style={styles.achievementCard}>
+              <Text style={styles.achievementIcon}>{achievement.icon}</Text>
+              <Text style={typography.bodyStrong}>Conquista desbloqueada: {achievement.title}</Text>
+            </Card>
+          );
+        })}
+
         <Button label="Voltar para Hoje" onPress={() => router.replace('/(tabs)')} />
       </ScreenContainer>
     );
@@ -103,6 +126,14 @@ const styles = StyleSheet.create({
   },
   reflectionCard: {
     gap: spacing.sm,
+  },
+  achievementCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  achievementIcon: {
+    fontSize: 28,
   },
   errorText: {
     ...typography.caption,

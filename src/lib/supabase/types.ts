@@ -216,6 +216,7 @@ export interface Database {
           current_streak: number;
           longest_streak: number;
           xp_awarded: number;
+          unlocked_achievement_codes: string[];
         }[];
       };
     };

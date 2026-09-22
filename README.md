@@ -4,10 +4,11 @@ Aplicativo de constância devocional cristã — hábito diário de oração e
 Bíblia, com o mascote Lumi (cordeiro). Contexto completo do produto em
 [docs/lumi-briefing.md](docs/lumi-briefing.md).
 
-> **Status:** Fase 1 (MVP) em andamento. Onboarding, Hoje, devocional
-> (YouVersion + reflexão), streak/XP, 5 estados do Lumi e lembretes locais
-> já funcionam. Faltam: IA para oração, histórico/conquistas na tela
-> Perfil. Arte final do Lumi pendente (produzida à parte).
+> **Status:** Fase 1 (MVP) completa, exceto IA para oração — próxima etapa,
+> bloqueada por escolha de fornecedor de modelo. Onboarding, Hoje,
+> devocional (YouVersion + reflexão), streak/XP, conquistas, histórico, 5
+> estados do Lumi e lembretes locais já funcionam. Arte final do Lumi
+> pendente (produzida à parte).
 >
 > ⚠️ **Requer development build** — o SDK YouVersion não funciona no Expo
 > Go. Ver [Integração YouVersion](#integração-youversion) abaixo.
@@ -75,10 +76,14 @@ src/
   features/devotional/  # useDevotional() — fluxo de leitura + reflexão + conclusão
   features/lumi/        # LumiMascot — SVG placeholder (5 estados); trocar pela arte final
   features/notifications/ # Lembretes locais (expo-notifications)
+  features/achievements/  # Catálogo de conquistas (espelha o seed)
+  features/profile/       # useProfileHistory() — streak, histórico, conquistas
   lib/supabase/         # Client Supabase + tipos do banco (Database)
 
 supabase/
-  migrations/           # SQL: schema, RLS, bootstrap de novo usuário
+  migrations/           # SQL: schema, RLS, bootstrap de novo usuário, funções
+  seed-content.sql      # Devocional placeholder — rodar manualmente
+  seed-achievements.sql # Catálogo de conquistas — rodar manualmente
   config.toml           # Config de auth (Supabase CLI)
 
 docs/
