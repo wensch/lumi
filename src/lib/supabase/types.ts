@@ -41,6 +41,7 @@ export interface Database {
         };
         Insert: Partial<Database['public']['Tables']['profiles']['Row']> & { id: string };
         Update: Partial<Database['public']['Tables']['profiles']['Row']>;
+        Relationships: [];
       };
       streaks: {
         Row: {
@@ -53,6 +54,7 @@ export interface Database {
         };
         Insert: Partial<Database['public']['Tables']['streaks']['Row']> & { user_id: string };
         Update: Partial<Database['public']['Tables']['streaks']['Row']>;
+        Relationships: [];
       };
       bible_sources: {
         Row: {
@@ -70,6 +72,7 @@ export interface Database {
           language: string;
         };
         Update: Partial<Database['public']['Tables']['bible_sources']['Row']>;
+        Relationships: [];
       };
       content: {
         Row: {
@@ -86,6 +89,7 @@ export interface Database {
           body: string;
         };
         Update: Partial<Database['public']['Tables']['content']['Row']>;
+        Relationships: [];
       };
       devotional_sessions: {
         Row: {
@@ -101,6 +105,7 @@ export interface Database {
           user_id: string;
         };
         Update: Partial<Database['public']['Tables']['devotional_sessions']['Row']>;
+        Relationships: [];
       };
       xp_events: {
         Row: {
@@ -117,6 +122,7 @@ export interface Database {
           reason: XpReason;
         };
         Update: never;
+        Relationships: [];
       };
       achievements: {
         Row: {
@@ -134,6 +140,7 @@ export interface Database {
           description: string;
         };
         Update: Partial<Database['public']['Tables']['achievements']['Row']>;
+        Relationships: [];
       };
       user_achievements: {
         Row: {
@@ -143,6 +150,7 @@ export interface Database {
         };
         Insert: Database['public']['Tables']['user_achievements']['Row'];
         Update: never;
+        Relationships: [];
       };
       prayer_entries: {
         Row: {
@@ -160,6 +168,7 @@ export interface Database {
           body: string;
         };
         Update: Partial<Database['public']['Tables']['prayer_entries']['Row']>;
+        Relationships: [];
       };
       lumi_state: {
         Row: {
@@ -170,6 +179,7 @@ export interface Database {
         };
         Insert: Partial<Database['public']['Tables']['lumi_state']['Row']> & { user_id: string };
         Update: Partial<Database['public']['Tables']['lumi_state']['Row']>;
+        Relationships: [];
       };
       notification_preferences: {
         Row: {
@@ -183,7 +193,10 @@ export interface Database {
           user_id: string;
         };
         Update: Partial<Database['public']['Tables']['notification_preferences']['Row']>;
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
   };
 }

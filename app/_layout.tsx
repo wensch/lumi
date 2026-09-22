@@ -10,6 +10,7 @@ import {
   Nunito_800ExtraBold,
 } from '@expo-google-fonts/nunito';
 import { AuthProvider, useAuth } from '@/features/auth';
+import { useProfile } from '@/features/onboarding';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,20 +41,30 @@ export default function RootLayout() {
 }
 
 function RootNavigation() {
-  const { session, loading } = useAuth();
+  const { session, loading: authLoading } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
   const segments = useSegments();
 
-  if (loading) {
+  if (authLoading || (session && profileLoading)) {
     return null;
   }
 
   const inAuthGroup = segments[0] === '(auth)';
+  const inOnboardingGroup = segments[0] === '(onboarding)';
 
   if (!session && !inAuthGroup) {
     return <Redirect href="/(auth)" />;
   }
 
   if (session && inAuthGroup) {
+    return <Redirect href="/(tabs)" />;
+  }
+
+  if (session && !profile?.onboarding_completed_at && !inOnboardingGroup) {
+    return <Redirect href="/(onboarding)" />;
+  }
+
+  if (session && profile?.onboarding_completed_at && inOnboardingGroup) {
     return <Redirect href="/(tabs)" />;
   }
 
