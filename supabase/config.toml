@@ -1,0 +1,13 @@
+project_id = "lumi"
+
+[auth]
+enabled = true
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+
+# Providers OAuth (Google/Apple) são habilitados no dashboard do Supabase
+# (Authentication > Providers) — precisam de client IDs por plataforma,
+# não configuráveis só por código. Ver README.md deste diretório.
