@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
 import { useAuth } from '@/features/auth';
+import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
 type Mode = 'sign_in' | 'sign_up';
@@ -59,7 +60,9 @@ export default function AuthScreen() {
 
   return (
     <ScreenContainer style={styles.container}>
-      <Text style={styles.lumiPlaceholder}>🐑</Text>
+      <View style={styles.mascotWrapper}>
+        <LumiMascot mood="normal" size={120} />
+      </View>
       <Text style={typography.title}>Bem-vindo ao Lumi</Text>
       <Text style={[typography.body, styles.subtitle]}>
         {mode === 'sign_in'
@@ -137,9 +140,8 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
   },
-  lumiPlaceholder: {
-    fontSize: 56,
-    textAlign: 'center',
+  mascotWrapper: {
+    alignItems: 'center',
   },
   subtitle: {
     color: colors.ink,

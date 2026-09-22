@@ -4,9 +4,10 @@ Aplicativo de constância devocional cristã — hábito diário de oração e
 Bíblia, com o mascote Lumi (cordeiro). Contexto completo do produto em
 [docs/lumi-briefing.md](docs/lumi-briefing.md).
 
-> **Status:** Fase 0 (identidade, shell de UI, Supabase conectado, auth
-> funcional). Dados de produto (streak, XP, devocional) ainda são mock. Sem
-> integração com YouVersion, IA ou notificações push.
+> **Status:** Fase 0 quase completa (identidade, shell de UI, Supabase
+> conectado, auth funcional, mascote placeholder). Dados de produto (streak,
+> XP, devocional) ainda são mock. Sem integração com YouVersion, IA ou
+> notificações push. Arte final do Lumi pendente (produzida à parte).
 
 ## Stack
 
@@ -72,6 +73,7 @@ src/
   theme/                # Design tokens: cores, tipografia, espaçamento
   components/           # Componentes base: Button, Card, TextField, StreakBadge, XPBadge, ScreenContainer
   features/auth/        # AuthProvider (sessão Supabase) + useAuth()
+  features/lumi/        # LumiMascot — SVG placeholder (normal/happy); trocar pela arte final
   lib/supabase/         # Client Supabase + tipos do banco (Database)
 
 supabase/
@@ -92,10 +94,20 @@ briefing (§9.3–9.4) e na skill `lumi-design-tokens`:
 
 - Cores: verde principal `#4CAF72`, verde escuro `#245C42`, creme `#FAF9F4`,
   amarelo `#FFC857`, azul `#5B8DEF`, tinta `#202124`.
-- Tipografia: Nunito (provisório — decisão final após protótipo visual).
+- Tipografia: Nunito (decisão final, briefing §9.4).
 
 Qualquer copy, texto do Lumi ou nova UI deve respeitar as skills
 `lumi-brand-guardrails` e `lumi-design-tokens`.
+
+## Mascote Lumi
+
+`src/features/lumi/LumiMascot.tsx` é um placeholder vetorial (SVG via
+react-native-svg) com os estados `normal` e `happy`, desenhado em código
+como substituto temporário — sem gerador de imagem disponível no ambiente
+de desenvolvimento. A arte final está sendo produzida à parte; quando
+chegar, substituir o conteúdo deste componente (ou trocá-lo por
+`<Image>`/Lottie apontando para os assets finais) mantendo a mesma API
+(`mood`, `size`) para não precisar tocar nas telas que já o consomem.
 
 ## Autenticação
 

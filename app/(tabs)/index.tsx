@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Button, Card, ScreenContainer, StreakBadge, XPBadge } from '@/components';
+import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
 export default function HojeScreen() {
@@ -11,7 +12,7 @@ export default function HojeScreen() {
       </View>
 
       <Card style={styles.heroCard}>
-        <Text style={styles.lumiPlaceholder}>🐑</Text>
+        <LumiMascot mood="normal" size={140} />
         <Text style={typography.heading}>Oi! Eu sou o Lumi.</Text>
         <Text style={[typography.body, styles.subtitle]}>
           Seu momento de hoje ainda não começou. Bora?
@@ -32,10 +33,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     marginTop: spacing.lg,
-  },
-  lumiPlaceholder: {
-    fontSize: 64,
-    marginBottom: spacing.sm,
   },
   subtitle: {
     color: colors.ink,

@@ -1,6 +1,6 @@
 /**
- * Tipografia Lumi — provisório (Nunito), decisão final após protótipo
- * visual. Ver docs/lumi-briefing.md §9.4.
+ * Tipografia Lumi — Nunito, decisão final (briefing §9.4 deixava em aberto
+ * entre Nunito/Poppins; confirmado Nunito após o protótipo visual da Fase 0).
  */
 export const fontFamily = {
   regular: 'Nunito_400Regular',
