@@ -1,3 +1,5 @@
+import type { LumiMoodVariant } from '@/features/lumi';
+
 /**
  * Falas do Lumi na tela Hoje, variando pelo estado de streak.
  * Revisado contra o checklist da skill lumi-brand-guardrails:
@@ -12,8 +14,15 @@
  * currentStreak, que fica com o valor antigo até a próxima conclusão.
  */
 export function lumiGreeting(daysSinceLastCompleted: number | null) {
+  const mood: LumiMoodVariant = (() => {
+    if (daysSinceLastCompleted === null || daysSinceLastCompleted === 1) return 'waiting';
+    if (daysSinceLastCompleted === 0) return 'happy';
+    return 'missing_you';
+  })();
+
   if (daysSinceLastCompleted === null) {
     return {
+      mood,
       title: 'Oi! Eu sou o Lumi.',
       subtitle: 'Seu primeiro momento está esperando. Bora começar?',
     };
@@ -21,6 +30,7 @@ export function lumiGreeting(daysSinceLastCompleted: number | null) {
 
   if (daysSinceLastCompleted === 0) {
     return {
+      mood,
       title: 'Você já veio hoje!',
       subtitle: 'Quer registrar mais alguma coisa ou só voltar amanhã. Sem pressa.',
     };
@@ -28,6 +38,7 @@ export function lumiGreeting(daysSinceLastCompleted: number | null) {
 
   if (daysSinceLastCompleted === 1) {
     return {
+      mood,
       title: 'Bora hoje?',
       subtitle: 'Seu momento de hoje ainda não começou. Bora?',
     };
@@ -35,6 +46,7 @@ export function lumiGreeting(daysSinceLastCompleted: number | null) {
 
   if (daysSinceLastCompleted >= 7) {
     return {
+      mood,
       title: 'Que bom te ver de novo.',
       subtitle:
         'Jesus ficou 40 dias no deserto. Você está há ' +
@@ -43,6 +55,7 @@ export function lumiGreeting(daysSinceLastCompleted: number | null) {
   }
 
   return {
+    mood,
     title: 'Ih, quebrou a sequência.',
     subtitle: 'Sem estresse — a proposta é constância, não perfeição. Bora recomeçar?',
   };

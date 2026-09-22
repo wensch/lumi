@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { BibleCard } from '@youversion/platform-react-native-expo-ui';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
 import { useDevotional } from '@/features/devotional';
+import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
 export default function DevocionalScreen() {
@@ -39,7 +40,7 @@ export default function DevocionalScreen() {
   if (result) {
     return (
       <ScreenContainer style={styles.centered}>
-        <Text style={styles.celebrateEmoji}>🎉</Text>
+        <LumiMascot mood="celebrating" size={140} />
         <Text style={typography.heading}>Momento concluído!</Text>
         <Text style={[typography.body, styles.subtitle]}>
           {result.xp > 0
@@ -95,9 +96,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: spacing.sm,
-  },
-  celebrateEmoji: {
-    fontSize: 48,
   },
   subtitle: {
     color: colors.ink,

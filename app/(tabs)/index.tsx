@@ -2,11 +2,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, ScreenContainer, StreakBadge, XPBadge } from '@/components';
 import { lumiGreeting, useHomeData } from '@/features/home';
-import { LumiMascot, lumiMoodToVariant } from '@/features/lumi';
+import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
 export default function HojeScreen() {
-  const { currentStreak, totalXp, lumiMood, daysSinceLastCompleted } = useHomeData();
+  const { currentStreak, totalXp, daysSinceLastCompleted } = useHomeData();
   const greeting = lumiGreeting(daysSinceLastCompleted);
   const completedToday = daysSinceLastCompleted === 0;
 
@@ -18,7 +18,7 @@ export default function HojeScreen() {
       </View>
 
       <Card style={styles.heroCard}>
-        <LumiMascot mood={lumiMoodToVariant(lumiMood)} size={140} />
+        <LumiMascot mood={greeting.mood} size={140} />
         <Text style={typography.heading}>{greeting.title}</Text>
         <Text style={[typography.body, styles.subtitle]}>{greeting.subtitle}</Text>
       </Card>
