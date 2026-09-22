@@ -107,13 +107,15 @@ Qualquer copy, texto do Lumi ou nova UI deve respeitar as skills
 
 ## Mascote Lumi
 
-`src/features/lumi/LumiMascot.tsx` é um placeholder vetorial (SVG via
-react-native-svg) com os estados `normal` e `happy`, desenhado em código
-como substituto temporário — sem gerador de imagem disponível no ambiente
-de desenvolvimento. A arte final está sendo produzida à parte; quando
-chegar, substituir o conteúdo deste componente (ou trocá-lo por
-`<Image>`/Lottie apontando para os assets finais) mantendo a mesma API
-(`mood`, `size`) para não precisar tocar nas telas que já o consomem.
+`src/features/lumi/LumiMascot.tsx` renderiza a arte oficial ilustrada do
+Lumi (`assets/lumi/*.png`, 512×512, fundo transparente, otimizada com
+ffmpeg a partir dos originais 1024×1024). Mapeamento das 5 variantes do
+MVP (`normal`, `happy`, `celebrating`, `waiting`, `missing_you`) para os
+arquivos de imagem — a arte ainda não cobre 1:1 todas as variantes:
+`celebrating` reaproveita `lumi-happy.png` e `waiting` reaproveita
+`lumi-sassy.png`, até termos ilustrações dedicadas. `lumi-surprised.png`
+e `lumi-accessory-glasses.png` chegaram no mesmo lote mas ainda não são
+usadas — ficam para quando o conjunto de estados for expandido na Fase 2.
 
 ## Autenticação
 

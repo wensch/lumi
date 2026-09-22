@@ -38,6 +38,9 @@ passDb.txt
 # supabase CLI local cache
 supabase/.temp/
 
+# Claude Code local scheduling state
+.claude/scheduled_tasks.lock
+
 # typescript
 *.tsbuildinfo
 
