@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useProfile } from '@/features/onboarding';
+import { requestNotificationPermission, scheduleDailyReminder } from '@/features/notifications';
 import { supabase } from '@/lib/supabase';
 import type { AgeRange } from '@/lib/supabase';
 import { colors, spacing, typography } from '@/theme';
@@ -83,6 +84,11 @@ export default function OnboardingScreen() {
       setError(notificationError.message);
       setSubmitting(false);
       return;
+    }
+
+    const granted = await requestNotificationPermission();
+    if (granted) {
+      await scheduleDailyReminder(timeString);
     }
 
     await refetch();

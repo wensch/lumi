@@ -13,8 +13,10 @@ import {
 } from '@expo-google-fonts/nunito';
 import { AuthProvider, useAuth } from '@/features/auth';
 import { useProfile } from '@/features/onboarding';
+import { configureNotificationHandler, useNotificationScheduler } from '@/features/notifications';
 
 SplashScreen.preventAutoHideAsync();
+configureNotificationHandler();
 
 const youVersionAppKey = process.env.EXPO_PUBLIC_YOUVERSION_APP_KEY;
 
@@ -52,6 +54,8 @@ function RootNavigation() {
   const { session, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const segments = useSegments();
+
+  useNotificationScheduler();
 
   if (authLoading || (session && profileLoading)) {
     return null;

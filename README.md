@@ -4,10 +4,10 @@ Aplicativo de constância devocional cristã — hábito diário de oração e
 Bíblia, com o mascote Lumi (cordeiro). Contexto completo do produto em
 [docs/lumi-briefing.md](docs/lumi-briefing.md).
 
-> **Status:** Fase 0 quase completa (identidade, shell de UI, Supabase
-> conectado, auth funcional, mascote placeholder). YouVersion integrada via
-> SDK oficial (leitura de passagens). Sem IA ou notificações push ainda.
-> Arte final do Lumi pendente (produzida à parte).
+> **Status:** Fase 1 (MVP) em andamento. Onboarding, Hoje, devocional
+> (YouVersion + reflexão), streak/XP, 5 estados do Lumi e lembretes locais
+> já funcionam. Faltam: IA para oração, histórico/conquistas na tela
+> Perfil. Arte final do Lumi pendente (produzida à parte).
 >
 > ⚠️ **Requer development build** — o SDK YouVersion não funciona no Expo
 > Go. Ver [Integração YouVersion](#integração-youversion) abaixo.
@@ -24,30 +24,24 @@ Bíblia, com o mascote Lumi (cordeiro). Contexto completo do produto em
 
 ## Como rodar
 
-Pré-requisitos: Node.js 20+, npm, e o app **Expo Go** no celular (ou um
-emulador Android/simulador iOS configurado).
+Pré-requisitos: Node.js 20+, npm, e um emulador Android ou simulador iOS
+configurado (ou dispositivo físico com depuração USB/Xcode).
 
 ```bash
 npm install
-cp .env.example .env   # preencha com as credenciais do seu projeto Supabase
-npm start
+cp .env.example .env   # preencha com as credenciais do seu projeto Supabase e a YouVersion App Key
+npx expo prebuild
+npx expo run:android   # ou run:ios (requer macOS)
 ```
 
 O app não inicia sem `.env` preenchido (`src/lib/supabase/client.ts` lança
 erro se as variáveis faltarem). Veja [supabase/README.md](supabase/README.md)
 para criar o projeto e aplicar as migrations.
 
-Isso abre o Metro bundler com um QR code. Escaneie com o Expo Go (Android)
-ou a câmera (iOS) para abrir o app no celular. Atalhos no terminal do Metro:
-`a` (abrir no emulador Android), `i` (simulador iOS), `w` (navegador).
-
-Scripts alternativos:
-
-```bash
-npm run android   # abre direto no emulador Android
-npm run ios       # abre direto no simulador iOS (só macOS)
-npm run web       # abre no navegador
-```
+⚠️ **Não dá para usar o Expo Go** — o SDK YouVersion e o
+`expo-notifications` exigem development build. Depois do primeiro
+`expo run:android`/`run:ios`, `npm start` funciona normalmente para os
+reloads seguintes (mesmo development build instalado no dispositivo).
 
 ## Qualidade de código
 
@@ -76,7 +70,11 @@ src/
   theme/                # Design tokens: cores, tipografia, espaçamento
   components/           # Componentes base: Button, Card, TextField, StreakBadge, XPBadge, ScreenContainer
   features/auth/        # AuthProvider (sessão Supabase) + useAuth()
-  features/lumi/        # LumiMascot — SVG placeholder (normal/happy); trocar pela arte final
+  features/onboarding/  # useProfile()
+  features/home/        # useHomeData(), lumiGreeting() — copy do Lumi por estado de streak
+  features/devotional/  # useDevotional() — fluxo de leitura + reflexão + conclusão
+  features/lumi/        # LumiMascot — SVG placeholder (5 estados); trocar pela arte final
+  features/notifications/ # Lembretes locais (expo-notifications)
   lib/supabase/         # Client Supabase + tipos do banco (Database)
 
 supabase/
@@ -134,13 +132,6 @@ para IA). A App Key vai em `EXPO_PUBLIC_YOUVERSION_APP_KEY` no `.env`
 (pegue em platform.youversion.com), configurada no `YouVersionProvider` em
 `app/_layout.tsx`.
 
-**Development build obrigatório**: o SDK não roda no Expo Go. Para testar:
-
-```bash
-npx expo prebuild
-npx expo run:android   # ou run:ios (requer macOS)
-```
-
 O SDK exige oficialmente Expo SDK 56; estamos no 57. Foi instalado com
 `--legacy-peer-deps` e o bundle compila (Android e o bundle DOM auxiliar),
 mas sem garantia oficial de suporte — revisar quando o SDK anunciar
@@ -150,3 +141,20 @@ compatibilidade com SDK 57.
 política de cache/retenção do texto retornado pela API. Não assumir
 armazenamento de longo prazo do conteúdo bíblico até confirmar nos Termos
 de Uso (platform.youversion.com/?tos=1) ou com o suporte oficial.
+
+## Notificações
+
+Lembretes locais via `expo-notifications` (sem backend/push remoto ainda —
+briefing §14 fala em "lembrete no horário escolhido" + "lembrete
+alternativo se não concluir", ambos cobertos localmente por ora):
+
+- Lembrete principal no horário de `notification_preferences.preferred_time`.
+- Lembrete alternativo 4h depois, tom mais leve, se a sequência não avançar.
+- Agendado ao concluir o onboarding e re-sincronizado a cada abertura do
+  app (`useNotificationScheduler`, no layout raiz) — reflete mudanças de
+  horário/preferência sem precisar reabrir o app manualmente.
+- Requer permissão do usuário (`requestNotificationPermission`) e, como o
+  restante do app, development build — não funciona no Expo Go.
+- Toda copy de notificação passa pelo checklist da skill
+  `lumi-brand-guardrails`: persistente e contextual, nunca com culpa
+  religiosa.

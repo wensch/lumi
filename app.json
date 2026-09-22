@@ -32,7 +32,14 @@
       "expo-font",
       "@react-native-community/datetimepicker",
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#4CAF72"
+        }
+      ]
     ]
   }
 }
