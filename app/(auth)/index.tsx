@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
-import { useAuth } from '@/features/auth';
+import { isValidEmail, translateAuthError, useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
@@ -17,14 +17,21 @@ export default function AuthScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     setError(null);
     setMagicLinkSent(false);
+    setNeedsEmailConfirmation(false);
 
     if (!email.trim()) {
       setError('Informe seu email.');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setError('Email inválido.');
       return;
     }
 
@@ -33,7 +40,7 @@ export default function AuthScreen() {
       if (method === 'magic_link') {
         const { error: authError } = await signInWithMagicLink(email.trim());
         if (authError) {
-          setError(authError);
+          setError(translateAuthError(authError));
         } else {
           setMagicLinkSent(true);
         }
@@ -45,13 +52,23 @@ export default function AuthScreen() {
         return;
       }
 
-      const { error: authError } =
-        mode === 'sign_in'
-          ? await signInWithPassword(email.trim(), password)
-          : await signUpWithPassword(email.trim(), password);
+      if (mode === 'sign_in') {
+        const { error: authError } = await signInWithPassword(email.trim(), password);
+        if (authError) {
+          setError(translateAuthError(authError));
+        }
+        return;
+      }
+
+      const { error: authError, needsEmailConfirmation: shouldConfirm } = await signUpWithPassword(
+        email.trim(),
+        password,
+      );
 
       if (authError) {
-        setError(authError);
+        setError(translateAuthError(authError));
+      } else if (shouldConfirm) {
+        setNeedsEmailConfirmation(true);
       }
     } finally {
       setSubmitting(false);
@@ -92,6 +109,11 @@ export default function AuthScreen() {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         {magicLinkSent ? (
           <Text style={styles.successText}>Link enviado! Confira seu email.</Text>
+        ) : null}
+        {needsEmailConfirmation ? (
+          <Text style={styles.successText}>
+            Conta criada! Confira seu email para confirmar antes de entrar.
+          </Text>
         ) : null}
 
         <Button

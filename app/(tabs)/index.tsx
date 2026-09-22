@@ -6,7 +6,16 @@ import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
 export default function HojeScreen() {
-  const { currentStreak, totalXp, daysSinceLastCompleted } = useHomeData();
+  const { currentStreak, totalXp, daysSinceLastCompleted, loading } = useHomeData();
+
+  if (loading) {
+    return (
+      <ScreenContainer style={styles.centered}>
+        <Text style={typography.body}>Carregando…</Text>
+      </ScreenContainer>
+    );
+  }
+
   const greeting = lumiGreeting(daysSinceLastCompleted);
   const completedToday = daysSinceLastCompleted === 0;
 
@@ -33,6 +42,10 @@ export default function HojeScreen() {
 }
 
 const styles = StyleSheet.create({
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

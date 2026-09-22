@@ -17,13 +17,15 @@ const AGE_RANGES: { value: AgeRange; label: string }[] = [
   { value: 'senior', label: 'Idoso' },
 ];
 
-type Step = 'name' | 'age' | 'time';
+const STEPS = ['name', 'age', 'time'] as const;
+type Step = (typeof STEPS)[number];
 
 export default function OnboardingScreen() {
   const { session } = useAuth();
   const { refetch } = useProfile();
 
-  const [step, setStep] = useState<Step>('name');
+  const [stepIndex, setStepIndex] = useState(0);
+  const step: Step = STEPS[stepIndex];
   const [displayName, setDisplayName] = useState('');
   const [ageRange, setAgeRange] = useState<AgeRange | null>(null);
   const [preferredTime, setPreferredTime] = useState(new Date(2000, 0, 1, 8, 0));
@@ -38,7 +40,7 @@ export default function OnboardingScreen() {
         setError('Como podemos te chamar?');
         return;
       }
-      setStep('age');
+      setStepIndex(stepIndex + 1);
       return;
     }
     if (step === 'age') {
@@ -46,12 +48,17 @@ export default function OnboardingScreen() {
         setError('Escolha uma faixa etária.');
         return;
       }
-      setStep('time');
+      setStepIndex(stepIndex + 1);
     }
   };
 
+  const goBack = () => {
+    setError(null);
+    setStepIndex(Math.max(0, stepIndex - 1));
+  };
+
   const finish = async () => {
-    if (!session) return;
+    if (!session || !ageRange) return;
     setError(null);
     setSubmitting(true);
 
@@ -59,29 +66,14 @@ export default function OnboardingScreen() {
       preferredTime.getMinutes(),
     ).padStart(2, '0')}:00`;
 
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({
-        display_name: displayName.trim(),
-        age_range: ageRange,
-        preferred_time: timeString,
-        onboarding_completed_at: new Date().toISOString(),
-      })
-      .eq('id', session.user.id);
+    const { error: onboardingError } = await supabase.rpc('complete_onboarding', {
+      p_display_name: displayName.trim(),
+      p_age_range: ageRange,
+      p_preferred_time: timeString,
+    });
 
-    if (profileError) {
-      setError(profileError.message);
-      setSubmitting(false);
-      return;
-    }
-
-    const { error: notificationError } = await supabase
-      .from('notification_preferences')
-      .update({ preferred_time: timeString })
-      .eq('user_id', session.user.id);
-
-    if (notificationError) {
-      setError(notificationError.message);
+    if (onboardingError) {
+      setError(onboardingError.message);
       setSubmitting(false);
       return;
     }
@@ -169,6 +161,10 @@ export default function OnboardingScreen() {
           onPress={step === 'time' ? finish : goNext}
           disabled={submitting}
         />
+
+        {stepIndex > 0 ? (
+          <Button label="Voltar" variant="ghost" onPress={goBack} disabled={submitting} />
+        ) : null}
       </Card>
     </ScreenContainer>
   );

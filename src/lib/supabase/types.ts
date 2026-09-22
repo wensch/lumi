@@ -219,6 +219,14 @@ export interface Database {
           unlocked_achievement_codes: string[];
         }[];
       };
+      complete_onboarding: {
+        Args: {
+          p_display_name: string;
+          p_age_range: string;
+          p_preferred_time: string;
+        };
+        Returns: undefined;
+      };
     };
   };
 }

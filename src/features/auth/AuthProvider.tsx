@@ -6,7 +6,10 @@ type AuthContextValue = {
   session: Session | null;
   loading: boolean;
   signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUpWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
+  signUpWithPassword: (
+    email: string,
+    password: string,
+  ) => Promise<{ error: string | null; needsEmailConfirmation: boolean }>;
   signInWithMagicLink: (email: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 };
@@ -39,8 +42,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error?.message ?? null };
       },
       signUpWithPassword: async (email, password) => {
-        const { error } = await supabase.auth.signUp({ email, password });
-        return { error: error?.message ?? null };
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        // Quando a confirmação de email está ativa, signUp cria o usuário
+        // mas não retorna sessão — sem isso, a tela mostrava sucesso como
+        // se o login já tivesse funcionado, e o usuário ficava sem saber
+        // que precisava confirmar o email antes de entrar.
+        const needsEmailConfirmation = !error && !data.session && !!data.user;
+        return { error: error?.message ?? null, needsEmailConfirmation };
       },
       signInWithMagicLink: async (email) => {
         const { error } = await supabase.auth.signInWithOtp({ email });

@@ -38,14 +38,19 @@ export function useDevotional() {
       return;
     }
 
+    // Filtra por usuário + data (não por content_id): se o conteúdo do dia
+    // mudar entre uma abertura e outra da tela, ainda reaproveita a sessão
+    // aberta em vez de criar uma nova e deixar a anterior órfã sem
+    // completed_at.
     const today = new Date().toISOString().slice(0, 10);
     const { data: existingSession } = await supabase
       .from('devotional_sessions')
       .select('*')
       .eq('user_id', userId)
-      .eq('content_id', content.id)
       .gte('started_at', `${today}T00:00:00`)
       .is('completed_at', null)
+      .order('started_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (existingSession) {
