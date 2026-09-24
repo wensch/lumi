@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { Button, Card, ScreenContainer, StreakBadge, XPBadge } from '@/components';
 import { lumiGreeting, useHomeData } from '@/features/home';
 import { LumiMascot } from '@/features/lumi';
+import { ShareStreakButton } from '@/features/share';
 import { colors, spacing, typography } from '@/theme';
 
 export default function HojeScreen() {
@@ -44,6 +45,12 @@ export default function HojeScreen() {
         variant={completedToday ? 'ghost' : 'primary'}
         onPress={() => router.push('/devocional')}
       />
+
+      {currentStreak > 0 ? (
+        <View style={styles.shareRow}>
+          <ShareStreakButton streak={currentStreak} totalXp={totalXp} />
+        </View>
+      ) : null}
     </ScreenContainer>
   );
 }
@@ -71,6 +78,9 @@ const styles = StyleSheet.create({
     color: colors.ink,
     opacity: 0.7,
     textAlign: 'center',
+    marginTop: spacing.sm,
+  },
+  shareRow: {
     marginTop: spacing.sm,
   },
 });

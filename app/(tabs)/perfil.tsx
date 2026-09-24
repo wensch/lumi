@@ -2,12 +2,19 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, ScreenContainer } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useProfileHistory } from '@/features/profile';
+import { ShareStreakButton } from '@/features/share';
 import { spacing, typography } from '@/theme';
 
 export default function PerfilScreen() {
   const { session, signOut } = useAuth();
-  const { currentStreak, longestStreak, recentSessions, allAchievements, unlockedAchievementIds } =
-    useProfileHistory();
+  const {
+    currentStreak,
+    longestStreak,
+    totalXp,
+    recentSessions,
+    allAchievements,
+    unlockedAchievementIds,
+  } = useProfileHistory();
 
   return (
     <ScreenContainer style={styles.container}>
@@ -24,6 +31,8 @@ export default function PerfilScreen() {
             <Text style={typography.caption}>maior sequência</Text>
           </View>
         </Card>
+
+        {currentStreak > 0 ? <ShareStreakButton streak={currentStreak} totalXp={totalXp} /> : null}
 
         <Text style={typography.subheading}>Conquistas</Text>
         <Card style={styles.achievementsGrid}>

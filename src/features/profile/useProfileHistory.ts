@@ -13,6 +13,7 @@ type CompletedSession = {
 type ProfileHistory = {
   currentStreak: number;
   longestStreak: number;
+  totalXp: number;
   recentSessions: CompletedSession[];
   allAchievements: Achievement[];
   unlockedAchievementIds: Set<string>;
@@ -21,6 +22,7 @@ type ProfileHistory = {
 const EMPTY_HISTORY: ProfileHistory = {
   currentStreak: 0,
   longestStreak: 0,
+  totalXp: 0,
   recentSessions: [],
   allAchievements: [],
   unlockedAchievementIds: new Set(),
@@ -34,13 +36,14 @@ export function useProfileHistory() {
   const fetchHistory = useCallback(async (userId: string) => {
     setLoading(true);
 
-    const [streakResult, sessionsResult, achievementsResult, userAchievementsResult] =
+    const [streakResult, xpResult, sessionsResult, achievementsResult, userAchievementsResult] =
       await Promise.all([
         supabase
           .from('streaks')
           .select('current_streak, longest_streak')
           .eq('user_id', userId)
           .single(),
+        supabase.from('xp_totals').select('total_xp').eq('user_id', userId).maybeSingle(),
         supabase
           .from('devotional_sessions')
           .select('id, completed_at, content:content_id (title)')
@@ -55,6 +58,7 @@ export function useProfileHistory() {
     setHistory({
       currentStreak: streakResult.data?.current_streak ?? 0,
       longestStreak: streakResult.data?.longest_streak ?? 0,
+      totalXp: xpResult.data?.total_xp ?? 0,
       recentSessions: (sessionsResult.data ?? []).map((row) => ({
         id: row.id,
         completed_at: row.completed_at as string,
