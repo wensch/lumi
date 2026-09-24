@@ -51,3 +51,25 @@ ordem numérica**, um de cada vez.
   pessoais (profiles, streaks, devotional_sessions, xp_events,
   prayer_entries, lumi_state, notification_preferences, user_achievements) —
   cobre o requisito de "permitir exclusão dos registros do usuário".
+
+### Avisos esperados no Security Advisor
+
+`complete_devotional_session` e `complete_onboarding` disparam o aviso
+**"Signed-In Users Can Execute SECURITY DEFINER Function"** (lint 0029).
+Isso é esperado, não um bug: ambas as funções precisam de `SECURITY
+DEFINER` para escrever em `streaks`/`xp_events`/`notification_preferences`
+(que o usuário não pode alterar via RLS direto), mas validam `auth.uid()`
+internamente e só escrevem na linha do próprio usuário chamador — o padrão
+"endpoint público intencional" que a
+[própria documentação do lint](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable)
+descreve como seguro. Revogar `EXECUTE` quebraria onboarding e devocional.
+
+Mitigação aplicada (`migrations/00011_security_definer_hardening.sql`):
+validação explícita de entrada (faixa etária, nome, tamanho de reflexão)
+para que dados inválidos gerem erro claro da própria função em vez de
+estourar um constraint genérico do banco. O aviso do Security Advisor
+continua aparecendo mesmo assim — isso é esperado, já que o lint sinaliza
+a existência do `SECURITY DEFINER` em si, não uma vulnerabilidade
+detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
+clicar no finding) é a ação correta depois de revisar; não há mudança de
+código que faça o aviso desaparecer sem revogar o acesso.
