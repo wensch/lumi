@@ -84,7 +84,14 @@ export default function DevocionalScreen() {
           );
         })}
 
-        <Button label="Voltar para Hoje" onPress={() => router.replace('/(tabs)')} />
+        <Button
+          label="Transformar isso em oração"
+          variant="secondary"
+          onPress={() =>
+            router.push({ pathname: '/oracao', params: { devotional_session_id: session?.id } })
+          }
+        />
+        <Button label="Voltar para Hoje" variant="ghost" onPress={() => router.replace('/(tabs)')} />
       </ScreenContainer>
     );
   }
