@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useYVAuth } from '@youversion/platform-react-native-expo-core';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
 import { isValidEmail, translateAuthError, useAuth } from '@/features/auth';
@@ -136,103 +136,123 @@ export default function AuthScreen() {
 
   return (
     <ScreenContainer style={styles.container}>
-      <View style={styles.mascotWrapper}>
-        <LumiMascot mood="normal" size={120} />
-      </View>
-      <Text style={typography.title}>Bem-vindo ao Lumi</Text>
-      <Text style={[typography.body, styles.subtitle]}>
-        {mode === 'sign_in'
-          ? 'Entre para continuar sua constância.'
-          : 'Crie sua conta para começar.'}
-      </Text>
-
-      <Card style={styles.card}>
-        <TextField
-          label="Email"
-          placeholder="voce@exemplo.com"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        {method === 'password' ? (
-          <TextField
-            label="Senha"
-            placeholder="••••••••"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-        ) : null}
-
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        {magicLinkSent ? (
-          <Text style={styles.successText}>Link enviado! Confira seu email.</Text>
-        ) : null}
-        {needsEmailConfirmation ? (
-          <Text style={styles.successText}>
-            Conta criada! Confira seu email para confirmar antes de entrar.
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.mascotWrapper}>
+            <LumiMascot mood="normal" size={120} />
+          </View>
+          <Text style={typography.title}>Bem-vindo ao Lumi</Text>
+          <Text style={[typography.body, styles.subtitle]}>
+            {mode === 'sign_in'
+              ? 'Entre para continuar sua constância.'
+              : 'Crie sua conta para começar.'}
           </Text>
-        ) : null}
 
-        <Button
-          label={
-            method === 'magic_link'
-              ? 'Enviar link mágico'
-              : mode === 'sign_in'
-                ? 'Entrar'
-                : 'Criar conta'
-          }
-          onPress={handleSubmit}
-          disabled={submitting}
-        />
+          <Card style={styles.card}>
+            <TextField
+              label="Email"
+              placeholder="voce@exemplo.com"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
 
-        <Button
-          variant="ghost"
-          label={method === 'password' ? 'Entrar sem senha (magic link)' : 'Entrar com senha'}
-          onPress={() => {
-            setMethod(method === 'password' ? 'magic_link' : 'password');
-            setError(null);
-            setMagicLinkSent(false);
-          }}
-        />
-      </Card>
+            {method === 'password' ? (
+              <TextField
+                label="Senha"
+                placeholder="••••••••"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+            ) : null}
 
-      {method === 'password' ? (
-        <View style={styles.toggleRow}>
-          <Text style={typography.body}>
-            {mode === 'sign_in' ? 'Ainda não tem conta?' : 'Já tem conta?'}
-          </Text>
-          <Button
-            variant="ghost"
-            label={mode === 'sign_in' ? 'Criar conta' : 'Entrar'}
-            onPress={() => {
-              setMode(mode === 'sign_in' ? 'sign_up' : 'sign_in');
-              setError(null);
-            }}
-          />
-        </View>
-      ) : null}
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {magicLinkSent ? (
+              <Text style={styles.successText}>Link enviado! Confira seu email.</Text>
+            ) : null}
+            {needsEmailConfirmation ? (
+              <Text style={styles.successText}>
+                Conta criada! Confira seu email para confirmar antes de entrar.
+              </Text>
+            ) : null}
 
-      <Card style={styles.card}>
-        {youVersionError ? <Text style={styles.errorText}>{youVersionError}</Text> : null}
-        <Button
-          variant="ghost"
-          label="Entrar com YouVersion"
-          onPress={handleYouVersionSignIn}
-          disabled={submitting}
-        />
-        <Text style={[typography.caption, styles.subtitle]}>
-          Enviamos um link de confirmação para o email da sua conta YouVersion.
-        </Text>
-      </Card>
+            <Button
+              label={
+                method === 'magic_link'
+                  ? 'Enviar link mágico'
+                  : mode === 'sign_in'
+                    ? 'Entrar'
+                    : 'Criar conta'
+              }
+              onPress={handleSubmit}
+              disabled={submitting}
+            />
+
+            <Button
+              variant="ghost"
+              label={method === 'password' ? 'Entrar sem senha (magic link)' : 'Entrar com senha'}
+              onPress={() => {
+                setMethod(method === 'password' ? 'magic_link' : 'password');
+                setError(null);
+                setMagicLinkSent(false);
+              }}
+            />
+          </Card>
+
+          {method === 'password' ? (
+            <View style={styles.toggleRow}>
+              <Text style={typography.body}>
+                {mode === 'sign_in' ? 'Ainda não tem conta?' : 'Já tem conta?'}
+              </Text>
+              <Button
+                variant="ghost"
+                label={mode === 'sign_in' ? 'Criar conta' : 'Entrar'}
+                onPress={() => {
+                  setMode(mode === 'sign_in' ? 'sign_up' : 'sign_in');
+                  setError(null);
+                }}
+              />
+            </View>
+          ) : null}
+
+          <Card style={styles.card}>
+            {youVersionError ? <Text style={styles.errorText}>{youVersionError}</Text> : null}
+            <Button
+              variant="ghost"
+              label="Entrar com YouVersion"
+              onPress={handleYouVersionSignIn}
+              disabled={submitting}
+            />
+            <Text style={[typography.caption, styles.subtitle]}>
+              Enviamos um link de confirmação para o email da sua conta YouVersion.
+            </Text>
+          </Card>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    padding: 0,
+  },
+  flex: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
+    padding: spacing.lg,
+    gap: spacing.md,
   },
   mascotWrapper: {
     alignItems: 'center',
