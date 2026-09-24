@@ -6,7 +6,7 @@ import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
 export default function HojeScreen() {
-  const { currentStreak, totalXp, daysSinceLastCompleted, loading } = useHomeData();
+  const { currentStreak, longestStreak, totalXp, daysSinceLastCompleted, loading } = useHomeData();
 
   if (loading) {
     return (
@@ -25,6 +25,13 @@ export default function HojeScreen() {
         <StreakBadge days={currentStreak} />
         <XPBadge xp={totalXp} />
       </View>
+
+      {longestStreak > currentStreak ? (
+        <Text style={styles.recordHint}>
+          Seu recorde é de {longestStreak} {longestStreak === 1 ? 'dia' : 'dias'} — já rolou antes,
+          rola de novo.
+        </Text>
+      ) : null}
 
       <Card style={styles.heroCard}>
         <LumiMascot mood={greeting.mood} size={140} />
@@ -58,5 +65,12 @@ const styles = StyleSheet.create({
   subtitle: {
     color: colors.ink,
     textAlign: 'center',
+  },
+  recordHint: {
+    ...typography.caption,
+    color: colors.ink,
+    opacity: 0.7,
+    textAlign: 'center',
+    marginTop: spacing.sm,
   },
 });

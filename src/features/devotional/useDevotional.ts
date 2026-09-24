@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
+import { calculateDaysSince } from '@/lib/dates';
+import { selectDailyContent } from './selectDailyContent';
 
 type Content = Database['public']['Tables']['content']['Row'];
 type DevotionalSession = Database['public']['Tables']['devotional_sessions']['Row'];
@@ -9,9 +11,16 @@ type DevotionalSession = Database['public']['Tables']['devotional_sessions']['Ro
 type DevotionalState = {
   content: Content | null;
   session: DevotionalSession | null;
+  /**
+   * true se, ao abrir a tela, o usuário já tinha ficado 2+ dias sem
+   * completar um devocional — usado para diferenciar "retorno após
+   * quebra" de "dia normal" na tela de resultado (feedback do agente de
+   * teste diário, relatório de 24/09: comemorar mais o retorno).
+   */
+  isReturningFromBreak: boolean;
 };
 
-const EMPTY_STATE: DevotionalState = { content: null, session: null };
+const EMPTY_STATE: DevotionalState = { content: null, session: null, isReturningFromBreak: false };
 
 export function useDevotional() {
   const { session: authSession } = useAuth();
@@ -24,16 +33,18 @@ export function useDevotional() {
     setLoading(true);
     setError(null);
 
-    const { data: content } = await supabase
-      .from('content')
-      .select('*')
-      .not('published_at', 'is', null)
-      .order('published_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const [{ data: allContent }, { data: streak }] = await Promise.all([
+      supabase.from('content').select('*').not('published_at', 'is', null),
+      supabase.from('streaks').select('last_completed_date').eq('user_id', userId).single(),
+    ]);
+
+    const isReturningFromBreak =
+      (calculateDaysSince(streak?.last_completed_date ?? null) ?? 0) >= 2;
+
+    const content = selectDailyContent(allContent ?? []);
 
     if (!content) {
-      setState(EMPTY_STATE);
+      setState({ ...EMPTY_STATE, isReturningFromBreak });
       setLoading(false);
       return;
     }
@@ -54,7 +65,7 @@ export function useDevotional() {
       .maybeSingle();
 
     if (existingSession) {
-      setState({ content, session: existingSession });
+      setState({ content, session: existingSession, isReturningFromBreak });
       setLoading(false);
       return;
     }
@@ -67,12 +78,12 @@ export function useDevotional() {
 
     if (insertError || !newSession) {
       setError(insertError?.message ?? 'Não foi possível iniciar o devocional.');
-      setState({ content, session: null });
+      setState({ content, session: null, isReturningFromBreak });
       setLoading(false);
       return;
     }
 
-    setState({ content, session: newSession });
+    setState({ content, session: newSession, isReturningFromBreak });
     setLoading(false);
   }, []);
 
