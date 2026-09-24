@@ -40,6 +40,13 @@
           "color": "#4CAF72"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "11e4ddd8-20ca-46df-9066-0324f673f906"
+      }
+    },
+    "owner": "wenschs-team"
   }
 }
