@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { AUTH_REDIRECT_URL, useAuthDeepLink } from './useAuthDeepLink';
 
 type AuthContextValue = {
   session: Session | null;
@@ -19,6 +20,8 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useAuthDeepLink();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -42,7 +45,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error?.message ?? null };
       },
       signUpWithPassword: async (email, password) => {
-        const { data, error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: AUTH_REDIRECT_URL },
+        });
         // Quando a confirmação de email está ativa, signUp cria o usuário
         // mas não retorna sessão — sem isso, a tela mostrava sucesso como
         // se o login já tivesse funcionado, e o usuário ficava sem saber
@@ -51,7 +58,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error?.message ?? null, needsEmailConfirmation };
       },
       signInWithMagicLink: async (email) => {
-        const { error } = await supabase.auth.signInWithOtp({ email });
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: AUTH_REDIRECT_URL },
+        });
         return { error: error?.message ?? null };
       },
       signOut: async () => {
