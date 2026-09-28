@@ -4,7 +4,6 @@ import { router } from 'expo-router';
 import { Button, Card, Screen, Section, TextField } from '@/components';
 import { ACHIEVEMENT_LABELS } from '@/features/achievements';
 import { useDevotional } from '@/features/devotional';
-import { BibleReferenceCard } from '@/features/devotional/BibleReferenceCard';
 import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
@@ -102,11 +101,12 @@ export default function DevocionalScreen() {
     <Screen>
       <Text style={typography.title}>{content.title}</Text>
 
-      {content.passage_reference && content.youversion_version_id ? (
-        <BibleReferenceCard
-          reference={content.passage_reference}
-          versionId={content.youversion_version_id}
-        />
+      {content.passage_reference ? (
+        <Section label="Versículo">
+          <Text style={[typography.heading, styles.verseReference]}>
+            {content.passage_reference}
+          </Text>
+        </Section>
       ) : null}
 
       <Section label="Texto explicativo">
@@ -163,6 +163,9 @@ const styles = StyleSheet.create({
   subtitle: {
     color: colors.ink,
     textAlign: 'center',
+  },
+  verseReference: {
+    color: colors.greenDark,
   },
   prayerText: {
     fontStyle: 'italic',
