@@ -1,11 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { Button, Card, Screen, Section } from '@/components';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Button, Card, Screen, ScreenHeader, Section } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useProfileHistory } from '@/features/profile';
 import { ShareStreakButton } from '@/features/share';
-import { colors, spacing, typography } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 export default function PerfilScreen() {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const { session, signOut } = useAuth();
   const {
     currentStreak,
@@ -18,32 +20,30 @@ export default function PerfilScreen() {
 
   return (
     <Screen>
-      <Text style={typography.title}>Perfil</Text>
+      <ScreenHeader title="Perfil" />
 
-      <Card style={styles.streaksRow}>
-        <View style={styles.streakStat}>
-          <Text style={typography.title}>{currentStreak}</Text>
+      <View style={styles.streaksRow}>
+        <Card style={[styles.streakCard, styles.streakCardHighlight]}>
+          <Text style={theme.typography.display}>{currentStreak}</Text>
           <Text style={styles.streakLabel}>sequência atual</Text>
-        </View>
-        <View style={styles.streakDivider} />
-        <View style={styles.streakStat}>
-          <Text style={typography.title}>{longestStreak}</Text>
+        </Card>
+        <Card style={styles.streakCard}>
+          <Text style={theme.typography.display}>{longestStreak}</Text>
           <Text style={styles.streakLabel}>maior sequência</Text>
-        </View>
-      </Card>
+        </Card>
+      </View>
 
       {currentStreak > 0 ? <ShareStreakButton streak={currentStreak} totalXp={totalXp} /> : null}
 
-      <Section label="Conquistas">
+      <Section label="Conquistas" pillLabel>
         <View style={styles.achievementsGrid}>
           {allAchievements.map((achievement) => {
             const unlocked = unlockedAchievementIds.has(achievement.id);
             return (
-              <View
-                key={achievement.id}
-                style={[styles.achievementItem, !unlocked && styles.achievementLocked]}
-              >
-                <Text style={styles.achievementIcon}>{unlocked ? achievement.icon : '🔒'}</Text>
+              <View key={achievement.id} style={styles.achievementItem}>
+                <View style={[styles.achievementCircle, !unlocked && styles.achievementLocked]}>
+                  <Text style={styles.achievementIcon}>{unlocked ? achievement.icon : '🔒'}</Text>
+                </View>
                 <Text style={styles.achievementLabel}>{achievement.title}</Text>
               </View>
             );
@@ -51,15 +51,17 @@ export default function PerfilScreen() {
         </View>
       </Section>
 
-      <Section label="Histórico recente">
+      <Section label="Histórico recente" pillLabel>
         {recentSessions.length === 0 ? (
-          <Text style={typography.body}>Seus devocionais concluídos aparecem aqui.</Text>
+          <Text style={theme.typography.body}>Seus devocionais concluídos aparecem aqui.</Text>
         ) : (
           <View style={styles.historyList}>
             {recentSessions.map((entry) => (
               <View key={entry.id} style={styles.historyRow}>
-                <Text style={typography.body}>{entry.content_title ?? 'Devocional'}</Text>
-                <Text style={typography.caption}>
+                <Text style={theme.typography.bodyStrong}>
+                  {entry.content_title ?? 'Devocional'}
+                </Text>
+                <Text style={styles.historyDate}>
                   {new Date(entry.completed_at).toLocaleDateString('pt-BR')}
                 </Text>
               </View>
@@ -68,64 +70,119 @@ export default function PerfilScreen() {
         )}
       </Section>
 
+      <Section label="Aparência">
+        <View style={styles.paletteRow}>
+          {theme.availablePalettes.map((palette) => {
+            const isSelected = palette.name === theme.palette.name;
+            return (
+              <Pressable
+                key={palette.name}
+                onPress={() => theme.setPaletteName(palette.name)}
+                style={[
+                  styles.paletteChip,
+                  { backgroundColor: isSelected ? palette.green : theme.colors.white },
+                ]}
+              >
+                <Text style={styles.paletteLabel}>{palette.label}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </Section>
+
       <Card style={styles.accountCard}>
-        <Text style={typography.caption}>Conectado como {session?.user.email}</Text>
+        <Text style={styles.accountEmail}>Conectado como {session?.user.email}</Text>
         <Button variant="tertiary" label="Sair" onPress={signOut} />
       </Card>
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  streaksRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  streakStat: {
-    flex: 1,
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  streakDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#EDEBE3',
-  },
-  streakLabel: {
-    ...typography.caption,
-    color: colors.ink,
-    opacity: 0.7,
-  },
-  achievementsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-  },
-  achievementItem: {
-    alignItems: 'center',
-    gap: spacing.xs,
-    width: 84,
-  },
-  achievementLocked: {
-    opacity: 0.4,
-  },
-  achievementIcon: {
-    fontSize: 28,
-  },
-  achievementLabel: {
-    ...typography.caption,
-    textAlign: 'center',
-  },
-  historyList: {
-    gap: spacing.sm,
-  },
-  historyRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  accountCard: {
-    gap: spacing.sm,
-    alignItems: 'flex-start',
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    streaksRow: {
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    streakCard: {
+      flex: 1,
+      alignItems: 'flex-start',
+    },
+    streakCardHighlight: {
+      backgroundColor: theme.colors.yellow,
+    },
+    streakLabel: {
+      ...theme.typography.bodyStrong,
+      color: theme.colors.ink,
+    },
+    achievementsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: theme.spacing.md,
+    },
+    achievementItem: {
+      alignItems: 'center',
+      gap: theme.spacing.xs,
+      width: 84,
+    },
+    achievementCircle: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: theme.colors.yellow,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    achievementLocked: {
+      backgroundColor: 'transparent',
+      borderStyle: 'dashed',
+      borderColor: theme.colors.muted,
+    },
+    achievementIcon: {
+      fontSize: 28,
+    },
+    achievementLabel: {
+      ...theme.typography.caption,
+      textAlign: 'center',
+    },
+    historyList: {
+      gap: theme.spacing.sm,
+    },
+    historyRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'baseline',
+      gap: theme.spacing.sm,
+    },
+    historyDate: {
+      ...theme.typography.caption,
+      color: theme.colors.muted,
+    },
+    paletteRow: {
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    paletteChip: {
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: theme.spacing.sm,
+      borderRadius: theme.radius.pill,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+    },
+    paletteLabel: {
+      ...theme.typography.button,
+      fontSize: 14,
+      color: theme.colors.ink,
+    },
+    accountCard: {
+      gap: theme.spacing.sm,
+      alignItems: 'flex-start',
+    },
+    accountEmail: {
+      ...theme.typography.caption,
+      color: theme.colors.muted,
+    },
+  });

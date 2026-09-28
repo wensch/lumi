@@ -4,16 +4,27 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { YouVersionProvider } from '@youversion/platform-react-native-expo-ui';
+import { useFonts } from 'expo-font';
 import {
-  useFonts,
   Nunito_400Regular,
   Nunito_600SemiBold,
   Nunito_700Bold,
   Nunito_800ExtraBold,
 } from '@expo-google-fonts/nunito';
+import {
+  BricolageGrotesque_500Medium,
+  BricolageGrotesque_700Bold,
+  BricolageGrotesque_800ExtraBold,
+} from '@expo-google-fonts/bricolage-grotesque';
+import {
+  Baloo2_600SemiBold,
+  Baloo2_700Bold,
+  Baloo2_800ExtraBold,
+} from '@expo-google-fonts/baloo-2';
 import { AuthProvider, useAuth } from '@/features/auth';
 import { useProfile } from '@/features/onboarding';
 import { configureNotificationHandler, useNotificationScheduler } from '@/features/notifications';
+import { ThemeProvider } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 configureNotificationHandler();
@@ -33,6 +44,12 @@ export default function RootLayout() {
     Nunito_600SemiBold,
     Nunito_700Bold,
     Nunito_800ExtraBold,
+    BricolageGrotesque_500Medium,
+    BricolageGrotesque_700Bold,
+    BricolageGrotesque_800ExtraBold,
+    Baloo2_600SemiBold,
+    Baloo2_700Bold,
+    Baloo2_800ExtraBold,
   });
 
   useEffect(() => {
@@ -47,12 +64,14 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <YouVersionProvider appKey={youVersionAppKey} theme="system" auth={youVersionAuthConfig}>
-        <AuthProvider>
-          <StatusBar style="dark" />
-          <RootNavigation />
-        </AuthProvider>
-      </YouVersionProvider>
+      <ThemeProvider>
+        <YouVersionProvider appKey={youVersionAppKey} theme="system" auth={youVersionAuthConfig}>
+          <AuthProvider>
+            <StatusBar style="dark" />
+            <RootNavigation />
+          </AuthProvider>
+        </YouVersionProvider>
+      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }

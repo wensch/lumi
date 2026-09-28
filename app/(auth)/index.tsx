@@ -5,12 +5,14 @@ import { useYVAuth } from '@youversion/platform-react-native-expo-core';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
 import { isValidEmail, translateAuthError, useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
-import { colors, spacing, typography } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 type Mode = 'sign_in' | 'sign_up';
 type Method = 'password' | 'magic_link';
 
 export default function AuthScreen() {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const { signInWithPassword, signUpWithPassword, signInWithMagicLink } = useAuth();
   const {
     signIn: signInWithYouVersion,
@@ -149,8 +151,8 @@ export default function AuthScreen() {
           <View style={styles.mascotWrapper}>
             <LumiMascot mood="normal" size={120} />
           </View>
-          <Text style={typography.title}>Bem-vindo ao Lumi</Text>
-          <Text style={[typography.body, styles.subtitle]}>
+          <Text style={theme.typography.title}>Bem-vindo ao Lumi</Text>
+          <Text style={[theme.typography.body, styles.subtitle]}>
             {mode === 'sign_in'
               ? 'Entre para continuar sua constância.'
               : 'Crie sua conta para começar.'}
@@ -218,7 +220,7 @@ export default function AuthScreen() {
 
           {method === 'password' ? (
             <View style={styles.toggleRow}>
-              <Text style={typography.body}>
+              <Text style={theme.typography.body}>
                 {mode === 'sign_in' ? 'Ainda não tem conta?' : 'Já tem conta?'}
               </Text>
               <Button
@@ -240,7 +242,7 @@ export default function AuthScreen() {
               onPress={handleYouVersionSignIn}
               disabled={submitting}
             />
-            <Text style={[typography.caption, styles.subtitle]}>
+            <Text style={[theme.typography.caption, styles.subtitle]}>
               Enviamos um link de confirmação para o email da sua conta YouVersion.
             </Text>
           </Card>
@@ -250,42 +252,43 @@ export default function AuthScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 0,
-  },
-  flex: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: spacing.lg,
-    gap: spacing.md,
-  },
-  mascotWrapper: {
-    alignItems: 'center',
-  },
-  subtitle: {
-    color: colors.ink,
-    textAlign: 'center',
-  },
-  card: {
-    gap: spacing.md,
-    marginTop: spacing.lg,
-  },
-  errorText: {
-    ...typography.caption,
-    color: '#E05252',
-  },
-  successText: {
-    ...typography.caption,
-    color: colors.greenDark,
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      padding: 0,
+    },
+    flex: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      padding: 22,
+      gap: theme.spacing.md,
+    },
+    mascotWrapper: {
+      alignItems: 'center',
+    },
+    subtitle: {
+      color: theme.colors.muted,
+      textAlign: 'center',
+    },
+    card: {
+      gap: theme.spacing.md,
+      marginTop: theme.spacing.lg,
+    },
+    errorText: {
+      ...theme.typography.caption,
+      color: '#E05252',
+    },
+    successText: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
+    },
+    toggleRow: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: theme.spacing.xs,
+    },
+  });

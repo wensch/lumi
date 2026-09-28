@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, View, type ScrollViewProps, type ViewProps } from 'react-native';
 import { ScreenContainer } from './ScreenContainer';
-import { spacing } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 type ScreenProps = ViewProps & {
   /** Envolve o conteúdo em ScrollView quando a tela pode exceder a viewport (padrão: true). */
@@ -25,13 +25,13 @@ export function Screen({
   children,
   ...rest
 }: ScreenProps) {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
   if (!scroll) {
     return (
       <ScreenContainer>
-        <View
-          style={[styles.content, centered && styles.centered, style]}
-          {...rest}
-        >
+        <View style={[styles.content, centered && styles.centered, style]} {...rest}>
           {children}
         </View>
       </ScreenContainer>
@@ -57,21 +57,22 @@ export function Screen({
   );
 }
 
-const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: spacing.lg,
-    gap: spacing.md,
-  },
-  scrollContent: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xxl,
-    flexGrow: 1,
-  },
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'stretch',
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    scrollView: {
+      flex: 1,
+    },
+    content: {
+      paddingHorizontal: 22,
+      gap: theme.spacing.md,
+    },
+    scrollContent: {
+      paddingTop: theme.spacing.lg,
+      paddingBottom: 130,
+      flexGrow: 1,
+    },
+    centered: {
+      justifyContent: 'center',
+      alignItems: 'stretch',
+    },
+  });

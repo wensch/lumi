@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 import { Button } from '@/components';
-import { colors, spacing, typography } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 import { useShareStreak } from './useShareStreak';
 import { OffscreenShareCard } from './OffscreenShareCard';
 
@@ -11,6 +11,8 @@ type ShareStreakButtonProps = {
 
 /** Botão "Compartilhar" estilo Duolingo: gera um card do streak e abre o menu nativo de compartilhamento. */
 export function ShareStreakButton({ streak, totalXp }: ShareStreakButtonProps) {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const { cardRef, share, sharing, error } = useShareStreak();
 
   return (
@@ -28,11 +30,12 @@ export function ShareStreakButton({ streak, totalXp }: ShareStreakButtonProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  error: {
-    ...typography.caption,
-    color: colors.ink,
-    textAlign: 'center',
-    marginTop: spacing.xs,
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    error: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
+      textAlign: 'center',
+      marginTop: theme.spacing.xs,
+    },
+  });

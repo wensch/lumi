@@ -1,5 +1,7 @@
-import { Image, type ImageSourcePropType } from 'react-native';
+import { SvgXml } from 'react-native-svg';
 import type { LumiMood } from '@/lib/supabase';
+import { lumiHappySvg } from './svgs/lumiHappySvg';
+import { lumiSadSvg } from './svgs/lumiSadSvg';
 
 export type LumiMoodVariant = 'normal' | 'happy' | 'celebrating' | 'waiting' | 'missing_you';
 
@@ -35,27 +37,25 @@ type LumiMascotProps = {
 };
 
 /**
- * Arte oficial do Lumi (ilustrado, fundo transparente, 512x512 fonte).
- * Mapeamento aproximado — a arte ainda não cobre 1:1 as 5 variantes do
- * MVP: "normal", "celebrating" e "waiting" reaproveitam a imagem feliz
- * (a mais acolhedora disponível; a alternativa "sassy" tem expressão
- * emburrada demais para telas neutras como auth/onboarding), até
- * termos ilustrações dedicadas para esses estados.
+ * Redesign "Recorte": só 2 ilustrações (feliz/triste) cobrindo as 5
+ * variantes do MVP — normal, celebrating e waiting reaproveitam a
+ * expressão feliz (a mais neutra/acolhedora disponível), missing_you usa
+ * a triste, até termos ilustrações dedicadas por estado.
  */
-const IMAGE_BY_VARIANT: Record<LumiMoodVariant, ImageSourcePropType> = {
-  normal: require('../../../assets/lumi/lumi-happy.png'),
-  happy: require('../../../assets/lumi/lumi-happy.png'),
-  celebrating: require('../../../assets/lumi/lumi-happy.png'),
-  waiting: require('../../../assets/lumi/lumi-happy.png'),
-  missing_you: require('../../../assets/lumi/lumi-sad.png'),
+const SVG_BY_VARIANT: Record<LumiMoodVariant, string> = {
+  normal: lumiHappySvg,
+  happy: lumiHappySvg,
+  celebrating: lumiHappySvg,
+  waiting: lumiHappySvg,
+  missing_you: lumiSadSvg,
 };
 
 export function LumiMascot({ mood = 'normal', size = 160 }: LumiMascotProps) {
   return (
-    <Image
-      source={IMAGE_BY_VARIANT[mood]}
-      style={{ width: size, height: size }}
-      resizeMode="contain"
+    <SvgXml
+      xml={SVG_BY_VARIANT[mood]}
+      width={size}
+      height={size}
       accessibilityLabel={`Lumi — estado ${mood}`}
     />
   );

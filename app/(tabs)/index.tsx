@@ -1,18 +1,23 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, Screen, StreakBadge, XPBadge } from '@/components';
-import { lumiGreeting, useHomeData } from '@/features/home';
+import { lumiGreeting, useHomeData, type WeekDay } from '@/features/home';
 import { LumiMascot } from '@/features/lumi';
 import { ShareStreakButton } from '@/features/share';
-import { colors, spacing, typography } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
+
+const WEEKDAY_LETTERS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
 export default function HojeScreen() {
-  const { currentStreak, longestStreak, totalXp, daysSinceLastCompleted, loading } = useHomeData();
+  const theme = useTheme();
+  const styles = getStyles(theme);
+  const { currentStreak, longestStreak, totalXp, daysSinceLastCompleted, week, loading } =
+    useHomeData();
 
   if (loading) {
     return (
       <Screen centered>
-        <Text style={typography.body}>Carregando…</Text>
+        <Text style={theme.typography.body}>Carregando…</Text>
       </Screen>
     );
   }
@@ -27,11 +32,41 @@ export default function HojeScreen() {
         <XPBadge xp={totalXp} />
       </View>
 
-      <Card style={styles.heroCard}>
-        <LumiMascot mood={greeting.mood} size={168} />
-        <Text style={[typography.heading, styles.heroTitle]}>{greeting.title}</Text>
-        <Text style={[typography.body, styles.heroSubtitle]}>{greeting.subtitle}</Text>
-      </Card>
+      <View style={styles.weekRow}>
+        {week.map((day, index) => (
+          <WeekDayCircle key={day.date} day={day} letter={WEEKDAY_LETTERS[index]} theme={theme} />
+        ))}
+      </View>
+
+      <View style={styles.mascotArea}>
+        <View style={styles.mascotBackdrop} />
+        <LumiMascot mood={greeting.mood} size={290} />
+      </View>
+
+      {completedToday ? (
+        <>
+          <Card style={styles.messageCard}>
+            <Text style={[theme.typography.heading, styles.centeredText]}>Você já veio hoje!</Text>
+            <Text style={[theme.typography.body, styles.messageSubtitle]}>
+              Quer registrar mais alguma coisa ou só voltar amanhã. Sem pressa.
+            </Text>
+          </Card>
+          <Button
+            label="Fazer mais um devocional"
+            variant="ghost"
+            onPress={() => router.push('/devocional')}
+          />
+          {currentStreak > 0 ? <ShareStreakButton streak={currentStreak} totalXp={totalXp} /> : null}
+        </>
+      ) : (
+        <>
+          <Card style={styles.messageCard}>
+            <Text style={styles.devotionalKicker}>Devocional de hoje</Text>
+            <Text style={theme.typography.heading}>{greeting.title}</Text>
+          </Card>
+          <Button label="Começar meu devocional" onPress={() => router.push('/devocional')} />
+        </>
+      )}
 
       {longestStreak > currentStreak ? (
         <Text style={styles.recordHint}>
@@ -39,41 +74,101 @@ export default function HojeScreen() {
           rola de novo.
         </Text>
       ) : null}
-
-      <Button
-        label={completedToday ? 'Fazer mais um devocional' : 'Começar meu devocional'}
-        variant={completedToday ? 'ghost' : 'primary'}
-        onPress={() => router.push('/devocional')}
-      />
-
-      {currentStreak > 0 ? <ShareStreakButton streak={currentStreak} totalXp={totalXp} /> : null}
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  heroCard: {
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingVertical: spacing.xl,
-  },
-  heroTitle: {
-    textAlign: 'center',
-  },
-  heroSubtitle: {
-    color: colors.ink,
-    textAlign: 'center',
-    opacity: 0.8,
-  },
-  recordHint: {
-    ...typography.caption,
-    color: colors.ink,
-    opacity: 0.6,
-    textAlign: 'center',
-  },
-});
+function WeekDayCircle({ day, letter, theme }: { day: WeekDay; letter: string; theme: Theme }) {
+  const styles = getStyles(theme);
+  return (
+    <View style={styles.weekDay}>
+      <View
+        style={[
+          styles.weekDayCircle,
+          day.completed && styles.weekDayCircleCompleted,
+          day.isToday && !day.completed && styles.weekDayCircleToday,
+        ]}
+      >
+        {day.completed ? <Text style={styles.weekDayCheck}>✓</Text> : null}
+      </View>
+      <Text style={styles.weekDayLabel}>{letter}</Text>
+    </View>
+  );
+}
+
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    weekRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 6,
+    },
+    weekDay: {
+      flex: 1,
+      alignItems: 'center',
+      gap: 5,
+    },
+    weekDayCircle: {
+      width: '100%',
+      aspectRatio: 1,
+      borderRadius: 999,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      backgroundColor: theme.colors.white,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    weekDayCircleCompleted: {
+      backgroundColor: theme.colors.green,
+    },
+    weekDayCircleToday: {
+      backgroundColor: theme.colors.yellow,
+    },
+    weekDayCheck: {
+      fontSize: 15,
+      color: theme.colors.ink,
+    },
+    weekDayLabel: {
+      ...theme.typography.caption,
+      color: theme.colors.muted,
+    },
+    mascotArea: {
+      height: 270,
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+    },
+    mascotBackdrop: {
+      position: 'absolute',
+      bottom: 6,
+      width: 250,
+      height: 250,
+      borderRadius: 999,
+      backgroundColor: theme.colors.yellow,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+    },
+    messageCard: {
+      gap: 6,
+    },
+    centeredText: {
+      textAlign: 'center',
+    },
+    messageSubtitle: {
+      color: theme.colors.ink,
+      textAlign: 'center',
+    },
+    devotionalKicker: {
+      ...theme.typography.bodyStrong,
+      color: theme.colors.muted,
+    },
+    recordHint: {
+      ...theme.typography.caption,
+      color: theme.colors.muted,
+      textAlign: 'center',
+    },
+  });

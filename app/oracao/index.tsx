@@ -4,11 +4,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Button, Card, Screen, TextField } from '@/components';
 import { LumiMascot } from '@/features/lumi';
 import { usePrayer } from '@/features/prayer';
-import { colors, spacing, typography } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 type Mode = 'choice' | 'manual' | 'ai' | 'done';
 
 export default function OracaoScreen() {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const { devotional_session_id } = useLocalSearchParams<{ devotional_session_id?: string }>();
   const { saveManual, generateWithAI, saving, generating, error } = usePrayer();
 
@@ -34,13 +36,13 @@ export default function OracaoScreen() {
     return (
       <Screen centered contentContainerStyle={styles.centeredContent}>
         <LumiMascot mood="happy" size={160} />
-        <Text style={[typography.heading, styles.centeredText]}>Oração registrada</Text>
+        <Text style={[theme.typography.heading, styles.centeredText]}>Oração registrada</Text>
         {generatedPrayer ? (
           <Card style={styles.prayerCard}>
-            <Text style={[typography.body, styles.prayerText]}>{generatedPrayer}</Text>
+            <Text style={[theme.typography.body, styles.prayerText]}>{generatedPrayer}</Text>
           </Card>
         ) : (
-          <Text style={[typography.body, styles.subtitle]}>
+          <Text style={[theme.typography.body, styles.subtitle]}>
             Fica guardada com você — nunca compartilhamos suas orações.
           </Text>
         )}
@@ -52,8 +54,8 @@ export default function OracaoScreen() {
   if (mode === 'manual') {
     return (
       <Screen>
-        <Text style={typography.title}>Sua oração</Text>
-        <Text style={[typography.body, styles.subtitle]}>
+        <Text style={theme.typography.title}>Sua oração</Text>
+        <Text style={[theme.typography.body, styles.subtitle]}>
           Escreva do seu jeito. Isso fica só entre você e o Lumi.
         </Text>
         <Card style={styles.formCard}>
@@ -79,8 +81,8 @@ export default function OracaoScreen() {
   if (mode === 'ai') {
     return (
       <Screen>
-        <Text style={typography.title}>Transformar em oração</Text>
-        <Text style={[typography.body, styles.subtitle]}>
+        <Text style={theme.typography.title}>Transformar em oração</Text>
+        <Text style={[theme.typography.body, styles.subtitle]}>
           Conta pra gente o que está pensando ou sentindo — o Lumi ajuda a transformar isso em
           oração, com base no devocional de hoje.
         </Text>
@@ -107,8 +109,8 @@ export default function OracaoScreen() {
   return (
     <Screen centered contentContainerStyle={styles.centeredContent}>
       <LumiMascot mood="waiting" size={160} />
-      <Text style={[typography.heading, styles.centeredText]}>Quer orar agora?</Text>
-      <Text style={[typography.body, styles.subtitle]}>Escolha como prefere fazer isso.</Text>
+      <Text style={[theme.typography.heading, styles.centeredText]}>Quer orar agora?</Text>
+      <Text style={[theme.typography.body, styles.subtitle]}>Escolha como prefere fazer isso.</Text>
 
       <Button label="Escrever minha oração" onPress={() => setMode('manual')} />
       <Button label="Pedir ajuda ao Lumi" variant="secondary" onPress={() => setMode('ai')} />
@@ -117,29 +119,30 @@ export default function OracaoScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  centeredContent: {
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  centeredText: {
-    textAlign: 'center',
-  },
-  subtitle: {
-    color: colors.ink,
-    textAlign: 'center',
-  },
-  formCard: {
-    gap: spacing.sm,
-  },
-  prayerCard: {
-    width: '100%',
-  },
-  prayerText: {
-    fontStyle: 'italic',
-  },
-  errorText: {
-    ...typography.caption,
-    color: '#E05252',
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    centeredContent: {
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+    },
+    centeredText: {
+      textAlign: 'center',
+    },
+    subtitle: {
+      color: theme.colors.muted,
+      textAlign: 'center',
+    },
+    formCard: {
+      gap: theme.spacing.sm,
+    },
+    prayerCard: {
+      width: '100%',
+    },
+    prayerText: {
+      fontStyle: 'italic',
+    },
+    errorText: {
+      ...theme.typography.caption,
+      color: '#E05252',
+    },
+  });

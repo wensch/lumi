@@ -1,5 +1,5 @@
 import { StyleSheet, View, type ViewProps } from 'react-native';
-import { colors, radius, spacing } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 type CardProps = ViewProps & {
   /** 'default' para blocos de conteúdo, 'compact' para elementos menores (linha de lista, badge). */
@@ -7,22 +7,23 @@ type CardProps = ViewProps & {
 };
 
 export function Card({ style, padding = 'default', ...rest }: CardProps) {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   return <View style={[styles.card, padding === 'compact' && styles.compact, style]} {...rest} />;
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    shadowColor: colors.ink,
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
-  },
-  compact: {
-    padding: spacing.md,
-    borderRadius: radius.md,
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: theme.colors.white,
+      borderRadius: theme.radius.lg,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      padding: theme.spacing.lg,
+      ...theme.shadow.card,
+    },
+    compact: {
+      padding: theme.spacing.md,
+      borderRadius: theme.radius.md,
+    },
+  });

@@ -8,7 +8,7 @@ import { useProfile } from '@/features/onboarding';
 import { requestNotificationPermission, scheduleDailyReminder } from '@/features/notifications';
 import { supabase } from '@/lib/supabase';
 import type { AgeRange } from '@/lib/supabase';
-import { colors, radius, spacing, typography } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 const AGE_RANGES: { value: AgeRange; label: string }[] = [
   { value: 'kid', label: 'Criança' },
@@ -21,6 +21,8 @@ const STEPS = ['name', 'age', 'time'] as const;
 type Step = (typeof STEPS)[number];
 
 export default function OnboardingScreen() {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const { session } = useAuth();
   const { refetch } = useProfile();
 
@@ -102,7 +104,7 @@ export default function OnboardingScreen() {
       <Card style={styles.card}>
         {step === 'name' ? (
           <>
-            <Text style={typography.heading}>Como podemos te chamar?</Text>
+            <Text style={theme.typography.heading}>Como podemos te chamar?</Text>
             <TextField
               label="Nome"
               placeholder="Seu nome"
@@ -115,7 +117,7 @@ export default function OnboardingScreen() {
 
         {step === 'age' ? (
           <>
-            <Text style={typography.heading}>Qual sua faixa etária?</Text>
+            <Text style={theme.typography.heading}>Qual sua faixa etária?</Text>
             <Text style={styles.helperText}>Isso nos ajuda a personalizar sua experiência.</Text>
             <View style={styles.optionsGrid}>
               {AGE_RANGES.map((option) => (
@@ -132,7 +134,7 @@ export default function OnboardingScreen() {
 
         {step === 'time' ? (
           <>
-            <Text style={typography.heading}>Que horas você quer ser lembrado?</Text>
+            <Text style={theme.typography.heading}>Que horas você quer ser lembrado?</Text>
             <Text style={styles.helperText}>Pode ajustar isso depois no seu perfil.</Text>
             {Platform.OS === 'android' && !showPicker ? (
               <Button
@@ -175,38 +177,40 @@ export default function OnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: {
-    alignItems: 'stretch',
-  },
-  progress: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: radius.pill,
-    backgroundColor: '#EDEBE3',
-  },
-  progressDotActive: {
-    backgroundColor: colors.greenPrimary,
-  },
-  card: {
-    gap: spacing.md,
-  },
-  helperText: {
-    ...typography.body,
-    color: colors.ink,
-    opacity: 0.7,
-  },
-  optionsGrid: {
-    gap: spacing.sm,
-  },
-  errorText: {
-    ...typography.caption,
-    color: '#E05252',
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    content: {
+      alignItems: 'stretch',
+    },
+    progress: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: theme.spacing.sm,
+      marginBottom: theme.spacing.lg,
+    },
+    progressDot: {
+      width: 8,
+      height: 8,
+      borderRadius: theme.radius.pill,
+      borderWidth: 2,
+      borderColor: theme.colors.ink,
+      backgroundColor: theme.colors.white,
+    },
+    progressDotActive: {
+      backgroundColor: theme.colors.green,
+    },
+    card: {
+      gap: theme.spacing.md,
+    },
+    helperText: {
+      ...theme.typography.body,
+      color: theme.colors.muted,
+    },
+    optionsGrid: {
+      gap: theme.spacing.sm,
+    },
+    errorText: {
+      ...theme.typography.caption,
+      color: '#E05252',
+    },
+  });

@@ -4,9 +4,11 @@ import { router } from 'expo-router';
 import { Button, Card, Screen, TextField } from '@/components';
 import { isValidEmail, useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
-import { colors, spacing, typography } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 export default function EsqueciSenhaScreen() {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const { sendPasswordReset } = useAuth();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -41,8 +43,8 @@ export default function EsqueciSenhaScreen() {
   return (
     <Screen centered contentContainerStyle={styles.content}>
       <LumiMascot mood="waiting" size={120} />
-      <Text style={[typography.title, styles.title]}>Esqueceu sua senha?</Text>
-      <Text style={[typography.body, styles.subtitle]}>
+      <Text style={[theme.typography.title, styles.title]}>Esqueceu sua senha?</Text>
+      <Text style={[theme.typography.body, styles.subtitle]}>
         Informa seu email que a gente manda um link pra você criar uma nova.
       </Text>
 
@@ -70,27 +72,28 @@ export default function EsqueciSenhaScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: {
-    alignItems: 'center',
-  },
-  title: {
-    textAlign: 'center',
-  },
-  subtitle: {
-    color: colors.ink,
-    textAlign: 'center',
-  },
-  card: {
-    width: '100%',
-    gap: spacing.md,
-  },
-  errorText: {
-    ...typography.caption,
-    color: '#E05252',
-  },
-  successText: {
-    ...typography.caption,
-    color: colors.greenDark,
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    content: {
+      alignItems: 'center',
+    },
+    title: {
+      textAlign: 'center',
+    },
+    subtitle: {
+      color: theme.colors.muted,
+      textAlign: 'center',
+    },
+    card: {
+      width: '100%',
+      gap: theme.spacing.md,
+    },
+    errorText: {
+      ...theme.typography.caption,
+      color: '#E05252',
+    },
+    successText: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
+    },
+  });

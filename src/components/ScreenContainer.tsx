@@ -1,5 +1,5 @@
 import { SafeAreaView, StyleSheet, type ViewProps } from 'react-native';
-import { semanticColors } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 /**
  * Casca da tela: só fundo + safe area. Não define padding nem gap —
@@ -9,12 +9,15 @@ import { semanticColors } from '@/theme';
  * o padrão recomendado de espaçamento vertical entre blocos.
  */
 export function ScreenContainer({ style, ...rest }: ViewProps) {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   return <SafeAreaView style={[styles.container, style]} {...rest} />;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: semanticColors.background,
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.bg,
+    },
+  });

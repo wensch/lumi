@@ -1,6 +1,6 @@
 import { Text } from 'react-native';
 import { Screen } from '@/components';
-import { typography } from '@/theme';
+import { useTheme } from '@/theme';
 
 /**
  * Alvo do deep link de confirmação/magic link do Supabase
@@ -10,6 +10,7 @@ import { typography } from '@/theme';
  * RootNavigation redireciona assim que a sessão é detectada.
  */
 export default function AuthCallbackScreen() {
+  const { typography } = useTheme();
   return (
     <Screen scroll={false} centered>
       <Text style={typography.body}>Entrando…</Text>

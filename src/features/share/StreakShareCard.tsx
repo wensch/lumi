@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LumiMascot } from '@/features/lumi';
-import { colors, radius, spacing, typography } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 type StreakShareCardProps = {
   streak: number;
@@ -18,6 +18,9 @@ export const StreakShareCard = forwardRef<View, StreakShareCardProps>(function S
   { streak, totalXp },
   ref,
 ) {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
   return (
     <View ref={ref} style={styles.card} collapsable={false}>
       <View style={styles.badge}>
@@ -41,56 +44,59 @@ export const StreakShareCard = forwardRef<View, StreakShareCardProps>(function S
 const CARD_WIDTH = 1080;
 const CARD_HEIGHT = 1920;
 
-const styles = StyleSheet.create({
-  card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    backgroundColor: colors.greenPrimary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xl,
-    paddingHorizontal: spacing.xxl,
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.white,
-    borderRadius: radius.pill,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
-  },
-  badgeIcon: {
-    fontSize: 48,
-  },
-  streakValue: {
-    ...typography.title,
-    fontSize: 56,
-    color: colors.ink,
-  },
-  streakLabel: {
-    ...typography.heading,
-    color: colors.ink,
-  },
-  title: {
-    ...typography.title,
-    fontSize: 48,
-    color: colors.white,
-    textAlign: 'center',
-  },
-  subtitle: {
-    ...typography.heading,
-    color: colors.white,
-    textAlign: 'center',
-    opacity: 0.9,
-  },
-  footer: {
-    position: 'absolute',
-    bottom: spacing.xxl,
-  },
-  footerText: {
-    ...typography.bodyStrong,
-    color: colors.white,
-    opacity: 0.85,
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    card: {
+      width: CARD_WIDTH,
+      height: CARD_HEIGHT,
+      backgroundColor: theme.colors.green,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: theme.spacing.xl,
+      paddingHorizontal: theme.spacing.xxl,
+    },
+    badge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+      backgroundColor: theme.colors.white,
+      borderWidth: 4,
+      borderColor: theme.colors.ink,
+      borderRadius: theme.radius.pill,
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.xl,
+    },
+    badgeIcon: {
+      fontSize: 48,
+    },
+    streakValue: {
+      ...theme.typography.title,
+      fontSize: 56,
+      color: theme.colors.ink,
+    },
+    streakLabel: {
+      ...theme.typography.heading,
+      color: theme.colors.ink,
+    },
+    title: {
+      ...theme.typography.title,
+      fontSize: 48,
+      color: theme.colors.ink,
+      textAlign: 'center',
+    },
+    subtitle: {
+      ...theme.typography.heading,
+      color: theme.colors.ink,
+      textAlign: 'center',
+      opacity: 0.85,
+    },
+    footer: {
+      position: 'absolute',
+      bottom: theme.spacing.xxl,
+    },
+    footerText: {
+      ...theme.typography.bodyStrong,
+      color: theme.colors.ink,
+      opacity: 0.85,
+    },
+  });

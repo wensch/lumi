@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
-import { colors, radius, spacing, typography } from '@/theme';
+import { useTheme, type Theme } from '@/theme';
 
 type TextFieldProps = TextInputProps & {
   label: string;
@@ -7,12 +7,15 @@ type TextFieldProps = TextInputProps & {
 };
 
 export function TextField({ label, error, style, ...rest }: TextFieldProps) {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
         style={[styles.input, error && styles.inputError, style]}
-        placeholderTextColor="#9C9A90"
+        placeholderTextColor={theme.colors.muted}
         autoCapitalize="none"
         {...rest}
       />
@@ -21,29 +24,30 @@ export function TextField({ label, error, style, ...rest }: TextFieldProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: spacing.xs,
-  },
-  label: {
-    ...typography.label,
-    color: colors.greenDark,
-  },
-  input: {
-    ...typography.body,
-    color: colors.ink,
-    backgroundColor: colors.white,
-    borderRadius: radius.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderWidth: 1,
-    borderColor: '#EDEBE3',
-  },
-  inputError: {
-    borderColor: '#E05252',
-  },
-  error: {
-    ...typography.caption,
-    color: '#E05252',
-  },
-});
+const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      gap: theme.spacing.xs,
+    },
+    label: {
+      ...theme.typography.label,
+      color: theme.colors.ink,
+    },
+    input: {
+      ...theme.typography.body,
+      color: theme.colors.ink,
+      backgroundColor: theme.colors.bg,
+      borderRadius: 16,
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.md,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+    },
+    inputError: {
+      borderColor: '#E05252',
+    },
+    error: {
+      ...theme.typography.caption,
+      color: '#E05252',
+    },
+  });
