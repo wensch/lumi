@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { useYVAuth } from '@youversion/platform-react-native-expo-core';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
 import { isValidEmail, translateAuthError, useAuth } from '@/features/auth';
@@ -205,6 +206,14 @@ export default function AuthScreen() {
                 setMagicLinkSent(false);
               }}
             />
+
+            {method === 'password' && mode === 'sign_in' ? (
+              <Button
+                variant="ghost"
+                label="Esqueci minha senha"
+                onPress={() => router.push('/(auth)/esqueci-senha')}
+              />
+            ) : null}
           </Card>
 
           {method === 'password' ? (

@@ -58,7 +58,7 @@ export default function RootLayout() {
 }
 
 function RootNavigation() {
-  const { session, loading: authLoading } = useAuth();
+  const { session, loading: authLoading, isPasswordRecovery } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const segments = useSegments();
 
@@ -71,11 +71,19 @@ function RootNavigation() {
   const inAuthGroup = segments[0] === '(auth)';
   const inOnboardingGroup = segments[0] === '(onboarding)';
   // Rota real (não grupo) /auth/callback: alvo do deep link de confirmação/
-  // magic link do Supabase. Precisa ficar de fora do redirect abaixo —
-  // useAuthDeepLink ainda está processando o token quando esta tela monta
-  // pela primeira vez (session ainda null), e sem essa exceção o redirect
-  // para /(auth) competia com o redirect pós-login e criava loop infinito.
+  // magic link/recuperação de senha do Supabase. Precisa ficar de fora do
+  // redirect abaixo — useAuthDeepLink ainda está processando o token quando
+  // esta tela monta pela primeira vez (session ainda null), e sem essa
+  // exceção o redirect para /(auth) competia com o redirect pós-login e
+  // criava loop infinito.
   const inAuthCallback = segments[0] === 'auth';
+  const inNovaSenha = segments[0] === 'nova-senha';
+
+  // Prioridade máxima: sessão de recuperação de senha nunca deve cair no
+  // fluxo normal (onboarding/tabs) enquanto a senha não for definida.
+  if (session && isPasswordRecovery && !inNovaSenha) {
+    return <Redirect href="/nova-senha" />;
+  }
 
   if (!session && !inAuthGroup && !inAuthCallback) {
     return <Redirect href="/(auth)" />;
@@ -89,7 +97,11 @@ function RootNavigation() {
     return <Redirect href="/(onboarding)" />;
   }
 
-  if (session && profile?.onboarding_completed_at && (inOnboardingGroup || inAuthCallback)) {
+  if (
+    session &&
+    profile?.onboarding_completed_at &&
+    (inOnboardingGroup || inAuthCallback || inNovaSenha)
+  ) {
     return <Redirect href="/(tabs)" />;
   }
 
