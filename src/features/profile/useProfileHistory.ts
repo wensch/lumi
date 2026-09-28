@@ -30,6 +30,7 @@ const EMPTY_HISTORY: ProfileHistory = {
 
 export function useProfileHistory() {
   const { session } = useAuth();
+  const userId = session?.user.id ?? null;
   const [history, setHistory] = useState<ProfileHistory>(EMPTY_HISTORY);
   const [loading, setLoading] = useState(true);
 
@@ -73,14 +74,16 @@ export function useProfileHistory() {
   }, []);
 
   useEffect(() => {
-    if (!session) {
+    if (!userId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reset síncrono ao deslogar, sem sistema externo envolvido
       setHistory(EMPTY_HISTORY);
       setLoading(false);
       return;
     }
-    fetchHistory(session.user.id);
-  }, [session, fetchHistory]);
+    fetchHistory(userId);
+    // session muda de referência a cada onAuthStateChange (TOKEN_REFRESHED
+    // incluso) — usar userId em vez de session evita refetch espúrio.
+  }, [userId, fetchHistory]);
 
   return { ...history, loading };
 }

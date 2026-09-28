@@ -24,6 +24,7 @@ const EMPTY_STATE: DevotionalState = { content: null, session: null, isReturning
 
 export function useDevotional() {
   const { session: authSession } = useAuth();
+  const userId = authSession?.user.id ?? null;
   const [state, setState] = useState<DevotionalState>(EMPTY_STATE);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
@@ -88,14 +89,18 @@ export function useDevotional() {
   }, []);
 
   useEffect(() => {
-    if (!authSession) {
+    if (!userId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reset síncrono ao deslogar, sem sistema externo envolvido
       setState(EMPTY_STATE);
       setLoading(false);
       return;
     }
-    start(authSession.user.id);
-  }, [authSession, start]);
+    start(userId);
+    // authSession muda de referência a cada onAuthStateChange (inclui
+    // TOKEN_REFRESHED silencioso) — sem usar userId, isso reiniciava o
+    // devocional (perdendo reflexão em andamento e podendo criar sessão
+    // duplicada) toda vez que o token era renovado em background.
+  }, [userId, start]);
 
   const complete = useCallback(
     async (reflectionText?: string) => {

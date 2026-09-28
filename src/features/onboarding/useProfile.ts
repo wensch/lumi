@@ -7,6 +7,7 @@ type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export function useProfile() {
   const { session } = useAuth();
+  const userId = session?.user.id ?? null;
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,15 +36,21 @@ export function useProfile() {
   }, []);
 
   useEffect(() => {
-    if (!session) {
+    if (!userId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reset síncrono ao deslogar, sem sistema externo envolvido
       setProfile(null);
       setError(null);
       setLoading(false);
       return;
     }
-    fetchProfile(session.user.id);
-  }, [session, fetchProfile]);
+    fetchProfile(userId);
+    // session muda de referência a cada onAuthStateChange (inclui
+    // TOKEN_REFRESHED silencioso em background) — refazer o fetch nesses
+    // casos derrubava loading:true momentaneamente, o que fazia
+    // RootNavigation desmontar <Slot/> (e qualquer tela com estado local,
+    // como o onboarding em andamento) até o fetch terminar de novo.
+    // userId só muda quando o usuário realmente muda.
+  }, [userId, fetchProfile]);
 
   const refetch = useCallback(async () => {
     if (!session) return;

@@ -23,6 +23,7 @@ const DEFAULT_HOME_DATA: HomeData = {
 
 export function useHomeData() {
   const { session } = useAuth();
+  const userId = session?.user.id ?? null;
   const [data, setData] = useState<HomeData>(DEFAULT_HOME_DATA);
   const [loading, setLoading] = useState(true);
 
@@ -50,19 +51,22 @@ export function useHomeData() {
   }, []);
 
   useEffect(() => {
-    if (!session) {
+    if (!userId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reset síncrono ao deslogar, sem sistema externo envolvido
       setData(DEFAULT_HOME_DATA);
       setLoading(false);
       return;
     }
-    fetchHomeData(session.user.id);
-  }, [session, fetchHomeData]);
+    fetchHomeData(userId);
+    // session muda de referência a cada onAuthStateChange (TOKEN_REFRESHED
+    // incluso) — usar userId em vez de session evita refetch/loading:true
+    // espúrio nesses casos.
+  }, [userId, fetchHomeData]);
 
   const refetch = useCallback(async () => {
-    if (!session) return;
-    await fetchHomeData(session.user.id);
-  }, [session, fetchHomeData]);
+    if (!userId) return;
+    await fetchHomeData(userId);
+  }, [userId, fetchHomeData]);
 
   return { ...data, loading, refetch };
 }

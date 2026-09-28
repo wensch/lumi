@@ -22,9 +22,10 @@ import {
  */
 export function useNotificationScheduler() {
   const { session } = useAuth();
+  const userId = session?.user.id ?? null;
 
   useEffect(() => {
-    if (!session) return;
+    if (!userId) return;
 
     let cancelled = false;
 
@@ -32,7 +33,7 @@ export function useNotificationScheduler() {
       const { data: prefs } = await supabase
         .from('notification_preferences')
         .select('reminders_enabled, preferred_time')
-        .eq('user_id', session.user.id)
+        .eq('user_id', userId)
         .single();
 
       if (cancelled || !prefs) return;
@@ -51,5 +52,7 @@ export function useNotificationScheduler() {
     return () => {
       cancelled = true;
     };
-  }, [session]);
+    // session muda de referência a cada onAuthStateChange (TOKEN_REFRESHED
+    // incluso) — usar userId evita reagendar a notificação sem necessidade.
+  }, [userId]);
 }
