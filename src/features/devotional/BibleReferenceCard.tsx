@@ -1,5 +1,5 @@
 import { Component, type ReactNode } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
 import { BibleCard } from '@youversion/platform-react-native-expo-ui';
 import { Card } from '@/components';
 import { colors, typography } from '@/theme';
@@ -7,6 +7,7 @@ import { colors, typography } from '@/theme';
 type Props = {
   reference: string;
   versionId: number;
+  style?: StyleProp<ViewStyle>;
 };
 
 type State = { hasError: boolean };
@@ -29,7 +30,7 @@ export class BibleReferenceCard extends Component<Props, State> {
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <Card>
+        <Card style={this.props.style}>
           <Text style={typography.bodyStrong}>{this.props.reference}</Text>
           <Text style={[typography.caption, styles.fallbackHint]}>
             Não foi possível carregar o texto bíblico agora.
@@ -39,7 +40,7 @@ export class BibleReferenceCard extends Component<Props, State> {
     }
 
     return (
-      <Card>
+      <Card style={this.props.style}>
         <BibleCard reference={this.props.reference} versionId={this.props.versionId} />
       </Card>
     );

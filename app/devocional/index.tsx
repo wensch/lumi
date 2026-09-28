@@ -99,44 +99,43 @@ export default function DevocionalScreen() {
   return (
     <ScreenContainer style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={typography.title}>{content.title}</Text>
+        <Text style={[typography.title, styles.pageTitle]}>{content.title}</Text>
 
         {content.passage_reference && content.youversion_version_id ? (
           <BibleReferenceCard
             reference={content.passage_reference}
             versionId={content.youversion_version_id}
+            style={styles.sectionCard}
           />
         ) : null}
 
-        <Card>
-          <Text style={typography.label}>TEXTO EXPLICATIVO</Text>
-          <Text style={[typography.body, styles.sectionBody]}>{content.body}</Text>
+        <Card style={styles.sectionCard}>
+          <Text style={styles.sectionLabel}>TEXTO EXPLICATIVO</Text>
+          <Text style={typography.body}>{content.body}</Text>
         </Card>
 
         {content.application_text ? (
-          <Card>
-            <Text style={typography.label}>APLICAÇÃO</Text>
-            <Text style={[typography.body, styles.sectionBody]}>{content.application_text}</Text>
+          <Card style={styles.sectionCard}>
+            <Text style={styles.sectionLabel}>APLICAÇÃO</Text>
+            <Text style={typography.body}>{content.application_text}</Text>
           </Card>
         ) : null}
 
         {content.challenge_text ? (
-          <Card>
-            <Text style={typography.label}>DESAFIO</Text>
-            <Text style={[typography.body, styles.sectionBody]}>{content.challenge_text}</Text>
+          <Card style={styles.sectionCard}>
+            <Text style={styles.sectionLabel}>DESAFIO</Text>
+            <Text style={typography.body}>{content.challenge_text}</Text>
           </Card>
         ) : null}
 
         {content.prayer_text ? (
-          <Card>
-            <Text style={typography.label}>ORAÇÃO</Text>
-            <Text style={[typography.body, styles.sectionBody, styles.prayerText]}>
-              {content.prayer_text}
-            </Text>
+          <Card style={styles.sectionCard}>
+            <Text style={styles.sectionLabel}>ORAÇÃO</Text>
+            <Text style={[typography.body, styles.prayerText]}>{content.prayer_text}</Text>
           </Card>
         ) : null}
 
-        <Card style={styles.reflectionCard}>
+        <Card style={[styles.sectionCard, styles.reflectionCard]}>
           <Text style={typography.bodyStrong}>Quer registrar uma reflexão? (opcional)</Text>
           <TextField
             label="Sua reflexão"
@@ -164,7 +163,6 @@ const styles = StyleSheet.create({
     gap: 0,
   },
   scrollContent: {
-    gap: spacing.md,
     paddingBottom: spacing.xl,
   },
   centered: {
@@ -176,8 +174,19 @@ const styles = StyleSheet.create({
     color: colors.ink,
     textAlign: 'center',
   },
-  sectionBody: {
-    marginTop: spacing.xs,
+  pageTitle: {
+    marginBottom: spacing.md,
+  },
+  // marginBottom explícito em vez de confiar só no gap do ScrollView —
+  // mais previsível entre plataformas e permite espaçamento consistente
+  // mesmo quando seções opcionais (application/challenge/prayer) somem.
+  sectionCard: {
+    marginBottom: spacing.md,
+  },
+  sectionLabel: {
+    ...typography.label,
+    color: colors.greenDark,
+    marginBottom: spacing.sm,
   },
   prayerText: {
     fontStyle: 'italic',
@@ -189,6 +198,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    marginBottom: spacing.sm,
   },
   achievementIcon: {
     fontSize: 28,
@@ -196,5 +206,6 @@ const styles = StyleSheet.create({
   errorText: {
     ...typography.caption,
     color: '#E05252',
+    marginBottom: spacing.sm,
   },
 });
