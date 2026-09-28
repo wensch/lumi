@@ -82,6 +82,9 @@ export interface Database {
           passage_reference: string | null;
           bible_source_id: string | null;
           youversion_version_id: number | null;
+          application_text: string | null;
+          challenge_text: string | null;
+          prayer_text: string | null;
           published_at: string | null;
           created_at: string;
         };

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
-import { BibleCard } from '@youversion/platform-react-native-expo-ui';
 import { Button, Card, ScreenContainer, TextField } from '@/components';
 import { ACHIEVEMENT_LABELS } from '@/features/achievements';
 import { useDevotional } from '@/features/devotional';
+import { BibleReferenceCard } from '@/features/devotional/BibleReferenceCard';
 import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
 
@@ -97,45 +97,76 @@ export default function DevocionalScreen() {
   }
 
   return (
-    <ScreenContainer>
-      <Text style={typography.title}>{content.title}</Text>
+    <ScreenContainer style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <Text style={typography.title}>{content.title}</Text>
 
-      {content.passage_reference && content.youversion_version_id ? (
-        <Card>
-          <BibleCard
+        {content.passage_reference && content.youversion_version_id ? (
+          <BibleReferenceCard
             reference={content.passage_reference}
             versionId={content.youversion_version_id}
           />
+        ) : null}
+
+        <Card>
+          <Text style={typography.label}>TEXTO EXPLICATIVO</Text>
+          <Text style={[typography.body, styles.sectionBody]}>{content.body}</Text>
         </Card>
-      ) : null}
 
-      <Card>
-        <Text style={typography.body}>{content.body}</Text>
-      </Card>
+        {content.application_text ? (
+          <Card>
+            <Text style={typography.label}>APLICAÇÃO</Text>
+            <Text style={[typography.body, styles.sectionBody]}>{content.application_text}</Text>
+          </Card>
+        ) : null}
 
-      <Card style={styles.reflectionCard}>
-        <Text style={typography.bodyStrong}>Quer registrar uma reflexão? (opcional)</Text>
-        <TextField
-          label="Sua reflexão"
-          placeholder="O que ficou com você hoje..."
-          value={reflection}
-          onChangeText={setReflection}
-          multiline
+        {content.challenge_text ? (
+          <Card>
+            <Text style={typography.label}>DESAFIO</Text>
+            <Text style={[typography.body, styles.sectionBody]}>{content.challenge_text}</Text>
+          </Card>
+        ) : null}
+
+        {content.prayer_text ? (
+          <Card>
+            <Text style={typography.label}>ORAÇÃO</Text>
+            <Text style={[typography.body, styles.sectionBody, styles.prayerText]}>
+              {content.prayer_text}
+            </Text>
+          </Card>
+        ) : null}
+
+        <Card style={styles.reflectionCard}>
+          <Text style={typography.bodyStrong}>Quer registrar uma reflexão? (opcional)</Text>
+          <TextField
+            label="Sua reflexão"
+            placeholder="O que ficou com você hoje..."
+            value={reflection}
+            onChangeText={setReflection}
+            multiline
+          />
+        </Card>
+
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+        <Button
+          label="Concluir meu devocional"
+          onPress={handleComplete}
+          disabled={completing || !session}
         />
-      </Card>
-
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-      <Button
-        label="Concluir meu devocional"
-        onPress={handleComplete}
-        disabled={completing || !session}
-      />
+      </ScrollView>
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    gap: 0,
+  },
+  scrollContent: {
+    gap: spacing.md,
+    paddingBottom: spacing.xl,
+  },
   centered: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -144,6 +175,12 @@ const styles = StyleSheet.create({
   subtitle: {
     color: colors.ink,
     textAlign: 'center',
+  },
+  sectionBody: {
+    marginTop: spacing.xs,
+  },
+  prayerText: {
+    fontStyle: 'italic',
   },
   reflectionCard: {
     gap: spacing.sm,
