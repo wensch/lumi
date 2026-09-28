@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Card, ScreenContainer } from '@/components';
+import { Screen, Section } from '@/components';
 import { LumiMascot, type LumiMoodVariant } from '@/features/lumi';
 import { spacing, typography } from '@/theme';
 
@@ -13,9 +13,9 @@ const STATES: { mood: LumiMoodVariant; label: string }[] = [
 
 export default function LumiScreen() {
   return (
-    <ScreenContainer>
+    <Screen>
       <Text style={typography.title}>Lumi</Text>
-      <Card style={styles.card}>
+      <Section style={styles.card}>
         <View style={styles.statesGrid}>
           {STATES.map((state) => (
             <View key={state.mood} style={styles.stateItem}>
@@ -24,18 +24,19 @@ export default function LumiScreen() {
             </View>
           ))}
         </View>
+      </Section>
+      <Section>
         <Text style={typography.body}>
           Mais estados, evolução e personalização do Lumi aparecem aqui em breve.
         </Text>
-      </Card>
-    </ScreenContainer>
+      </Section>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
-    gap: spacing.md,
   },
   statesGrid: {
     flexDirection: 'row',

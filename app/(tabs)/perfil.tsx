@@ -1,9 +1,9 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Button, Card, ScreenContainer } from '@/components';
+import { StyleSheet, Text, View } from 'react-native';
+import { Button, Card, Screen, Section } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useProfileHistory } from '@/features/profile';
 import { ShareStreakButton } from '@/features/share';
-import { spacing, typography } from '@/theme';
+import { colors, spacing, typography } from '@/theme';
 
 export default function PerfilScreen() {
   const { session, signOut } = useAuth();
@@ -17,25 +17,25 @@ export default function PerfilScreen() {
   } = useProfileHistory();
 
   return (
-    <ScreenContainer style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={typography.title}>Perfil</Text>
+    <Screen>
+      <Text style={typography.title}>Perfil</Text>
 
-        <Card style={styles.streaksRow}>
-          <View style={styles.streakStat}>
-            <Text style={typography.title}>{currentStreak}</Text>
-            <Text style={typography.caption}>sequência atual</Text>
-          </View>
-          <View style={styles.streakStat}>
-            <Text style={typography.title}>{longestStreak}</Text>
-            <Text style={typography.caption}>maior sequência</Text>
-          </View>
-        </Card>
+      <Card style={styles.streaksRow}>
+        <View style={styles.streakStat}>
+          <Text style={typography.title}>{currentStreak}</Text>
+          <Text style={styles.streakLabel}>sequência atual</Text>
+        </View>
+        <View style={styles.streakDivider} />
+        <View style={styles.streakStat}>
+          <Text style={typography.title}>{longestStreak}</Text>
+          <Text style={styles.streakLabel}>maior sequência</Text>
+        </View>
+      </Card>
 
-        {currentStreak > 0 ? <ShareStreakButton streak={currentStreak} totalXp={totalXp} /> : null}
+      {currentStreak > 0 ? <ShareStreakButton streak={currentStreak} totalXp={totalXp} /> : null}
 
-        <Text style={typography.subheading}>Conquistas</Text>
-        <Card style={styles.achievementsGrid}>
+      <Section label="Conquistas">
+        <View style={styles.achievementsGrid}>
           {allAchievements.map((achievement) => {
             const unlocked = unlockedAchievementIds.has(achievement.id);
             return (
@@ -48,48 +48,53 @@ export default function PerfilScreen() {
               </View>
             );
           })}
-        </Card>
+        </View>
+      </Section>
 
-        <Text style={typography.subheading}>Histórico recente</Text>
-        <Card style={styles.historyCard}>
-          {recentSessions.length === 0 ? (
-            <Text style={typography.body}>Seus momentos concluídos aparecem aqui.</Text>
-          ) : (
-            recentSessions.map((entry) => (
+      <Section label="Histórico recente">
+        {recentSessions.length === 0 ? (
+          <Text style={typography.body}>Seus devocionais concluídos aparecem aqui.</Text>
+        ) : (
+          <View style={styles.historyList}>
+            {recentSessions.map((entry) => (
               <View key={entry.id} style={styles.historyRow}>
-                <Text style={typography.body}>{entry.content_title ?? 'Momento devocional'}</Text>
+                <Text style={typography.body}>{entry.content_title ?? 'Devocional'}</Text>
                 <Text style={typography.caption}>
                   {new Date(entry.completed_at).toLocaleDateString('pt-BR')}
                 </Text>
               </View>
-            ))
-          )}
-        </Card>
+            ))}
+          </View>
+        )}
+      </Section>
 
-        <Card style={styles.accountCard}>
-          <Text style={typography.caption}>Conectado como {session?.user.email}</Text>
-          <Button variant="ghost" label="Sair" onPress={signOut} />
-        </Card>
-      </ScrollView>
-    </ScreenContainer>
+      <Card style={styles.accountCard}>
+        <Text style={typography.caption}>Conectado como {session?.user.email}</Text>
+        <Button variant="tertiary" label="Sair" onPress={signOut} />
+      </Card>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 0,
-  },
-  scrollContent: {
-    gap: spacing.md,
-    paddingBottom: spacing.xl,
-  },
   streaksRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   streakStat: {
+    flex: 1,
     alignItems: 'center',
     gap: spacing.xs,
+  },
+  streakDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: '#EDEBE3',
+  },
+  streakLabel: {
+    ...typography.caption,
+    color: colors.ink,
+    opacity: 0.7,
   },
   achievementsGrid: {
     flexDirection: 'row',
@@ -99,10 +104,10 @@ const styles = StyleSheet.create({
   achievementItem: {
     alignItems: 'center',
     gap: spacing.xs,
-    width: 88,
+    width: 84,
   },
   achievementLocked: {
-    opacity: 0.5,
+    opacity: 0.4,
   },
   achievementIcon: {
     fontSize: 28,
@@ -111,7 +116,7 @@ const styles = StyleSheet.create({
     ...typography.caption,
     textAlign: 'center',
   },
-  historyCard: {
+  historyList: {
     gap: spacing.sm,
   },
   historyRow: {
@@ -121,5 +126,6 @@ const styles = StyleSheet.create({
   },
   accountCard: {
     gap: spacing.sm,
+    alignItems: 'flex-start',
   },
 });

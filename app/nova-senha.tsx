@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import { Button, Card, ScreenContainer, TextField } from '@/components';
+import { Button, Card, Screen, TextField } from '@/components';
 import { useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
@@ -42,9 +42,9 @@ export default function NovaSenhaScreen() {
   };
 
   return (
-    <ScreenContainer style={styles.container}>
+    <Screen centered contentContainerStyle={styles.content}>
       <LumiMascot mood="normal" size={120} />
-      <Text style={typography.title}>Nova senha</Text>
+      <Text style={[typography.title, styles.title]}>Nova senha</Text>
       <Text style={[typography.body, styles.subtitle]}>Escolha uma nova senha para sua conta.</Text>
 
       <Card style={styles.card}>
@@ -71,14 +71,16 @@ export default function NovaSenhaScreen() {
           disabled={submitting}
         />
       </Card>
-    </ScreenContainer>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
+  content: {
     alignItems: 'center',
+  },
+  title: {
+    textAlign: 'center',
   },
   subtitle: {
     color: colors.ink,
@@ -87,7 +89,6 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     gap: spacing.md,
-    marginTop: spacing.lg,
   },
   errorText: {
     ...typography.caption,

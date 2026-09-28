@@ -198,7 +198,7 @@ export default function AuthScreen() {
             />
 
             <Button
-              variant="ghost"
+              variant="tertiary"
               label={method === 'password' ? 'Entrar sem senha (magic link)' : 'Entrar com senha'}
               onPress={() => {
                 setMethod(method === 'password' ? 'magic_link' : 'password');
@@ -209,7 +209,7 @@ export default function AuthScreen() {
 
             {method === 'password' && mode === 'sign_in' ? (
               <Button
-                variant="ghost"
+                variant="tertiary"
                 label="Esqueci minha senha"
                 onPress={() => router.push('/(auth)/esqueci-senha')}
               />
@@ -222,7 +222,7 @@ export default function AuthScreen() {
                 {mode === 'sign_in' ? 'Ainda não tem conta?' : 'Já tem conta?'}
               </Text>
               <Button
-                variant="ghost"
+                variant="tertiary"
                 label={mode === 'sign_in' ? 'Criar conta' : 'Entrar'}
                 onPress={() => {
                   setMode(mode === 'sign_in' ? 'sign_up' : 'sign_in');

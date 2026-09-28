@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
-import { Button, Card, ScreenContainer, TextField } from '@/components';
+import { Button, Card, Screen, TextField } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useProfile } from '@/features/onboarding';
 import { requestNotificationPermission, scheduleDailyReminder } from '@/features/notifications';
 import { supabase } from '@/lib/supabase';
 import type { AgeRange } from '@/lib/supabase';
-import { colors, spacing, typography } from '@/theme';
+import { colors, radius, spacing, typography } from '@/theme';
 
 const AGE_RANGES: { value: AgeRange; label: string }[] = [
   { value: 'kid', label: 'Criança' },
@@ -89,7 +89,16 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <ScreenContainer style={styles.container}>
+    <Screen centered contentContainerStyle={styles.content}>
+      <View style={styles.progress}>
+        {STEPS.map((s, index) => (
+          <View
+            key={s}
+            style={[styles.progressDot, index <= stepIndex && styles.progressDotActive]}
+          />
+        ))}
+      </View>
+
       <Card style={styles.card}>
         {step === 'name' ? (
           <>
@@ -107,9 +116,7 @@ export default function OnboardingScreen() {
         {step === 'age' ? (
           <>
             <Text style={typography.heading}>Qual sua faixa etária?</Text>
-            <Text style={[typography.body, styles.helperText]}>
-              Isso nos ajuda a personalizar sua experiência.
-            </Text>
+            <Text style={styles.helperText}>Isso nos ajuda a personalizar sua experiência.</Text>
             <View style={styles.optionsGrid}>
               {AGE_RANGES.map((option) => (
                 <Button
@@ -126,9 +133,7 @@ export default function OnboardingScreen() {
         {step === 'time' ? (
           <>
             <Text style={typography.heading}>Que horas você quer ser lembrado?</Text>
-            <Text style={[typography.body, styles.helperText]}>
-              Pode ajustar isso depois no seu perfil.
-            </Text>
+            <Text style={styles.helperText}>Pode ajustar isso depois no seu perfil.</Text>
             {Platform.OS === 'android' && !showPicker ? (
               <Button
                 variant="ghost"
@@ -163,22 +168,39 @@ export default function OnboardingScreen() {
         />
 
         {stepIndex > 0 ? (
-          <Button label="Voltar" variant="ghost" onPress={goBack} disabled={submitting} />
+          <Button label="Voltar" variant="tertiary" onPress={goBack} disabled={submitting} />
         ) : null}
       </Card>
-    </ScreenContainer>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
+    alignItems: 'stretch',
+  },
+  progress: {
+    flexDirection: 'row',
     justifyContent: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  progressDot: {
+    width: 8,
+    height: 8,
+    borderRadius: radius.pill,
+    backgroundColor: '#EDEBE3',
+  },
+  progressDotActive: {
+    backgroundColor: colors.greenPrimary,
   },
   card: {
     gap: spacing.md,
   },
   helperText: {
+    ...typography.body,
     color: colors.ink,
+    opacity: 0.7,
   },
   optionsGrid: {
     gap: spacing.sm,

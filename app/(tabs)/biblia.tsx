@@ -1,18 +1,16 @@
 import { Text } from 'react-native';
-import { BibleCard } from '@youversion/platform-react-native-expo-ui';
-import { Card, ScreenContainer } from '@/components';
+import { Screen, Section } from '@/components';
+import { BibleReferenceCard } from '@/features/devotional/BibleReferenceCard';
 import { typography } from '@/theme';
 
 export default function BibliaScreen() {
   return (
-    <ScreenContainer>
+    <Screen>
       <Text style={typography.title}>Bíblia</Text>
-      <Card>
-        <BibleCard reference="JHN.3.16" versionId={3034} />
-      </Card>
-      <Card>
+      <BibleReferenceCard reference="JHN.3.16" versionId={3034} />
+      <Section>
         <Text style={typography.body}>Busca, temas e mais passagens chegam em breve por aqui.</Text>
-      </Card>
-    </ScreenContainer>
+      </Section>
+    </Screen>
   );
 }

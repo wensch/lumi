@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, ScreenContainer, TextField } from '@/components';
+import { Button, Card, Screen, Section, TextField } from '@/components';
 import { ACHIEVEMENT_LABELS } from '@/features/achievements';
 import { useDevotional } from '@/features/devotional';
 import { BibleReferenceCard } from '@/features/devotional/BibleReferenceCard';
@@ -33,19 +33,21 @@ export default function DevocionalScreen() {
 
   if (loading) {
     return (
-      <ScreenContainer style={styles.centered}>
+      <Screen centered>
         <Text style={typography.body}>Preparando seu devocional…</Text>
-      </ScreenContainer>
+      </Screen>
     );
   }
 
   if (!content) {
     return (
-      <ScreenContainer style={styles.centered}>
-        <Text style={typography.heading}>Ainda não há devocional disponível.</Text>
+      <Screen centered contentContainerStyle={styles.centeredContent}>
+        <Text style={[typography.heading, styles.centeredText]}>
+          Ainda não há devocional disponível.
+        </Text>
         <Text style={[typography.body, styles.subtitle]}>Volte em breve.</Text>
-        <Button label="Voltar" variant="ghost" onPress={() => router.back()} />
-      </ScreenContainer>
+        <Button label="Voltar" variant="tertiary" onPress={() => router.back()} />
+      </Screen>
     );
   }
 
@@ -57,10 +59,10 @@ export default function DevocionalScreen() {
     const showReturnWelcome = isReturningFromBreak && result.streak === 1;
 
     return (
-      <ScreenContainer style={styles.centered}>
-        <LumiMascot mood="celebrating" size={140} />
-        <Text style={typography.heading}>
-          {showReturnWelcome ? 'Que bom te ver de novo!' : 'Momento concluído!'}
+      <Screen centered contentContainerStyle={styles.centeredContent}>
+        <LumiMascot mood="celebrating" size={160} />
+        <Text style={[typography.heading, styles.centeredText]}>
+          {showReturnWelcome ? 'Que bom te ver de novo!' : 'Devocional concluído!'}
         </Text>
         <Text style={[typography.body, styles.subtitle]}>
           {result.xp > 0
@@ -77,7 +79,7 @@ export default function DevocionalScreen() {
           const achievement = ACHIEVEMENT_LABELS[code];
           if (!achievement) return null;
           return (
-            <Card key={code} style={styles.achievementCard}>
+            <Card key={code} padding="compact" style={styles.achievementCard}>
               <Text style={styles.achievementIcon}>{achievement.icon}</Text>
               <Text style={typography.bodyStrong}>Conquista desbloqueada: {achievement.title}</Text>
             </Card>
@@ -91,114 +93,84 @@ export default function DevocionalScreen() {
             router.push({ pathname: '/oracao', params: { devotional_session_id: session?.id } })
           }
         />
-        <Button label="Voltar para Hoje" variant="ghost" onPress={() => router.replace('/(tabs)')} />
-      </ScreenContainer>
+        <Button label="Voltar para Hoje" variant="tertiary" onPress={() => router.replace('/(tabs)')} />
+      </Screen>
     );
   }
 
   return (
-    <ScreenContainer style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={[typography.title, styles.pageTitle]}>{content.title}</Text>
+    <Screen>
+      <Text style={typography.title}>{content.title}</Text>
 
-        {content.passage_reference && content.youversion_version_id ? (
-          <BibleReferenceCard
-            reference={content.passage_reference}
-            versionId={content.youversion_version_id}
-            style={styles.sectionCard}
-          />
-        ) : null}
-
-        <Card style={styles.sectionCard}>
-          <Text style={styles.sectionLabel}>TEXTO EXPLICATIVO</Text>
-          <Text style={typography.body}>{content.body}</Text>
-        </Card>
-
-        {content.application_text ? (
-          <Card style={styles.sectionCard}>
-            <Text style={styles.sectionLabel}>APLICAÇÃO</Text>
-            <Text style={typography.body}>{content.application_text}</Text>
-          </Card>
-        ) : null}
-
-        {content.challenge_text ? (
-          <Card style={styles.sectionCard}>
-            <Text style={styles.sectionLabel}>DESAFIO</Text>
-            <Text style={typography.body}>{content.challenge_text}</Text>
-          </Card>
-        ) : null}
-
-        {content.prayer_text ? (
-          <Card style={styles.sectionCard}>
-            <Text style={styles.sectionLabel}>ORAÇÃO</Text>
-            <Text style={[typography.body, styles.prayerText]}>{content.prayer_text}</Text>
-          </Card>
-        ) : null}
-
-        <Card style={[styles.sectionCard, styles.reflectionCard]}>
-          <Text style={typography.bodyStrong}>Quer registrar uma reflexão? (opcional)</Text>
-          <TextField
-            label="Sua reflexão"
-            placeholder="O que ficou com você hoje..."
-            value={reflection}
-            onChangeText={setReflection}
-            multiline
-          />
-        </Card>
-
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-        <Button
-          label="Concluir meu devocional"
-          onPress={handleComplete}
-          disabled={completing || !session}
+      {content.passage_reference && content.youversion_version_id ? (
+        <BibleReferenceCard
+          reference={content.passage_reference}
+          versionId={content.youversion_version_id}
         />
-      </ScrollView>
-    </ScreenContainer>
+      ) : null}
+
+      <Section label="Texto explicativo">
+        <Text style={typography.body}>{content.body}</Text>
+      </Section>
+
+      {content.application_text ? (
+        <Section label="Aplicação">
+          <Text style={typography.body}>{content.application_text}</Text>
+        </Section>
+      ) : null}
+
+      {content.challenge_text ? (
+        <Section label="Desafio">
+          <Text style={typography.body}>{content.challenge_text}</Text>
+        </Section>
+      ) : null}
+
+      {content.prayer_text ? (
+        <Section label="Oração">
+          <Text style={[typography.body, styles.prayerText]}>{content.prayer_text}</Text>
+        </Section>
+      ) : null}
+
+      <Section label="Quer registrar uma reflexão? (opcional)">
+        <TextField
+          label="Sua reflexão"
+          placeholder="O que ficou com você hoje..."
+          value={reflection}
+          onChangeText={setReflection}
+          multiline
+        />
+      </Section>
+
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+      <Button
+        label="Concluir meu devocional"
+        onPress={handleComplete}
+        disabled={completing || !session}
+      />
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    gap: 0,
-  },
-  scrollContent: {
-    paddingBottom: spacing.xl,
-  },
-  centered: {
-    justifyContent: 'center',
+  centeredContent: {
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  centeredText: {
+    textAlign: 'center',
   },
   subtitle: {
     color: colors.ink,
     textAlign: 'center',
   },
-  pageTitle: {
-    marginBottom: spacing.md,
-  },
-  // marginBottom explícito em vez de confiar só no gap do ScrollView —
-  // mais previsível entre plataformas e permite espaçamento consistente
-  // mesmo quando seções opcionais (application/challenge/prayer) somem.
-  sectionCard: {
-    marginBottom: spacing.md,
-  },
-  sectionLabel: {
-    ...typography.label,
-    color: colors.greenDark,
-    marginBottom: spacing.sm,
-  },
   prayerText: {
     fontStyle: 'italic',
-  },
-  reflectionCard: {
-    gap: spacing.sm,
   },
   achievementCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    marginBottom: spacing.sm,
   },
   achievementIcon: {
     fontSize: 28,
@@ -206,6 +178,5 @@ const styles = StyleSheet.create({
   errorText: {
     ...typography.caption,
     color: '#E05252',
-    marginBottom: spacing.sm,
   },
 });

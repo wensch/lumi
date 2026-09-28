@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, ScreenContainer, StreakBadge, XPBadge } from '@/components';
+import { Button, Card, Screen, StreakBadge, XPBadge } from '@/components';
 import { lumiGreeting, useHomeData } from '@/features/home';
 import { LumiMascot } from '@/features/lumi';
 import { ShareStreakButton } from '@/features/share';
@@ -11,9 +11,9 @@ export default function HojeScreen() {
 
   if (loading) {
     return (
-      <ScreenContainer style={styles.centered}>
+      <Screen centered>
         <Text style={typography.body}>Carregando…</Text>
-      </ScreenContainer>
+      </Screen>
     );
   }
 
@@ -21,11 +21,17 @@ export default function HojeScreen() {
   const completedToday = daysSinceLastCompleted === 0;
 
   return (
-    <ScreenContainer>
+    <Screen>
       <View style={styles.header}>
         <StreakBadge days={currentStreak} />
         <XPBadge xp={totalXp} />
       </View>
+
+      <Card style={styles.heroCard}>
+        <LumiMascot mood={greeting.mood} size={168} />
+        <Text style={[typography.heading, styles.heroTitle]}>{greeting.title}</Text>
+        <Text style={[typography.body, styles.heroSubtitle]}>{greeting.subtitle}</Text>
+      </Card>
 
       {longestStreak > currentStreak ? (
         <Text style={styles.recordHint}>
@@ -34,53 +40,40 @@ export default function HojeScreen() {
         </Text>
       ) : null}
 
-      <Card style={styles.heroCard}>
-        <LumiMascot mood={greeting.mood} size={140} />
-        <Text style={typography.heading}>{greeting.title}</Text>
-        <Text style={[typography.body, styles.subtitle]}>{greeting.subtitle}</Text>
-      </Card>
-
       <Button
         label={completedToday ? 'Fazer mais um devocional' : 'Começar meu devocional'}
         variant={completedToday ? 'ghost' : 'primary'}
         onPress={() => router.push('/devocional')}
       />
 
-      {currentStreak > 0 ? (
-        <View style={styles.shareRow}>
-          <ShareStreakButton streak={currentStreak} totalXp={totalXp} />
-        </View>
-      ) : null}
-    </ScreenContainer>
+      {currentStreak > 0 ? <ShareStreakButton streak={currentStreak} totalXp={totalXp} /> : null}
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   heroCard: {
     alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.lg,
+    gap: spacing.md,
+    paddingVertical: spacing.xl,
   },
-  subtitle: {
+  heroTitle: {
+    textAlign: 'center',
+  },
+  heroSubtitle: {
     color: colors.ink,
     textAlign: 'center',
+    opacity: 0.8,
   },
   recordHint: {
     ...typography.caption,
     color: colors.ink,
-    opacity: 0.7,
+    opacity: 0.6,
     textAlign: 'center',
-    marginTop: spacing.sm,
-  },
-  shareRow: {
-    marginTop: spacing.sm,
   },
 });

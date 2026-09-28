@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Button, Card, ScreenContainer, TextField } from '@/components';
+import { Button, Card, Screen, TextField } from '@/components';
 import { LumiMascot } from '@/features/lumi';
 import { usePrayer } from '@/features/prayer';
 import { colors, spacing, typography } from '@/theme';
@@ -32,9 +32,9 @@ export default function OracaoScreen() {
 
   if (mode === 'done') {
     return (
-      <ScreenContainer style={styles.centered}>
-        <LumiMascot mood="happy" size={140} />
-        <Text style={typography.heading}>Oração registrada</Text>
+      <Screen centered contentContainerStyle={styles.centeredContent}>
+        <LumiMascot mood="happy" size={160} />
+        <Text style={[typography.heading, styles.centeredText]}>Oração registrada</Text>
         {generatedPrayer ? (
           <Card style={styles.prayerCard}>
             <Text style={[typography.body, styles.prayerText]}>{generatedPrayer}</Text>
@@ -45,13 +45,13 @@ export default function OracaoScreen() {
           </Text>
         )}
         <Button label="Voltar para Hoje" onPress={() => router.replace('/(tabs)')} />
-      </ScreenContainer>
+      </Screen>
     );
   }
 
   if (mode === 'manual') {
     return (
-      <ScreenContainer>
+      <Screen>
         <Text style={typography.title}>Sua oração</Text>
         <Text style={[typography.body, styles.subtitle]}>
           Escreva do seu jeito. Isso fica só entre você e o Lumi.
@@ -71,14 +71,14 @@ export default function OracaoScreen() {
           onPress={handleSaveManual}
           disabled={saving || !manualText.trim()}
         />
-        <Button label="Voltar" variant="ghost" onPress={() => setMode('choice')} />
-      </ScreenContainer>
+        <Button label="Voltar" variant="tertiary" onPress={() => setMode('choice')} />
+      </Screen>
     );
   }
 
   if (mode === 'ai') {
     return (
-      <ScreenContainer>
+      <Screen>
         <Text style={typography.title}>Transformar em oração</Text>
         <Text style={[typography.body, styles.subtitle]}>
           Conta pra gente o que está pensando ou sentindo — o Lumi ajuda a transformar isso em
@@ -99,33 +99,31 @@ export default function OracaoScreen() {
           onPress={handleGenerate}
           disabled={generating || !personalText.trim()}
         />
-        <Button label="Voltar" variant="ghost" onPress={() => setMode('choice')} />
-      </ScreenContainer>
+        <Button label="Voltar" variant="tertiary" onPress={() => setMode('choice')} />
+      </Screen>
     );
   }
 
   return (
-    <ScreenContainer style={styles.centered}>
-      <LumiMascot mood="waiting" size={140} />
-      <Text style={typography.heading}>Quer orar agora?</Text>
+    <Screen centered contentContainerStyle={styles.centeredContent}>
+      <LumiMascot mood="waiting" size={160} />
+      <Text style={[typography.heading, styles.centeredText]}>Quer orar agora?</Text>
       <Text style={[typography.body, styles.subtitle]}>Escolha como prefere fazer isso.</Text>
 
       <Button label="Escrever minha oração" onPress={() => setMode('manual')} />
-      <Button
-        label="Pedir ajuda ao Lumi"
-        variant="secondary"
-        onPress={() => setMode('ai')}
-      />
-      <Button label="Agora não" variant="ghost" onPress={() => router.replace('/(tabs)')} />
-    </ScreenContainer>
+      <Button label="Pedir ajuda ao Lumi" variant="secondary" onPress={() => setMode('ai')} />
+      <Button label="Agora não" variant="tertiary" onPress={() => router.replace('/(tabs)')} />
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  centered: {
-    justifyContent: 'center',
+  centeredContent: {
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  centeredText: {
+    textAlign: 'center',
   },
   subtitle: {
     color: colors.ink,
@@ -135,7 +133,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   prayerCard: {
-    marginTop: spacing.sm,
+    width: '100%',
   },
   prayerText: {
     fontStyle: 'italic',

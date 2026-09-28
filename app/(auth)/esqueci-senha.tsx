@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, ScreenContainer, TextField } from '@/components';
+import { Button, Card, Screen, TextField } from '@/components';
 import { isValidEmail, useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
 import { colors, spacing, typography } from '@/theme';
@@ -39,9 +39,9 @@ export default function EsqueciSenhaScreen() {
   };
 
   return (
-    <ScreenContainer style={styles.container}>
+    <Screen centered contentContainerStyle={styles.content}>
       <LumiMascot mood="waiting" size={120} />
-      <Text style={typography.title}>Esqueceu sua senha?</Text>
+      <Text style={[typography.title, styles.title]}>Esqueceu sua senha?</Text>
       <Text style={[typography.body, styles.subtitle]}>
         Informa seu email que a gente manda um link pra você criar uma nova.
       </Text>
@@ -56,9 +56,7 @@ export default function EsqueciSenhaScreen() {
         />
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        {sent ? (
-          <Text style={styles.successText}>Link enviado! Confira seu email.</Text>
-        ) : null}
+        {sent ? <Text style={styles.successText}>Link enviado! Confira seu email.</Text> : null}
 
         <Button
           label={submitting ? 'Enviando...' : 'Enviar link de redefinição'}
@@ -67,15 +65,17 @@ export default function EsqueciSenhaScreen() {
         />
       </Card>
 
-      <Button variant="ghost" label="Voltar" onPress={() => router.back()} />
-    </ScreenContainer>
+      <Button variant="tertiary" label="Voltar" onPress={() => router.back()} />
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
+  content: {
     alignItems: 'center',
+  },
+  title: {
+    textAlign: 'center',
   },
   subtitle: {
     color: colors.ink,
@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     gap: spacing.md,
-    marginTop: spacing.lg,
   },
   errorText: {
     ...typography.caption,

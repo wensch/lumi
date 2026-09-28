@@ -1,5 +1,5 @@
 import { Text } from 'react-native';
-import { ScreenContainer } from '@/components';
+import { Screen } from '@/components';
 import { typography } from '@/theme';
 
 /**
@@ -11,8 +11,8 @@ import { typography } from '@/theme';
  */
 export default function AuthCallbackScreen() {
   return (
-    <ScreenContainer style={{ justifyContent: 'center', alignItems: 'center' }}>
+    <Screen scroll={false} centered>
       <Text style={typography.body}>Entrando…</Text>
-    </ScreenContainer>
+    </Screen>
   );
 }
