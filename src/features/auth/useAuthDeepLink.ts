@@ -31,6 +31,14 @@ function extractAuthParamsFromUrl(url: string) {
   return { access_token, refresh_token, type };
 }
 
+// No Android, o mesmo link pode chegar duas vezes (getInitialURL no cold
+// start + o listener 'url' quando a activity resume) — sem essa guarda,
+// cada entrega chama setSession de novo, dispara onAuthStateChange de
+// novo, gera novo objeto session e re-renderiza RootNavigation em
+// sequência rápida o bastante para estourar "Maximum update depth
+// exceeded" nos <Redirect> encadeados.
+let lastProcessedToken: string | null = null;
+
 async function handleIncomingUrl(url: string | null, onRecovery: () => void) {
   if (!url) return;
 
@@ -38,6 +46,9 @@ async function handleIncomingUrl(url: string | null, onRecovery: () => void) {
   if (!authParams) return;
 
   const { access_token, refresh_token, type } = authParams;
+  if (access_token === lastProcessedToken) return;
+  lastProcessedToken = access_token;
+
   await supabase.auth.setSession({ access_token, refresh_token });
 
   if (type === 'recovery') {

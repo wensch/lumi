@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Redirect, Slot, useSegments } from 'expo-router';
+import { router, Slot, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -57,6 +57,55 @@ export default function RootLayout() {
   );
 }
 
+/**
+ * Calcula a rota alvo (ou null se a rota atual já está correta) a partir
+ * do estado de auth/onboarding. Mantido como função pura fora do
+ * componente para o useEffect abaixo poder decidir "não faço nada" sem
+ * precisar comparar segments/JSX — evita re-disparar router.replace para
+ * a mesma rota em cada render, que foi a causa raiz de um "Maximum update
+ * depth exceeded" visto tanto na web quanto no Android.
+ */
+function resolveTargetRoute({
+  session,
+  isPasswordRecovery,
+  onboardingCompleted,
+  segments,
+}: {
+  session: unknown;
+  isPasswordRecovery: boolean;
+  onboardingCompleted: boolean;
+  segments: string[];
+}): string | null {
+  const inAuthGroup = segments[0] === '(auth)';
+  const inOnboardingGroup = segments[0] === '(onboarding)';
+  // Rota real (não grupo) /auth/callback: alvo do deep link de confirmação/
+  // magic link/recuperação de senha do Supabase.
+  const inAuthCallback = segments[0] === 'auth';
+  const inNovaSenha = segments[0] === 'nova-senha';
+
+  if (session && isPasswordRecovery) {
+    return inNovaSenha ? null : '/nova-senha';
+  }
+
+  if (!session) {
+    return inAuthGroup || inAuthCallback ? null : '/(auth)';
+  }
+
+  if (inAuthGroup) {
+    return '/(tabs)';
+  }
+
+  if (!onboardingCompleted) {
+    return inOnboardingGroup ? null : '/(onboarding)';
+  }
+
+  if (inOnboardingGroup || inAuthCallback || inNovaSenha) {
+    return '/(tabs)';
+  }
+
+  return null;
+}
+
 function RootNavigation() {
   const { session, loading: authLoading, isPasswordRecovery } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
@@ -64,45 +113,28 @@ function RootNavigation() {
 
   useNotificationScheduler();
 
-  if (authLoading || (session && profileLoading)) {
+  const ready = !authLoading && !(session && profileLoading);
+
+  useEffect(() => {
+    if (!ready) return;
+
+    const target = resolveTargetRoute({
+      session,
+      isPasswordRecovery,
+      onboardingCompleted: !!profile?.onboarding_completed_at,
+      segments,
+    });
+
+    if (target) {
+      router.replace(target);
+    }
+    // segments é um array novo a cada render; usamos seu conteúdo via join
+    // para não disparar o efeito por causa só da referência ter mudado.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, session, isPasswordRecovery, profile?.onboarding_completed_at, segments.join('/')]);
+
+  if (!ready) {
     return null;
-  }
-
-  const inAuthGroup = segments[0] === '(auth)';
-  const inOnboardingGroup = segments[0] === '(onboarding)';
-  // Rota real (não grupo) /auth/callback: alvo do deep link de confirmação/
-  // magic link/recuperação de senha do Supabase. Precisa ficar de fora do
-  // redirect abaixo — useAuthDeepLink ainda está processando o token quando
-  // esta tela monta pela primeira vez (session ainda null), e sem essa
-  // exceção o redirect para /(auth) competia com o redirect pós-login e
-  // criava loop infinito.
-  const inAuthCallback = segments[0] === 'auth';
-  const inNovaSenha = segments[0] === 'nova-senha';
-
-  // Prioridade máxima: sessão de recuperação de senha nunca deve cair no
-  // fluxo normal (onboarding/tabs) enquanto a senha não for definida.
-  if (session && isPasswordRecovery && !inNovaSenha) {
-    return <Redirect href="/nova-senha" />;
-  }
-
-  if (!session && !inAuthGroup && !inAuthCallback) {
-    return <Redirect href="/(auth)" />;
-  }
-
-  if (session && inAuthGroup) {
-    return <Redirect href="/(tabs)" />;
-  }
-
-  if (session && !profile?.onboarding_completed_at && !inOnboardingGroup) {
-    return <Redirect href="/(onboarding)" />;
-  }
-
-  if (
-    session &&
-    profile?.onboarding_completed_at &&
-    (inOnboardingGroup || inAuthCallback || inNovaSenha)
-  ) {
-    return <Redirect href="/(tabs)" />;
   }
 
   return <Slot />;
