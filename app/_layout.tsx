@@ -70,8 +70,14 @@ function RootNavigation() {
 
   const inAuthGroup = segments[0] === '(auth)';
   const inOnboardingGroup = segments[0] === '(onboarding)';
+  // Rota real (não grupo) /auth/callback: alvo do deep link de confirmação/
+  // magic link do Supabase. Precisa ficar de fora do redirect abaixo —
+  // useAuthDeepLink ainda está processando o token quando esta tela monta
+  // pela primeira vez (session ainda null), e sem essa exceção o redirect
+  // para /(auth) competia com o redirect pós-login e criava loop infinito.
+  const inAuthCallback = segments[0] === 'auth';
 
-  if (!session && !inAuthGroup) {
+  if (!session && !inAuthGroup && !inAuthCallback) {
     return <Redirect href="/(auth)" />;
   }
 
@@ -83,7 +89,7 @@ function RootNavigation() {
     return <Redirect href="/(onboarding)" />;
   }
 
-  if (session && profile?.onboarding_completed_at && inOnboardingGroup) {
+  if (session && profile?.onboarding_completed_at && (inOnboardingGroup || inAuthCallback)) {
     return <Redirect href="/(tabs)" />;
   }
 
