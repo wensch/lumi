@@ -1,12 +1,14 @@
 import { Pressable, StyleSheet, Text, type PressableProps } from 'react-native';
 import { colors, radius, spacing, typography } from '@/theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'tertiary';
 
 type ButtonProps = PressableProps & {
   label: string;
   variant?: ButtonVariant;
 };
+
+const LIGHT_LABEL_VARIANTS: ButtonVariant[] = ['ghost', 'tertiary'];
 
 export function Button({ label, variant = 'primary', style, disabled, ...rest }: ButtonProps) {
   return (
@@ -22,7 +24,9 @@ export function Button({ label, variant = 'primary', style, disabled, ...rest }:
       ]}
       {...rest}
     >
-      <Text style={[styles.label, variant === 'ghost' && styles.labelGhost]}>{label}</Text>
+      <Text style={[styles.label, LIGHT_LABEL_VARIANTS.includes(variant) && styles.labelLight]}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -45,7 +49,7 @@ const styles = StyleSheet.create({
     ...typography.bodyStrong,
     color: colors.white,
   },
-  labelGhost: {
+  labelLight: {
     color: colors.greenDark,
   },
 });
@@ -61,5 +65,10 @@ const variantStyles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderWidth: 2,
     borderColor: colors.greenPrimary,
+  },
+  // Ação de baixa ênfase (ex: "Voltar", cancelar) — sem borda, para não
+  // competir visualmente com a ação secundária real da mesma tela.
+  tertiary: {
+    backgroundColor: 'transparent',
   },
 });
