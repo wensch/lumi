@@ -25,6 +25,7 @@ import { AuthProvider, useAuth } from '@/features/auth';
 import { useProfile } from '@/features/onboarding';
 import { configureNotificationHandler, useNotificationScheduler } from '@/features/notifications';
 import { ThemeProvider } from '@/theme';
+import { I18nProvider } from '@/i18n';
 
 SplashScreen.preventAutoHideAsync();
 configureNotificationHandler();
@@ -64,14 +65,16 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider>
-        <YouVersionProvider appKey={youVersionAppKey} theme="system" auth={youVersionAuthConfig}>
-          <AuthProvider>
-            <StatusBar style="dark" />
-            <RootNavigation />
-          </AuthProvider>
-        </YouVersionProvider>
-      </ThemeProvider>
+      <I18nProvider>
+        <ThemeProvider>
+          <YouVersionProvider appKey={youVersionAppKey} theme="system" auth={youVersionAuthConfig}>
+            <AuthProvider>
+              <StatusBar style="dark" />
+              <RootNavigation />
+            </AuthProvider>
+          </YouVersionProvider>
+        </ThemeProvider>
+      </I18nProvider>
     </GestureHandlerRootView>
   );
 }

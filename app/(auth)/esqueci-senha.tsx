@@ -5,10 +5,12 @@ import { Button, Card, Screen, TextField } from '@/components';
 import { isValidEmail, useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 export default function EsqueciSenhaScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
   const { sendPasswordReset } = useAuth();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -19,12 +21,12 @@ export default function EsqueciSenhaScreen() {
     setError(null);
 
     if (!email.trim()) {
-      setError('Informe seu email.');
+      setError(t('auth.emailRequired'));
       return;
     }
 
     if (!isValidEmail(email)) {
-      setError('Email inválido.');
+      setError(t('auth.emailInvalid'));
       return;
     }
 
@@ -33,7 +35,7 @@ export default function EsqueciSenhaScreen() {
     setSubmitting(false);
 
     if (resetError) {
-      setError('Não foi possível enviar o link agora. Tenta de novo em instantes.');
+      setError(t('forgotPassword.genericError'));
       return;
     }
 
@@ -43,31 +45,29 @@ export default function EsqueciSenhaScreen() {
   return (
     <Screen centered contentContainerStyle={styles.content}>
       <LumiMascot mood="waiting" size={120} />
-      <Text style={[theme.typography.title, styles.title]}>Esqueceu sua senha?</Text>
-      <Text style={[theme.typography.body, styles.subtitle]}>
-        Informa seu email que a gente manda um link pra você criar uma nova.
-      </Text>
+      <Text style={[theme.typography.title, styles.title]}>{t('forgotPassword.title')}</Text>
+      <Text style={[theme.typography.body, styles.subtitle]}>{t('forgotPassword.subtitle')}</Text>
 
       <Card style={styles.card}>
         <TextField
-          label="Email"
-          placeholder="voce@exemplo.com"
+          label={t('common.email')}
+          placeholder={t('auth.emailPlaceholder')}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        {sent ? <Text style={styles.successText}>Link enviado! Confira seu email.</Text> : null}
+        {sent ? <Text style={styles.successText}>{t('forgotPassword.sent')}</Text> : null}
 
         <Button
-          label={submitting ? 'Enviando...' : 'Enviar link de redefinição'}
+          label={submitting ? t('forgotPassword.submitting') : t('forgotPassword.submit')}
           onPress={handleSubmit}
           disabled={submitting}
         />
       </Card>
 
-      <Button variant="tertiary" label="Voltar" onPress={() => router.back()} />
+      <Button variant="tertiary" label={t('common.back')} onPress={() => router.back()} />
     </Screen>
   );
 }

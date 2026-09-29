@@ -4,10 +4,12 @@ import { Card, Screen, ScreenHeader, Section } from '@/components';
 import { useProfileHistory } from '@/features/profile';
 import { ShareStreakButton } from '@/features/share';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 export default function PerfilScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t, language } = useTranslation();
   const {
     currentStreak,
     longestStreak,
@@ -19,22 +21,22 @@ export default function PerfilScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title="Perfil" onSettingsPress={() => router.push('/configuracoes')} />
+      <ScreenHeader title={t('tabs.profile')} onSettingsPress={() => router.push('/configuracoes')} />
 
       <View style={styles.streaksRow}>
         <Card style={[styles.streakCard, styles.streakCardHighlight]}>
           <Text style={theme.typography.display}>{currentStreak}</Text>
-          <Text style={styles.streakLabel}>sequência atual</Text>
+          <Text style={styles.streakLabel}>{t('profile.currentStreak')}</Text>
         </Card>
         <Card style={styles.streakCard}>
           <Text style={theme.typography.display}>{longestStreak}</Text>
-          <Text style={styles.streakLabel}>maior sequência</Text>
+          <Text style={styles.streakLabel}>{t('profile.longestStreak')}</Text>
         </Card>
       </View>
 
       {currentStreak > 0 ? <ShareStreakButton streak={currentStreak} totalXp={totalXp} /> : null}
 
-      <Section label="Conquistas" pillLabel>
+      <Section label={t('profile.achievements')} pillLabel>
         <View style={styles.achievementsGrid}>
           {allAchievements.map((achievement) => {
             const unlocked = unlockedAchievementIds.has(achievement.id);
@@ -50,18 +52,20 @@ export default function PerfilScreen() {
         </View>
       </Section>
 
-      <Section label="Histórico recente" pillLabel>
+      <Section label={t('profile.recentHistory')} pillLabel>
         {recentSessions.length === 0 ? (
-          <Text style={theme.typography.body}>Seus devocionais concluídos aparecem aqui.</Text>
+          <Text style={theme.typography.body}>{t('profile.noHistoryYet')}</Text>
         ) : (
           <View style={styles.historyList}>
             {recentSessions.map((entry) => (
               <View key={entry.id} style={styles.historyRow}>
                 <Text style={theme.typography.bodyStrong}>
-                  {entry.content_title ?? 'Devocional'}
+                  {entry.content_title ?? t('profile.defaultDevotionalName')}
                 </Text>
                 <Text style={styles.historyDate}>
-                  {new Date(entry.completed_at).toLocaleDateString('pt-BR')}
+                  {new Date(entry.completed_at).toLocaleDateString(
+                    language === 'en' ? 'en-US' : 'pt-BR',
+                  )}
                 </Text>
               </View>
             ))}

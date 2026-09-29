@@ -9,13 +9,14 @@ import { requestNotificationPermission, scheduleDailyReminder } from '@/features
 import { supabase } from '@/lib/supabase';
 import type { AgeRange } from '@/lib/supabase';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
-const AGE_RANGES: { value: AgeRange; label: string }[] = [
-  { value: 'kid', label: 'Criança' },
-  { value: 'teen', label: 'Adolescente' },
-  { value: 'adult', label: 'Adulto' },
-  { value: 'senior', label: 'Idoso' },
-];
+const AGE_RANGE_KEYS: Record<AgeRange, string> = {
+  kid: 'ageKid',
+  teen: 'ageTeen',
+  adult: 'ageAdult',
+  senior: 'ageSenior',
+};
 
 const STEPS = ['name', 'age', 'time'] as const;
 type Step = (typeof STEPS)[number];
@@ -23,8 +24,14 @@ type Step = (typeof STEPS)[number];
 export default function OnboardingScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
   const { session } = useAuth();
   const { refetch } = useProfile();
+
+  const ageRanges = (Object.keys(AGE_RANGE_KEYS) as AgeRange[]).map((value) => ({
+    value,
+    label: t(`onboarding.${AGE_RANGE_KEYS[value]}` as const),
+  }));
 
   const [stepIndex, setStepIndex] = useState(0);
   const step: Step = STEPS[stepIndex];
@@ -39,7 +46,7 @@ export default function OnboardingScreen() {
     setError(null);
     if (step === 'name') {
       if (!displayName.trim()) {
-        setError('Como podemos te chamar?');
+        setError(t('onboarding.nameRequired'));
         return;
       }
       setStepIndex(stepIndex + 1);
@@ -47,7 +54,7 @@ export default function OnboardingScreen() {
     }
     if (step === 'age') {
       if (!ageRange) {
-        setError('Escolha uma faixa etária.');
+        setError(t('onboarding.ageRequired'));
         return;
       }
       setStepIndex(stepIndex + 1);
@@ -104,10 +111,10 @@ export default function OnboardingScreen() {
       <Card style={styles.card}>
         {step === 'name' ? (
           <>
-            <Text style={theme.typography.heading}>Como podemos te chamar?</Text>
+            <Text style={theme.typography.heading}>{t('onboarding.nameQuestion')}</Text>
             <TextField
-              label="Nome"
-              placeholder="Seu nome"
+              label={t('onboarding.nameLabel')}
+              placeholder={t('onboarding.namePlaceholder')}
               value={displayName}
               onChangeText={setDisplayName}
               autoCapitalize="words"
@@ -117,10 +124,10 @@ export default function OnboardingScreen() {
 
         {step === 'age' ? (
           <>
-            <Text style={theme.typography.heading}>Qual sua faixa etária?</Text>
-            <Text style={styles.helperText}>Isso nos ajuda a personalizar sua experiência.</Text>
+            <Text style={theme.typography.heading}>{t('onboarding.ageQuestion')}</Text>
+            <Text style={styles.helperText}>{t('onboarding.ageHelper')}</Text>
             <View style={styles.optionsGrid}>
-              {AGE_RANGES.map((option) => (
+              {ageRanges.map((option) => (
                 <Button
                   key={option.value}
                   label={option.label}
@@ -134,8 +141,8 @@ export default function OnboardingScreen() {
 
         {step === 'time' ? (
           <>
-            <Text style={theme.typography.heading}>Que horas você quer ser lembrado?</Text>
-            <Text style={styles.helperText}>Pode ajustar isso depois no seu perfil.</Text>
+            <Text style={theme.typography.heading}>{t('onboarding.timeQuestion')}</Text>
+            <Text style={styles.helperText}>{t('onboarding.timeHelper')}</Text>
             {Platform.OS === 'android' && !showPicker ? (
               <Button
                 variant="ghost"
@@ -164,13 +171,18 @@ export default function OnboardingScreen() {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <Button
-          label={step === 'time' ? 'Concluir' : 'Continuar'}
+          label={step === 'time' ? t('onboarding.finish') : t('onboarding.continue')}
           onPress={step === 'time' ? finish : goNext}
           disabled={submitting}
         />
 
         {stepIndex > 0 ? (
-          <Button label="Voltar" variant="tertiary" onPress={goBack} disabled={submitting} />
+          <Button
+            label={t('common.back')}
+            variant="tertiary"
+            onPress={goBack}
+            disabled={submitting}
+          />
         ) : null}
       </Card>
     </Screen>

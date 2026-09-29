@@ -6,6 +6,7 @@ import { Button, Card, ScreenContainer, TextField } from '@/components';
 import { isValidEmail, translateAuthError, useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 type Mode = 'sign_in' | 'sign_up';
 type Method = 'password' | 'magic_link';
@@ -13,6 +14,7 @@ type Method = 'password' | 'magic_link';
 export default function AuthScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
   const { signInWithPassword, signUpWithPassword, signInWithMagicLink } = useAuth();
   const {
     signIn: signInWithYouVersion,
@@ -42,7 +44,7 @@ export default function AuthScreen() {
       // resolve e o provider re-renderiza — a ponte pro Supabase acontece
       // no useEffect abaixo, reagindo a yvAuthenticated/yvUserInfo.
     } catch {
-      setYouVersionError('Não foi possível conectar com a YouVersion. Tente de novo.');
+      setYouVersionError(t('auth.youVersionError'));
       setSubmitting(false);
     }
   };
@@ -50,7 +52,7 @@ export default function AuthScreen() {
   useEffect(() => {
     if (yvAuthError) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza com erro reportado pelo SDK YouVersion (sistema externo)
-      setYouVersionError('Não foi possível conectar com a YouVersion. Tente de novo.');
+      setYouVersionError(t('auth.youVersionError'));
       setSubmitting(false);
       return;
     }
@@ -58,9 +60,7 @@ export default function AuthScreen() {
     if (!yvAuthenticated) return;
 
     if (!yvUserInfo?.email) {
-      setYouVersionError(
-        'Sua conta YouVersion não retornou um email. Tente outro método de login.',
-      );
+      setYouVersionError(t('auth.youVersionNoEmail'));
       setSubmitting(false);
       return;
     }
@@ -74,13 +74,13 @@ export default function AuthScreen() {
       const { error: authError } = await signInWithMagicLink(yvUserInfo.email as string);
       setSubmitting(false);
       if (authError) {
-        setError(translateAuthError(authError));
+        setError(translateAuthError(authError, t));
         return;
       }
       setEmail(yvUserInfo.email as string);
       setMagicLinkSent(true);
     })();
-  }, [yvAuthenticated, yvUserInfo, yvAuthError, signInWithMagicLink]);
+  }, [yvAuthenticated, yvUserInfo, yvAuthError, signInWithMagicLink, t]);
 
   const handleSubmit = async () => {
     setError(null);
@@ -88,12 +88,12 @@ export default function AuthScreen() {
     setNeedsEmailConfirmation(false);
 
     if (!email.trim()) {
-      setError('Informe seu email.');
+      setError(t('auth.emailRequired'));
       return;
     }
 
     if (!isValidEmail(email)) {
-      setError('Email inválido.');
+      setError(t('auth.emailInvalid'));
       return;
     }
 
@@ -102,7 +102,7 @@ export default function AuthScreen() {
       if (method === 'magic_link') {
         const { error: authError } = await signInWithMagicLink(email.trim());
         if (authError) {
-          setError(translateAuthError(authError));
+          setError(translateAuthError(authError, t));
         } else {
           setMagicLinkSent(true);
         }
@@ -110,14 +110,14 @@ export default function AuthScreen() {
       }
 
       if (!password) {
-        setError('Informe sua senha.');
+        setError(t('auth.passwordRequired'));
         return;
       }
 
       if (mode === 'sign_in') {
         const { error: authError } = await signInWithPassword(email.trim(), password);
         if (authError) {
-          setError(translateAuthError(authError));
+          setError(translateAuthError(authError, t));
         }
         return;
       }
@@ -128,7 +128,7 @@ export default function AuthScreen() {
       );
 
       if (authError) {
-        setError(translateAuthError(authError));
+        setError(translateAuthError(authError, t));
       } else if (shouldConfirm) {
         setNeedsEmailConfirmation(true);
       }
@@ -151,17 +151,15 @@ export default function AuthScreen() {
           <View style={styles.mascotWrapper}>
             <LumiMascot mood="normal" size={120} />
           </View>
-          <Text style={theme.typography.title}>Bem-vindo ao Lumi</Text>
+          <Text style={theme.typography.title}>{t('auth.welcomeTitle')}</Text>
           <Text style={[theme.typography.body, styles.subtitle]}>
-            {mode === 'sign_in'
-              ? 'Entre para continuar sua constância.'
-              : 'Crie sua conta para começar.'}
+            {mode === 'sign_in' ? t('auth.signInSubtitle') : t('auth.signUpSubtitle')}
           </Text>
 
           <Card style={styles.card}>
             <TextField
-              label="Email"
-              placeholder="voce@exemplo.com"
+              label={t('common.email')}
+              placeholder={t('auth.emailPlaceholder')}
               keyboardType="email-address"
               value={email}
               onChangeText={setEmail}
@@ -169,7 +167,7 @@ export default function AuthScreen() {
 
             {method === 'password' ? (
               <TextField
-                label="Senha"
+                label={t('common.password')}
                 placeholder="••••••••"
                 secureTextEntry
                 value={password}
@@ -179,21 +177,19 @@ export default function AuthScreen() {
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             {magicLinkSent ? (
-              <Text style={styles.successText}>Link enviado! Confira seu email.</Text>
+              <Text style={styles.successText}>{t('auth.magicLinkSent')}</Text>
             ) : null}
             {needsEmailConfirmation ? (
-              <Text style={styles.successText}>
-                Conta criada! Confira seu email para confirmar antes de entrar.
-              </Text>
+              <Text style={styles.successText}>{t('auth.signUpConfirmationSent')}</Text>
             ) : null}
 
             <Button
               label={
                 method === 'magic_link'
-                  ? 'Enviar link mágico'
+                  ? t('auth.sendMagicLink')
                   : mode === 'sign_in'
-                    ? 'Entrar'
-                    : 'Criar conta'
+                    ? t('auth.signIn')
+                    : t('auth.signUp')
               }
               onPress={handleSubmit}
               disabled={submitting}
@@ -201,7 +197,7 @@ export default function AuthScreen() {
 
             <Button
               variant="tertiary"
-              label={method === 'password' ? 'Entrar sem senha (magic link)' : 'Entrar com senha'}
+              label={method === 'password' ? t('auth.useMagicLink') : t('auth.usePassword')}
               onPress={() => {
                 setMethod(method === 'password' ? 'magic_link' : 'password');
                 setError(null);
@@ -212,7 +208,7 @@ export default function AuthScreen() {
             {method === 'password' && mode === 'sign_in' ? (
               <Button
                 variant="tertiary"
-                label="Esqueci minha senha"
+                label={t('auth.forgotPassword')}
                 onPress={() => router.push('/(auth)/esqueci-senha')}
               />
             ) : null}
@@ -221,11 +217,11 @@ export default function AuthScreen() {
           {method === 'password' ? (
             <View style={styles.toggleRow}>
               <Text style={theme.typography.body}>
-                {mode === 'sign_in' ? 'Ainda não tem conta?' : 'Já tem conta?'}
+                {mode === 'sign_in' ? t('auth.noAccountYet') : t('auth.alreadyHaveAccount')}
               </Text>
               <Button
                 variant="tertiary"
-                label={mode === 'sign_in' ? 'Criar conta' : 'Entrar'}
+                label={mode === 'sign_in' ? t('auth.signUp') : t('auth.signIn')}
                 onPress={() => {
                   setMode(mode === 'sign_in' ? 'sign_up' : 'sign_in');
                   setError(null);
@@ -238,12 +234,12 @@ export default function AuthScreen() {
             {youVersionError ? <Text style={styles.errorText}>{youVersionError}</Text> : null}
             <Button
               variant="ghost"
-              label="Entrar com YouVersion"
+              label={t('auth.signInWithYouVersion')}
               onPress={handleYouVersionSignIn}
               disabled={submitting}
             />
             <Text style={[theme.typography.caption, styles.subtitle]}>
-              Enviamos um link de confirmação para o email da sua conta YouVersion.
+              {t('auth.youVersionHint')}
             </Text>
           </Card>
         </ScrollView>

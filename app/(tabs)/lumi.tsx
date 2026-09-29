@@ -3,24 +3,31 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card, Screen, ScreenHeader } from '@/components';
 import { LumiMascot, type LumiMoodVariant } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
-const STATES: { mood: LumiMoodVariant; label: string }[] = [
-  { mood: 'normal', label: 'Normal' },
-  { mood: 'happy', label: 'Feliz' },
-  { mood: 'celebrating', label: 'Comemorando' },
-  { mood: 'waiting', label: 'Esperando' },
-  { mood: 'missing_you', label: 'Com saudade' },
-];
+const MOOD_KEYS = {
+  normal: 'normal',
+  happy: 'happy',
+  celebrating: 'celebrating',
+  waiting: 'waiting',
+  missing_you: 'missingYou',
+} as const satisfies Record<LumiMoodVariant, string>;
 
 export default function LumiScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
   const [selected, setSelected] = useState(0);
-  const current = STATES[selected];
+
+  const states = (Object.keys(MOOD_KEYS) as LumiMoodVariant[]).map((mood) => ({
+    mood,
+    label: t(`lumi.${MOOD_KEYS[mood]}` as const),
+  }));
+  const current = states[selected];
 
   return (
     <Screen>
-      <ScreenHeader title="Lumi" />
+      <ScreenHeader title={t('tabs.lumi')} />
 
       <Card style={styles.moodCard}>
         <LumiMascot mood={current.mood} size={250} />
@@ -28,7 +35,7 @@ export default function LumiScreen() {
       </Card>
 
       <View style={styles.chipsRow}>
-        {STATES.map((state, index) => {
+        {states.map((state, index) => {
           const isSelected = index === selected;
           return (
             <Pressable
@@ -42,9 +49,7 @@ export default function LumiScreen() {
         })}
       </View>
 
-      <Text style={styles.helperText}>
-        Mais estados, evolução e personalização do Lumi aparecem aqui em breve.
-      </Text>
+      <Text style={styles.helperText}>{t('lumi.comingSoon')}</Text>
     </Screen>
   );
 }

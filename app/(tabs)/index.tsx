@@ -5,19 +5,21 @@ import { lumiGreeting, useHomeData, type WeekDay } from '@/features/home';
 import { LumiMascot } from '@/features/lumi';
 import { ShareStreakButton } from '@/features/share';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 const WEEKDAY_LETTERS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
 export default function HojeScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
   const { currentStreak, longestStreak, totalXp, daysSinceLastCompleted, week, loading } =
     useHomeData();
 
   if (loading) {
     return (
       <Screen centered>
-        <Text style={theme.typography.body}>Carregando…</Text>
+        <Text style={theme.typography.body}>{t('common.loading')}</Text>
       </Screen>
     );
   }
@@ -46,13 +48,15 @@ export default function HojeScreen() {
       {completedToday ? (
         <>
           <Card style={styles.messageCard}>
-            <Text style={[theme.typography.heading, styles.centeredText]}>Você já veio hoje!</Text>
+            <Text style={[theme.typography.heading, styles.centeredText]}>
+              {t('home.alreadyCameToday')}
+            </Text>
             <Text style={[theme.typography.body, styles.messageSubtitle]}>
-              Quer registrar mais alguma coisa ou só voltar amanhã. Sem pressa.
+              {t('home.alreadyCameSubtitle')}
             </Text>
           </Card>
           <Button
-            label="Fazer mais um devocional"
+            label={t('home.anotherDevotional')}
             variant="ghost"
             onPress={() => router.push('/devocional')}
           />
@@ -61,17 +65,18 @@ export default function HojeScreen() {
       ) : (
         <>
           <Card style={styles.messageCard}>
-            <Text style={styles.devotionalKicker}>Devocional de hoje</Text>
+            <Text style={styles.devotionalKicker}>{t('home.devotionalOfTheDay')}</Text>
             <Text style={theme.typography.heading}>{greeting.title}</Text>
           </Card>
-          <Button label="Começar meu devocional" onPress={() => router.push('/devocional')} />
+          <Button label={t('home.startDevotional')} onPress={() => router.push('/devocional')} />
         </>
       )}
 
       {longestStreak > currentStreak ? (
         <Text style={styles.recordHint}>
-          Seu recorde é de {longestStreak} {longestStreak === 1 ? 'dia' : 'dias'} — já rolou antes,
-          rola de novo.
+          {t('home.recordHint', {
+            record: `${longestStreak} ${t(longestStreak === 1 ? 'home.day' : 'home.days')}`,
+          })}
         </Text>
       ) : null}
     </Screen>

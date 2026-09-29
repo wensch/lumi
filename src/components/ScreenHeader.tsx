@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 type ScreenHeaderProps = {
   title: string;
@@ -11,6 +12,7 @@ type ScreenHeaderProps = {
 export function ScreenHeader({ title, onSettingsPress }: ScreenHeaderProps) {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
@@ -18,7 +20,7 @@ export function ScreenHeader({ title, onSettingsPress }: ScreenHeaderProps) {
       <Pressable
         onPress={onSettingsPress}
         accessibilityRole="button"
-        accessibilityLabel="Configurações"
+        accessibilityLabel={t('settings.title')}
         style={styles.settingsButton}
       >
         <Ionicons name="settings-outline" size={18} color={theme.colors.ink} />

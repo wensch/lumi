@@ -7,6 +7,7 @@ import { useAuth } from '@/features/auth';
 import { useNotificationPreferences } from '@/features/settings';
 import { requestNotificationPermission } from '@/features/notifications';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation, type LanguageCode } from '@/i18n';
 
 function timeStringToDate(time: string | null): Date {
   if (!time) return new Date(2000, 0, 1, 8, 0);
@@ -14,9 +15,15 @@ function timeStringToDate(time: string | null): Date {
   return new Date(2000, 0, 1, Number(hourStr), Number(minuteStr));
 }
 
+const LANGUAGES: { code: LanguageCode; labelKey: 'settings.languagePortuguese' | 'settings.languageEnglish' }[] = [
+  { code: 'pt', labelKey: 'settings.languagePortuguese' },
+  { code: 'en', labelKey: 'settings.languageEnglish' },
+];
+
 export default function ConfiguracoesScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t, language, setLanguage } = useTranslation();
   const { session, signOut } = useAuth();
   const { remindersEnabled, preferredTime, loading, updatePreferredTime, setRemindersEnabled } =
     useNotificationPreferences();
@@ -43,13 +50,13 @@ export default function ConfiguracoesScreen() {
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={theme.typography.display}>Configurações</Text>
-        <Button variant="tertiary" label="Voltar" onPress={() => router.back()} />
+        <Text style={theme.typography.display}>{t('settings.title')}</Text>
+        <Button variant="tertiary" label={t('common.back')} onPress={() => router.back()} />
       </View>
 
-      <Section label="Lembretes">
+      <Section label={t('settings.reminders')}>
         <View style={styles.row}>
-          <Text style={theme.typography.bodyStrong}>Lembrete diário</Text>
+          <Text style={theme.typography.bodyStrong}>{t('settings.dailyReminder')}</Text>
           <Switch
             value={remindersEnabled}
             onValueChange={handleToggleReminders}
@@ -60,11 +67,11 @@ export default function ConfiguracoesScreen() {
 
         {remindersEnabled ? (
           <>
-            <Text style={styles.helperText}>Horário do lembrete</Text>
+            <Text style={styles.helperText}>{t('settings.reminderTime')}</Text>
             {Platform.OS === 'android' && !showPicker ? (
               <Button
                 variant="ghost"
-                label={preferredTime ? preferredTime.slice(0, 5) : 'Definir horário'}
+                label={preferredTime ? preferredTime.slice(0, 5) : t('settings.setTime')}
                 onPress={() => setShowPicker(true)}
               />
             ) : null}
@@ -80,7 +87,7 @@ export default function ConfiguracoesScreen() {
         ) : null}
       </Section>
 
-      <Section label="Aparência">
+      <Section label={t('settings.appearance')}>
         <View style={styles.paletteRow}>
           {theme.availablePalettes.map((palette) => {
             const isSelected = palette.name === theme.palette.name;
@@ -100,9 +107,31 @@ export default function ConfiguracoesScreen() {
         </View>
       </Section>
 
-      <Section label="Conta">
-        <Text style={styles.accountEmail}>Conectado como {session?.user.email}</Text>
-        <Button variant="tertiary" label="Sair" onPress={signOut} />
+      <Section label={t('settings.language')}>
+        <View style={styles.paletteRow}>
+          {LANGUAGES.map((option) => {
+            const isSelected = option.code === language;
+            return (
+              <Pressable
+                key={option.code}
+                onPress={() => setLanguage(option.code)}
+                style={[
+                  styles.paletteChip,
+                  { backgroundColor: isSelected ? theme.colors.green : theme.colors.white },
+                ]}
+              >
+                <Text style={styles.paletteLabel}>{t(option.labelKey)}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </Section>
+
+      <Section label={t('settings.account')}>
+        <Text style={styles.accountEmail}>
+          {t('settings.connectedAs', { email: session?.user.email ?? '' })}
+        </Text>
+        <Button variant="tertiary" label={t('common.signOut')} onPress={signOut} />
       </Section>
     </Screen>
   );

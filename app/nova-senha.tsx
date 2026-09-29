@@ -4,6 +4,7 @@ import { Button, Card, Screen, TextField } from '@/components';
 import { useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 /**
  * Alvo do link de "esqueci minha senha", depois que useAuthDeepLink
@@ -15,6 +16,7 @@ import { useTheme, type Theme } from '@/theme';
 export default function NovaSenhaScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
   const { updatePassword } = useAuth();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,12 +27,12 @@ export default function NovaSenhaScreen() {
     setError(null);
 
     if (password.length < 6) {
-      setError('A senha precisa ter pelo menos 6 caracteres.');
+      setError(t('newPassword.tooShort'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('As senhas não coincidem.');
+      setError(t('newPassword.mismatch'));
       return;
     }
 
@@ -39,28 +41,26 @@ export default function NovaSenhaScreen() {
     setSubmitting(false);
 
     if (updateError) {
-      setError('Não foi possível salvar a nova senha. Tenta de novo.');
+      setError(t('newPassword.genericError'));
     }
   };
 
   return (
     <Screen centered contentContainerStyle={styles.content}>
       <LumiMascot mood="normal" size={120} />
-      <Text style={[theme.typography.title, styles.title]}>Nova senha</Text>
-      <Text style={[theme.typography.body, styles.subtitle]}>
-        Escolha uma nova senha para sua conta.
-      </Text>
+      <Text style={[theme.typography.title, styles.title]}>{t('newPassword.title')}</Text>
+      <Text style={[theme.typography.body, styles.subtitle]}>{t('newPassword.subtitle')}</Text>
 
       <Card style={styles.card}>
         <TextField
-          label="Nova senha"
+          label={t('newPassword.newPassword')}
           placeholder="••••••••"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
         />
         <TextField
-          label="Confirmar nova senha"
+          label={t('newPassword.confirmPassword')}
           placeholder="••••••••"
           secureTextEntry
           value={confirmPassword}
@@ -70,7 +70,7 @@ export default function NovaSenhaScreen() {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <Button
-          label={submitting ? 'Salvando...' : 'Salvar nova senha'}
+          label={submitting ? t('newPassword.submitting') : t('newPassword.submit')}
           onPress={handleSubmit}
           disabled={submitting}
         />

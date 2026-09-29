@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 type StreakShareCardProps = {
   streak: number;
@@ -20,19 +21,22 @@ export const StreakShareCard = forwardRef<View, StreakShareCardProps>(function S
 ) {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
 
   return (
     <View ref={ref} style={styles.card} collapsable={false}>
       <View style={styles.badge}>
         <Text style={styles.badgeIcon}>🔥</Text>
         <Text style={styles.streakValue}>{streak}</Text>
-        <Text style={styles.streakLabel}>{streak === 1 ? 'dia seguido' : 'dias seguidos'}</Text>
+        <Text style={styles.streakLabel}>
+          {t(streak === 1 ? 'share.streakOneDay' : 'share.streakManyDays')}
+        </Text>
       </View>
 
       <LumiMascot mood="celebrating" size={320} />
 
-      <Text style={styles.title}>Constância em dia</Text>
-      <Text style={styles.subtitle}>{totalXp} XP acumulado com o Lumi</Text>
+      <Text style={styles.title}>{t('share.title')}</Text>
+      <Text style={styles.subtitle}>{t('share.subtitle', { xp: totalXp })}</Text>
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>Projeto Lumi</Text>

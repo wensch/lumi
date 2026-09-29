@@ -6,6 +6,7 @@ import { ACHIEVEMENT_LABELS } from '@/features/achievements';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 import type { Database } from '@/lib/supabase';
 
 type Content = Database['public']['Tables']['content']['Row'];
@@ -17,7 +18,7 @@ type Result = {
 
 type DevotionalStep = {
   key: string;
-  label: string;
+  labelKey: 'devotional.stepVerse' | 'devotional.stepText' | 'devotional.stepApplication' | 'devotional.stepChallenge' | 'devotional.stepPrayer' | 'devotional.stepReflect';
   bgKey: 'green' | 'white' | 'pink' | 'yellow' | 'blue' | 'bg';
   kind: 'verse' | 'text' | 'reflect';
   text?: string | null;
@@ -25,30 +26,31 @@ type DevotionalStep = {
 
 function buildSteps(content: Content): DevotionalStep[] {
   return [
-    { key: 'verse', label: 'Versículo', bgKey: 'green', kind: 'verse' },
-    { key: 'text', label: 'Texto explicativo', bgKey: 'white', kind: 'text', text: content.body },
+    { key: 'verse', labelKey: 'devotional.stepVerse', bgKey: 'green', kind: 'verse' },
+    { key: 'text', labelKey: 'devotional.stepText', bgKey: 'white', kind: 'text', text: content.body },
     {
       key: 'application',
-      label: 'Aplicação',
+      labelKey: 'devotional.stepApplication',
       bgKey: 'pink',
       kind: 'text',
       text: content.application_text,
     },
     {
       key: 'challenge',
-      label: 'Desafio',
+      labelKey: 'devotional.stepChallenge',
       bgKey: 'yellow',
       kind: 'text',
       text: content.challenge_text,
     },
-    { key: 'prayer', label: 'Oração', bgKey: 'blue', kind: 'text', text: content.prayer_text },
-    { key: 'reflect', label: 'Reflexão', bgKey: 'bg', kind: 'reflect' },
+    { key: 'prayer', labelKey: 'devotional.stepPrayer', bgKey: 'blue', kind: 'text', text: content.prayer_text },
+    { key: 'reflect', labelKey: 'devotional.stepReflect', bgKey: 'bg', kind: 'reflect' },
   ].filter((step) => step.kind !== 'text' || !!step.text) as DevotionalStep[];
 }
 
 export default function DevocionalScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
   const { content, session, loading, completing, error, complete, isReturningFromBreak } =
     useDevotional();
   const [stepIndex, setStepIndex] = useState(0);
@@ -99,7 +101,7 @@ export default function DevocionalScreen() {
   if (loading) {
     return (
       <Screen centered>
-        <Text style={theme.typography.body}>Preparando seu devocional…</Text>
+        <Text style={theme.typography.body}>{t('devotional.preparing')}</Text>
       </Screen>
     );
   }
@@ -108,10 +110,10 @@ export default function DevocionalScreen() {
     return (
       <Screen centered contentContainerStyle={styles.centeredContent}>
         <Text style={[theme.typography.heading, styles.centeredText]}>
-          Ainda não há devocional disponível.
+          {t('devotional.unavailable')}
         </Text>
-        <Text style={[theme.typography.body, styles.subtitle]}>Volte em breve.</Text>
-        <Button label="Voltar" variant="tertiary" onPress={() => router.back()} />
+        <Text style={[theme.typography.body, styles.subtitle]}>{t('devotional.comeBackLater')}</Text>
+        <Button label={t('common.back')} variant="tertiary" onPress={() => router.back()} />
       </Screen>
     );
   }
@@ -131,16 +133,23 @@ export default function DevocionalScreen() {
             <LumiMascot mood="celebrating" size={290} />
           </View>
           <Text style={[theme.typography.heading, styles.centeredText]}>
-            {showReturnWelcome ? 'Que bom te ver de novo!' : 'Devocional concluído!'}
+            {showReturnWelcome ? t('devotional.returnWelcomeTitle') : t('devotional.completedTitle')}
           </Text>
           <Text style={styles.doneChip}>
             {result.xp > 0
-              ? `+${result.xp} XP · sequência de ${result.streak} ${result.streak === 1 ? 'dia' : 'dias'}`
-              : `Sequência de ${result.streak} ${result.streak === 1 ? 'dia' : 'dias'}`}
+              ? t('devotional.xpAndStreak', {
+                  xp: result.xp,
+                  count: result.streak,
+                  unit: t(result.streak === 1 ? 'devotional.day' : 'devotional.days'),
+                })
+              : t('devotional.streakOnly', {
+                  count: result.streak,
+                  unit: t(result.streak === 1 ? 'devotional.day' : 'devotional.days'),
+                })}
           </Text>
           {showReturnWelcome ? (
             <Text style={[theme.typography.caption, styles.subtitle]}>
-              Recomeçar já é a parte que mais importa.
+              {t('devotional.returnWelcomeSubtitle')}
             </Text>
           ) : null}
 
@@ -151,21 +160,21 @@ export default function DevocionalScreen() {
               <Card key={code} padding="compact" style={styles.achievementCard}>
                 <Text style={styles.achievementIcon}>{achievement.icon}</Text>
                 <Text style={theme.typography.bodyStrong}>
-                  Conquista desbloqueada: {achievement.title}
+                  {t('devotional.achievementUnlocked', { title: achievement.title })}
                 </Text>
               </Card>
             );
           })}
 
           <Button
-            label="Transformar isso em oração"
+            label={t('devotional.turnIntoPrayer')}
             variant="secondary"
             onPress={() =>
               router.push({ pathname: '/oracao', params: { devotional_session_id: session?.id } })
             }
           />
           <Button
-            label="Voltar para Hoje"
+            label={t('devotional.backToToday')}
             variant="tertiary"
             onPress={() => router.replace('/(tabs)')}
           />
@@ -180,7 +189,7 @@ export default function DevocionalScreen() {
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
-          accessibilityLabel="Fechar"
+          accessibilityLabel={t('devotional.close')}
           style={styles.closeButton}
         >
           <Text style={styles.closeButtonLabel}>✕</Text>
@@ -196,7 +205,7 @@ export default function DevocionalScreen() {
       </View>
 
       <View style={styles.stepCard}>
-        <Text style={styles.stepPill}>{currentStep.label}</Text>
+        <Text style={styles.stepPill}>{t(currentStep.labelKey)}</Text>
 
         {currentStep.kind === 'verse' ? (
           <>
@@ -211,10 +220,10 @@ export default function DevocionalScreen() {
 
         {currentStep.kind === 'reflect' ? (
           <>
-            <Text style={theme.typography.heading}>Quer registrar uma reflexão? (opcional)</Text>
+            <Text style={theme.typography.heading}>{t('devotional.reflectQuestion')}</Text>
             <TextField
-              label="Sua reflexão"
-              placeholder="O que ficou com você hoje..."
+              label={t('devotional.reflectLabel')}
+              placeholder={t('devotional.reflectPlaceholder')}
               value={reflection}
               onChangeText={setReflection}
               multiline
@@ -227,8 +236,8 @@ export default function DevocionalScreen() {
           showAsk ? (
             <View style={styles.askBox}>
               <TextField
-                label="Sua dúvida sobre esse texto"
-                placeholder="O que isso quer dizer quando fala..."
+                label={t('devotional.askLabel')}
+                placeholder={t('devotional.askPlaceholder')}
                 value={question}
                 onChangeText={setQuestion}
                 multiline
@@ -237,17 +246,17 @@ export default function DevocionalScreen() {
               {answer ? <Text style={styles.answerText}>{answer}</Text> : null}
               <View style={styles.askActions}>
                 <Button
-                  label={asking ? 'Perguntando...' : 'Perguntar'}
+                  label={asking ? t('devotional.asking') : t('devotional.ask')}
                   variant="secondary"
                   onPress={() => ask(question)}
                   disabled={asking || !question.trim()}
                 />
-                <Button label="Fechar" variant="tertiary" onPress={closeAsk} />
+                <Button label={t('devotional.close')} variant="tertiary" onPress={closeAsk} />
               </View>
             </View>
           ) : (
             <Button
-              label="Tirar uma dúvida sobre esse texto"
+              label={t('devotional.askAboutText')}
               variant="ghost"
               onPress={() => setShowAsk(true)}
             />
@@ -268,7 +277,7 @@ export default function DevocionalScreen() {
           </Pressable>
         ) : null}
         <Button
-          label={isLastStep ? 'Concluir meu devocional' : 'Continuar'}
+          label={isLastStep ? t('devotional.finish') : t('devotional.continueButton')}
           onPress={goNext}
           disabled={completing || !session}
           style={styles.nextButton}

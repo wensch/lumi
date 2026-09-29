@@ -1,6 +1,7 @@
 import { Text } from 'react-native';
 import { Screen } from '@/components';
 import { useTheme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 /**
  * Alvo do deep link de confirmação/magic link do Supabase
@@ -11,9 +12,10 @@ import { useTheme } from '@/theme';
  */
 export default function AuthCallbackScreen() {
   const { typography } = useTheme();
+  const { t } = useTranslation();
   return (
     <Screen scroll={false} centered>
-      <Text style={typography.body}>Entrando…</Text>
+      <Text style={typography.body}>{t('common.signingIn')}</Text>
     </Screen>
   );
 }
