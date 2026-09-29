@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { Button, Card, Screen, ScreenContainer, TextField } from '@/components';
 import { ACHIEVEMENT_LABELS } from '@/features/achievements';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
+import { useVersePassage } from '@/features/bible';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -66,6 +67,16 @@ export default function DevocionalScreen() {
   const currentStep = steps[stepIndex];
   const isLastStep = stepIndex === steps.length - 1;
   const canAsk = currentStep?.kind === 'verse' || currentStep?.kind === 'text';
+
+  const isVerseStep = currentStep?.kind === 'verse';
+  const {
+    passage: versePassage,
+    loading: verseLoading,
+    error: verseError,
+  } = useVersePassage(
+    isVerseStep ? (content?.youversion_version_id ?? null) : null,
+    isVerseStep ? (content?.passage_reference ?? null) : null,
+  );
 
   const handleComplete = async () => {
     const outcome = await complete(reflection.trim() || undefined);
@@ -209,8 +220,10 @@ export default function DevocionalScreen() {
 
         {currentStep.kind === 'verse' ? (
           <>
-            <Text style={styles.verseReference}>{content.passage_reference}</Text>
-            <Text style={theme.typography.heading}>{content.title}</Text>
+            <Text style={styles.verseReference}>{versePassage?.reference ?? content.passage_reference}</Text>
+            {verseLoading ? <Text style={styles.stepText}>{t('devotional.preparing')}</Text> : null}
+            {verseError ? <Text style={styles.stepText}>{content.title}</Text> : null}
+            {versePassage ? <Text style={styles.stepText}>{versePassage.content}</Text> : null}
           </>
         ) : null}
 

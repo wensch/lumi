@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { YouVersionProvider } from '@youversion/platform-react-native-expo-ui';
+import { YouVersionProvider as YouVersionDataProvider } from '@youversion/platform-react-hooks';
 import { useFonts } from 'expo-font';
 import {
   Nunito_400Regular,
@@ -68,10 +69,12 @@ export default function RootLayout() {
       <I18nProvider>
         <ThemeProvider>
           <YouVersionProvider appKey={youVersionAppKey} theme="system" auth={youVersionAuthConfig}>
-            <AuthProvider>
-              <StatusBar style="dark" />
-              <RootNavigation />
-            </AuthProvider>
+            <YouVersionDataProvider appKey={youVersionAppKey ?? ''}>
+              <AuthProvider>
+                <StatusBar style="dark" />
+                <RootNavigation />
+              </AuthProvider>
+            </YouVersionDataProvider>
           </YouVersionProvider>
         </ThemeProvider>
       </I18nProvider>
