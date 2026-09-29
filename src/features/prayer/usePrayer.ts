@@ -8,7 +8,6 @@ type PrayerEntry = Database['public']['Tables']['prayer_entries']['Row'];
 export function usePrayer() {
   const { session } = useAuth();
   const [saving, setSaving] = useState(false);
-  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const saveManual = useCallback(
@@ -42,35 +41,5 @@ export function usePrayer() {
     [session],
   );
 
-  const generateWithAI = useCallback(
-    async (personalText: string, devotionalSessionId?: string) => {
-      const trimmed = personalText.trim();
-      if (!trimmed) return null;
-
-      setGenerating(true);
-      setError(null);
-
-      const { data, error: fnError } = await supabase.functions.invoke<{
-        prayer?: PrayerEntry;
-        error?: string;
-      }>('generate-prayer', {
-        body: {
-          personal_text: trimmed,
-          devotional_session_id: devotionalSessionId,
-        },
-      });
-
-      setGenerating(false);
-
-      if (fnError || !data?.prayer) {
-        setError(data?.error ?? 'Não foi possível gerar a oração agora.');
-        return null;
-      }
-
-      return data.prayer;
-    },
-    [],
-  );
-
-  return { saveManual, generateWithAI, saving, generating, error };
+  return { saveManual, saving, error };
 }

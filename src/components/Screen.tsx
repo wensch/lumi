@@ -64,10 +64,11 @@ const getStyles = (theme: Theme) =>
     },
     content: {
       paddingHorizontal: 22,
+      paddingTop: theme.spacing.lg,
       gap: theme.spacing.md,
     },
     scrollContent: {
-      paddingTop: theme.spacing.lg,
+      paddingTop: theme.spacing.xl,
       paddingBottom: 130,
       flexGrow: 1,
     },

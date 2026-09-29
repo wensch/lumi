@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, Screen, ScreenContainer, TextField } from '@/components';
 import { ACHIEVEMENT_LABELS } from '@/features/achievements';
-import { useDevotional } from '@/features/devotional';
+import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import type { Database } from '@/lib/supabase';
@@ -54,10 +54,16 @@ export default function DevocionalScreen() {
   const [stepIndex, setStepIndex] = useState(0);
   const [reflection, setReflection] = useState('');
   const [result, setResult] = useState<Result | null>(null);
+  const [showAsk, setShowAsk] = useState(false);
+  const [question, setQuestion] = useState('');
+  const { ask, reset: resetAsk, asking, answer, error: askError } = useAskAboutDevotional(
+    session?.id ?? null,
+  );
 
   const steps = useMemo(() => (content ? buildSteps(content) : []), [content]);
   const currentStep = steps[stepIndex];
   const isLastStep = stepIndex === steps.length - 1;
+  const canAsk = currentStep?.kind === 'verse' || currentStep?.kind === 'text';
 
   const handleComplete = async () => {
     const outcome = await complete(reflection.trim() || undefined);
@@ -70,15 +76,25 @@ export default function DevocionalScreen() {
     }
   };
 
+  const closeAsk = () => {
+    setShowAsk(false);
+    setQuestion('');
+    resetAsk();
+  };
+
   const goNext = () => {
     if (isLastStep) {
       handleComplete();
       return;
     }
+    closeAsk();
     setStepIndex((i) => i + 1);
   };
 
-  const goBack = () => setStepIndex((i) => Math.max(0, i - 1));
+  const goBack = () => {
+    closeAsk();
+    setStepIndex((i) => Math.max(0, i - 1));
+  };
 
   if (loading) {
     return (
@@ -207,6 +223,37 @@ export default function DevocionalScreen() {
           </>
         ) : null}
 
+        {canAsk ? (
+          showAsk ? (
+            <View style={styles.askBox}>
+              <TextField
+                label="Sua dúvida sobre esse texto"
+                placeholder="O que isso quer dizer quando fala..."
+                value={question}
+                onChangeText={setQuestion}
+                multiline
+              />
+              {askError ? <Text style={styles.errorText}>{askError}</Text> : null}
+              {answer ? <Text style={styles.answerText}>{answer}</Text> : null}
+              <View style={styles.askActions}>
+                <Button
+                  label={asking ? 'Perguntando...' : 'Perguntar'}
+                  variant="secondary"
+                  onPress={() => ask(question)}
+                  disabled={asking || !question.trim()}
+                />
+                <Button label="Fechar" variant="tertiary" onPress={closeAsk} />
+              </View>
+            </View>
+          ) : (
+            <Button
+              label="Tirar uma dúvida sobre esse texto"
+              variant="ghost"
+              onPress={() => setShowAsk(true)}
+            />
+          )
+        ) : null}
+
         <View style={styles.stepMascot}>
           <LumiMascot mood="waiting" size={110} />
         </View>
@@ -294,7 +341,7 @@ const getStyles = (theme: Theme) =>
     // Fluxo em passos
     devScreen: {
       paddingHorizontal: 22,
-      paddingTop: 16,
+      paddingTop: theme.spacing.xl,
       paddingBottom: 26,
       gap: theme.spacing.md,
     },
@@ -366,6 +413,22 @@ const getStyles = (theme: Theme) =>
     },
     reflectionInput: {
       minHeight: 140,
+    },
+    askBox: {
+      gap: theme.spacing.sm,
+    },
+    askActions: {
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    answerText: {
+      ...theme.typography.body,
+      color: theme.colors.ink,
+      backgroundColor: theme.colors.bg,
+      borderWidth: 2,
+      borderColor: theme.colors.ink,
+      borderRadius: theme.radius.md,
+      padding: theme.spacing.md,
     },
     stepMascot: {
       alignSelf: 'flex-end',
