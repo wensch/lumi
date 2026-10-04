@@ -1,0 +1,84 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main, fase-1-mvp, 'claude/**', 'ccr-*']
+    paths-ignore: ['docs/**', 'supabase/**', '**/*.md']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+      EXPO_PUBLIC_YOUVERSION_APP_KEY: ${{ secrets.EXPO_PUBLIC_YOUVERSION_APP_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Check secrets
+        run: |
+          for v in EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_YOUVERSION_APP_KEY; do
+            if [ -z "${!v}" ]; then echo "::error::Secret $v não configurado"; exit 1; fi
+          done
+
+      - run: npm ci --legacy-peer-deps
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm run lint
+
+      # ios/ e android/ não existem no repo (CNG): são gerados a cada build.
+      - run: npx expo prebuild --platform android --no-install
+
+      # Opcional: com o secret ANDROID_DEBUG_KEYSTORE_BASE64 o APK sai sempre com a mesma
+      # assinatura e pode ser instalado por cima da versão anterior.
+      - name: Use fixed signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_DEBUG_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > android/app/debug.keystore
+          else
+            echo "::warning::Sem ANDROID_DEBUG_KEYSTORE_BASE64: a assinatura muda a cada build; desinstale o app antes de atualizar."
+          fi
+
+      - name: Set versionCode
+        run: sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
+
+      - name: Assemble APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lumi-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      # Release fixa "apk-latest": abra a página no celular e baixe o APK.
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk Lumi.apk
+          gh release delete apk-latest --cleanup-tag --yes || true
+          gh release create apk-latest Lumi.apk \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "Lumi (APK mais recente)" \
+            --notes "Build #${{ github.run_number }} do commit $GITHUB_SHA"
