@@ -3,7 +3,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useBibleSearch, type BibleSearchResult } from '@youversion/platform-react-hooks';
 import type { BibleBook } from '@youversion/platform-core';
 import { Card, Screen, ScreenHeader, TextField } from '@/components';
-import { DEFAULT_BIBLE_VERSION_ID, useBibleBook, useBibleBooks, useBibleChapterText } from '@/features/bible';
+import {
+  DEFAULT_BIBLE_VERSION_ID,
+  useBibleBook,
+  useBibleBooks,
+  useBibleChapterText,
+} from '@/features/bible';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 
@@ -24,7 +29,8 @@ export default function BibliaScreen() {
   };
 
   const openBook = (bookId: string) => setView({ kind: 'chapters', bookId });
-  const openChapter = (bookId: string, chapter: number) => setView({ kind: 'reader', bookId, chapter });
+  const openChapter = (bookId: string, chapter: number) =>
+    setView({ kind: 'reader', bookId, chapter });
   const backToList = () => setView({ kind: 'list' });
   const backToChapters = (bookId: string) => setView({ kind: 'chapters', bookId });
 
@@ -254,7 +260,9 @@ function SearchSuggestions({
 
   return (
     <View style={styles.bookListContainer}>
-      <Text style={styles.groupTitle}>{isTrending ? t('bible.trendingSearches') : t('bible.suggestions')}</Text>
+      <Text style={styles.groupTitle}>
+        {isTrending ? t('bible.trendingSearches') : t('bible.suggestions')}
+      </Text>
       <View style={styles.bookGrid}>
         {queries.map((query) => (
           <Pressable key={query.text} onPress={() => onSelect(query.text)} style={styles.bookChip}>

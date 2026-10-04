@@ -26,7 +26,9 @@ export default function OracaoScreen() {
     return (
       <Screen centered contentContainerStyle={styles.centeredContent}>
         <LumiMascot mood="happy" size={160} />
-        <Text style={[theme.typography.heading, styles.centeredText]}>{t('prayer.savedTitle')}</Text>
+        <Text style={[theme.typography.heading, styles.centeredText]}>
+          {t('prayer.savedTitle')}
+        </Text>
         <Text style={[theme.typography.body, styles.subtitle]}>{t('prayer.savedSubtitle')}</Text>
         <Button label={t('devotional.backToToday')} onPress={() => router.replace('/(tabs)')} />
       </Screen>
@@ -52,7 +54,11 @@ export default function OracaoScreen() {
         onPress={handleSave}
         disabled={saving || !manualText.trim()}
       />
-      <Button label={t('prayer.notNow')} variant="tertiary" onPress={() => router.replace('/(tabs)')} />
+      <Button
+        label={t('prayer.notNow')}
+        variant="tertiary"
+        onPress={() => router.replace('/(tabs)')}
+      />
     </Screen>
   );
 }

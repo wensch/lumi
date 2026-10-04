@@ -21,7 +21,10 @@ export default function PerfilScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={t('tabs.profile')} onSettingsPress={() => router.push('/configuracoes')} />
+      <ScreenHeader
+        title={t('tabs.profile')}
+        onSettingsPress={() => router.push('/configuracoes')}
+      />
 
       <View style={styles.streaksRow}>
         <Card style={[styles.streakCard, styles.streakCardHighlight]}>

@@ -19,7 +19,13 @@ type Result = {
 
 type DevotionalStep = {
   key: string;
-  labelKey: 'devotional.stepVerse' | 'devotional.stepText' | 'devotional.stepApplication' | 'devotional.stepChallenge' | 'devotional.stepPrayer' | 'devotional.stepReflect';
+  labelKey:
+    | 'devotional.stepVerse'
+    | 'devotional.stepText'
+    | 'devotional.stepApplication'
+    | 'devotional.stepChallenge'
+    | 'devotional.stepPrayer'
+    | 'devotional.stepReflect';
   bgKey: 'green' | 'white' | 'pink' | 'yellow' | 'blue' | 'bg';
   kind: 'verse' | 'text' | 'reflect';
   text?: string | null;
@@ -28,7 +34,13 @@ type DevotionalStep = {
 function buildSteps(content: Content): DevotionalStep[] {
   return [
     { key: 'verse', labelKey: 'devotional.stepVerse', bgKey: 'green', kind: 'verse' },
-    { key: 'text', labelKey: 'devotional.stepText', bgKey: 'white', kind: 'text', text: content.body },
+    {
+      key: 'text',
+      labelKey: 'devotional.stepText',
+      bgKey: 'white',
+      kind: 'text',
+      text: content.body,
+    },
     {
       key: 'application',
       labelKey: 'devotional.stepApplication',
@@ -43,7 +55,13 @@ function buildSteps(content: Content): DevotionalStep[] {
       kind: 'text',
       text: content.challenge_text,
     },
-    { key: 'prayer', labelKey: 'devotional.stepPrayer', bgKey: 'blue', kind: 'text', text: content.prayer_text },
+    {
+      key: 'prayer',
+      labelKey: 'devotional.stepPrayer',
+      bgKey: 'blue',
+      kind: 'text',
+      text: content.prayer_text,
+    },
     { key: 'reflect', labelKey: 'devotional.stepReflect', bgKey: 'bg', kind: 'reflect' },
   ].filter((step) => step.kind !== 'text' || !!step.text) as DevotionalStep[];
 }
@@ -59,9 +77,13 @@ export default function DevocionalScreen() {
   const [result, setResult] = useState<Result | null>(null);
   const [showAsk, setShowAsk] = useState(false);
   const [question, setQuestion] = useState('');
-  const { ask, reset: resetAsk, asking, answer, error: askError } = useAskAboutDevotional(
-    session?.id ?? null,
-  );
+  const {
+    ask,
+    reset: resetAsk,
+    asking,
+    answer,
+    error: askError,
+  } = useAskAboutDevotional(session?.id ?? null);
 
   const steps = useMemo(() => (content ? buildSteps(content) : []), [content]);
   const currentStep = steps[stepIndex];
@@ -123,7 +145,9 @@ export default function DevocionalScreen() {
         <Text style={[theme.typography.heading, styles.centeredText]}>
           {t('devotional.unavailable')}
         </Text>
-        <Text style={[theme.typography.body, styles.subtitle]}>{t('devotional.comeBackLater')}</Text>
+        <Text style={[theme.typography.body, styles.subtitle]}>
+          {t('devotional.comeBackLater')}
+        </Text>
         <Button label={t('common.back')} variant="tertiary" onPress={() => router.back()} />
       </Screen>
     );
@@ -144,7 +168,9 @@ export default function DevocionalScreen() {
             <LumiMascot mood="celebrating" size={290} />
           </View>
           <Text style={[theme.typography.heading, styles.centeredText]}>
-            {showReturnWelcome ? t('devotional.returnWelcomeTitle') : t('devotional.completedTitle')}
+            {showReturnWelcome
+              ? t('devotional.returnWelcomeTitle')
+              : t('devotional.completedTitle')}
           </Text>
           <Text style={styles.doneChip}>
             {result.xp > 0
@@ -195,7 +221,9 @@ export default function DevocionalScreen() {
   }
 
   return (
-    <ScreenContainer style={[styles.devScreen, { backgroundColor: theme.colors[currentStep.bgKey] }]}>
+    <ScreenContainer
+      style={[styles.devScreen, { backgroundColor: theme.colors[currentStep.bgKey] }]}
+    >
       <View style={styles.devHeader}>
         <Pressable
           onPress={() => router.back()}
@@ -220,7 +248,9 @@ export default function DevocionalScreen() {
 
         {currentStep.kind === 'verse' ? (
           <>
-            <Text style={styles.verseReference}>{versePassage?.reference ?? content.passage_reference}</Text>
+            <Text style={styles.verseReference}>
+              {versePassage?.reference ?? content.passage_reference}
+            </Text>
             {verseLoading ? <Text style={styles.stepText}>{t('devotional.preparing')}</Text> : null}
             {verseError ? <Text style={styles.stepText}>{content.title}</Text> : null}
             {versePassage ? <Text style={styles.stepText}>{versePassage.content}</Text> : null}

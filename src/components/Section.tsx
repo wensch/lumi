@@ -18,15 +18,20 @@ type SectionProps = ViewProps & {
  * espaçamento de um jeito ligeiramente diferente, o que é o que causava
  * a sensação de proporção inconsistente entre telas.
  */
-export function Section({ label, card = true, pillLabel = false, style, children, ...rest }: SectionProps) {
+export function Section({
+  label,
+  card = true,
+  pillLabel = false,
+  style,
+  children,
+  ...rest
+}: SectionProps) {
   const theme = useTheme();
   const styles = getStyles(theme);
 
   const content = (
     <>
-      {label ? (
-        <Text style={pillLabel ? styles.pillLabel : styles.label}>{label}</Text>
-      ) : null}
+      {label ? <Text style={pillLabel ? styles.pillLabel : styles.label}>{label}</Text> : null}
       {children}
     </>
   );

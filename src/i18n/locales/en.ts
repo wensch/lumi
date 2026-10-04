@@ -36,7 +36,8 @@ export const en: TranslationSchema = {
     signInWithYouVersion: 'Sign in with YouVersion',
     youVersionHint: 'We sent a confirmation link to the email on your YouVersion account.',
     youVersionError: "Couldn't connect to YouVersion. Try again.",
-    youVersionNoEmail: "Your YouVersion account didn't return an email. Try another sign-in method.",
+    youVersionNoEmail:
+      "Your YouVersion account didn't return an email. Try another sign-in method.",
     emailRequired: 'Enter your email.',
     emailInvalid: 'Invalid email.',
     passwordRequired: 'Enter your password.',
@@ -130,7 +131,7 @@ export const en: TranslationSchema = {
   },
   prayer: {
     title: 'Your prayer',
-    subtitle: "Write it your own way. It stays just between you and Lumi.",
+    subtitle: 'Write it your own way. It stays just between you and Lumi.',
     label: 'Prayer',
     placeholder: 'Lord, today I wanted to...',
     save: 'Save prayer',
@@ -161,7 +162,7 @@ export const en: TranslationSchema = {
     celebrating: 'Celebrating',
     waiting: 'Waiting',
     missingYou: 'Missing you',
-    comingSoon: "More moods, evolution, and Lumi customization are coming soon.",
+    comingSoon: 'More moods, evolution, and Lumi customization are coming soon.',
   },
   profile: {
     currentStreak: 'current streak',

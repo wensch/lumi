@@ -30,7 +30,11 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
         const iconName = ICON_BY_ROUTE[route.name] ?? 'ellipse';
 
         const onPress = () => {
-          const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
           if (!isFocused && !event.defaultPrevented) {
             navigation.navigate(route.name);
           }

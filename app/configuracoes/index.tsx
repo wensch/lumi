@@ -15,7 +15,10 @@ function timeStringToDate(time: string | null): Date {
   return new Date(2000, 0, 1, Number(hourStr), Number(minuteStr));
 }
 
-const LANGUAGES: { code: LanguageCode; labelKey: 'settings.languagePortuguese' | 'settings.languageEnglish' }[] = [
+const LANGUAGES: {
+  code: LanguageCode;
+  labelKey: 'settings.languagePortuguese' | 'settings.languageEnglish';
+}[] = [
   { code: 'pt', labelKey: 'settings.languagePortuguese' },
   { code: 'en', labelKey: 'settings.languageEnglish' },
 ];

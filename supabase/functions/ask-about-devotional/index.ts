@@ -55,11 +55,9 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Serviço indisponível no momento.' }, 503);
   }
 
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_ANON_KEY')!,
-    { global: { headers: { Authorization: authHeader } } },
-  );
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, {
+    global: { headers: { Authorization: authHeader } },
+  });
 
   const {
     data: { user },
@@ -97,9 +95,11 @@ Deno.serve(async (req) => {
     .eq('user_id', user.id)
     .maybeSingle();
 
-  const content = session?.content as unknown as
-    | { title: string; passage_reference: string | null; body: string }
-    | null;
+  const content = session?.content as unknown as {
+    title: string;
+    passage_reference: string | null;
+    body: string;
+  } | null;
 
   if (!content) {
     return jsonResponse({ error: 'Devocional não encontrado' }, 404);

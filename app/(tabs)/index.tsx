@@ -60,7 +60,9 @@ export default function HojeScreen() {
             variant="ghost"
             onPress={() => router.push('/devocional')}
           />
-          {currentStreak > 0 ? <ShareStreakButton streak={currentStreak} totalXp={totalXp} /> : null}
+          {currentStreak > 0 ? (
+            <ShareStreakButton streak={currentStreak} totalXp={totalXp} />
+          ) : null}
         </>
       ) : (
         <>
