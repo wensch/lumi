@@ -206,7 +206,7 @@ export const en: TranslationSchema = {
     searching: 'Searching…',
     noResults: 'Nothing found for that search.',
     loadMore: 'Load more results',
-    trendingSearches: 'Trending searches',
+    trendingSearches: 'Trending topics',
     suggestions: 'Suggestions',
   },
   lumi: {

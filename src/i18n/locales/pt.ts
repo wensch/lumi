@@ -209,7 +209,7 @@ export const pt = {
     searching: 'Buscando…',
     noResults: 'Nada encontrado para essa busca.',
     loadMore: 'Ver mais resultados',
-    trendingSearches: 'Buscas em alta',
+    trendingSearches: 'Temas em alta',
     suggestions: 'Sugestões',
   },
   lumi: {

@@ -8,6 +8,8 @@ import {
   useBibleBook,
   useBibleBooks,
   useBibleChapterText,
+  parseVerses,
+  plainTextFromHtml,
 } from '@/features/bible';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -252,6 +254,7 @@ function ChapterReader({
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const { passage, loading, error } = useBibleChapterText(bookId, chapter);
+  const verses = useMemo(() => (passage ? parseVerses(passage.content) : []), [passage]);
 
   return (
     <View style={styles.bookListContainer}>
@@ -265,7 +268,18 @@ function ChapterReader({
       {passage ? (
         <Card style={styles.readerCard}>
           <Text style={styles.readerReference}>{passage.reference}</Text>
-          <Text style={styles.readerText}>{passage.content}</Text>
+          {verses.length > 0 ? (
+            <View style={styles.verseList}>
+              {verses.map((verse) => (
+                <View key={verse.number} style={styles.verseRow}>
+                  <Text style={styles.verseNumber}>{verse.number}</Text>
+                  <Text style={styles.verseText}>{verse.text}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.readerText}>{plainTextFromHtml(passage.content)}</Text>
+          )}
         </Card>
       ) : null}
     </View>
@@ -412,6 +426,29 @@ const getStyles = (theme: Theme) =>
     },
     readerText: {
       ...theme.typography.body,
+      fontSize: 18,
+      lineHeight: 26,
+      color: theme.colors.ink,
+    },
+    verseList: {
+      gap: theme.spacing.sm,
+    },
+    verseRow: {
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    verseNumber: {
+      ...theme.typography.bodyStrong,
+      width: 26,
+      fontSize: 14,
+      lineHeight: 26,
+      textAlign: 'right',
+      color: theme.colors.ink,
+      opacity: 0.7,
+    },
+    verseText: {
+      ...theme.typography.body,
+      flex: 1,
       fontSize: 18,
       lineHeight: 26,
       color: theme.colors.ink,

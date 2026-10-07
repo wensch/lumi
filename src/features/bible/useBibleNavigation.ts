@@ -18,7 +18,9 @@ export function useBibleChapterText(bookId: string | null, chapter: number | nul
   const { passage, loading, error } = usePassage({
     versionId: DEFAULT_BIBLE_VERSION_ID,
     usfm,
-    format: 'text',
+    // HTML bruto (sem jsdom): traz os marcadores de versículo usados por parseVerses.
+    format: 'html',
+    transform: false,
     options: { enabled: !!usfm },
   });
   return { passage, loading, error };

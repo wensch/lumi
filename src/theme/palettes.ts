@@ -82,7 +82,7 @@ export const palettes: Record<PaletteName, Palette> = {
     ink: '#EDE8DA',
     bg: '#17171C',
     green: '#286C49',
-    yellow: '#A64B22',
+    yellow: '#6A44A8',
     blue: '#3A52A0',
     pink: '#8A3A5C',
     muted: '#A29E92',
