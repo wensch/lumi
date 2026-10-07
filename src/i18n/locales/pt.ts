@@ -199,6 +199,7 @@ export const pt = {
     books: 'Livros',
     oldTestament: 'Antigo Testamento',
     newTestament: 'Novo Testamento',
+    results: 'Resultados',
     chapters: 'Capítulos',
     loadingBooks: 'Carregando livros…',
     loadingChapter: 'Carregando capítulo…',

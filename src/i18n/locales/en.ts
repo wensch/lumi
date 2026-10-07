@@ -196,6 +196,7 @@ export const en: TranslationSchema = {
     books: 'Books',
     oldTestament: 'Old Testament',
     newTestament: 'New Testament',
+    results: 'Results',
     chapters: 'Chapters',
     loadingBooks: 'Loading books…',
     loadingChapter: 'Loading chapter…',

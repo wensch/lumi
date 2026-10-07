@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useBibleSearch, type BibleSearchResult } from '@youversion/platform-react-hooks';
 import type { BibleBook } from '@youversion/platform-core';
 import { Card, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
@@ -8,6 +8,7 @@ import {
   useBibleBook,
   useBibleBooks,
   useBibleChapterText,
+  useVersePassage,
   parseVerses,
   plainTextFromHtml,
 } from '@/features/bible';
@@ -17,7 +18,14 @@ import { useTranslation } from '@/i18n';
 type ViewState =
   | { kind: 'list' }
   | { kind: 'chapters'; bookId: string }
-  | { kind: 'reader'; bookId: string; chapter: number };
+  | {
+      kind: 'reader';
+      bookId: string;
+      chapter: number;
+      /** Versículos a destacar (vindos de um resultado de busca). */
+      highlight: readonly number[];
+      from: 'search' | 'chapters';
+    };
 
 export default function BibliaScreen() {
   const theme = useTheme();
@@ -25,79 +33,115 @@ export default function BibliaScreen() {
   const { t } = useTranslation();
   const [view, setView] = useState<ViewState>({ kind: 'list' });
   const search = useBibleSearch({ versionId: DEFAULT_BIBLE_VERSION_ID });
+  const scrollRef = useRef<ScrollView>(null);
 
   const openResult = (result: BibleSearchResult) => {
-    setView({ kind: 'reader', bookId: result.book, chapter: Number(result.chapter) });
+    setView({
+      kind: 'reader',
+      bookId: result.book,
+      chapter: Number(result.chapter),
+      highlight: result.verses,
+      from: 'search',
+    });
   };
 
   const openBook = (bookId: string) => setView({ kind: 'chapters', bookId });
   const openChapter = (bookId: string, chapter: number) =>
-    setView({ kind: 'reader', bookId, chapter });
+    setView({ kind: 'reader', bookId, chapter, highlight: [], from: 'chapters' });
   const backToList = () => setView({ kind: 'list' });
   const backToChapters = (bookId: string) => setView({ kind: 'chapters', bookId });
 
+  // Botão voltar do Android: sobe um nível dentro da Bíblia em vez de sair do app.
+  useEffect(() => {
+    if (view.kind === 'list') return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (view.kind === 'reader' && view.from === 'chapters') {
+        setView({ kind: 'chapters', bookId: view.bookId });
+      } else {
+        setView({ kind: 'list' });
+      }
+      return true;
+    });
+    return () => subscription.remove();
+  }, [view]);
+
+  const searchActive = search.query.trim().length > 0;
+
   return (
-    <Screen>
+    <Screen scrollRef={scrollRef}>
       <ScreenHeader title={t('tabs.bible')} />
 
-      <TextField
-        label={t('bible.searchLabel')}
-        placeholder={t('bible.searchPlaceholder')}
-        value={search.query}
-        onChangeText={search.setQuery}
-        onSubmitEditing={search.submit}
-        returnKeyType="search"
-      />
-
-      {search.phase.kind === 'trending' && view.kind === 'list' ? (
+      {view.kind === 'list' ? (
         <>
-          <SearchSuggestions
-            queries={search.phase.queries}
-            loading={search.phase.loading}
-            isTrending
-            onSelect={search.selectSuggestion}
+          <TextField
+            label={t('bible.searchLabel')}
+            placeholder={t('bible.searchPlaceholder')}
+            value={search.query}
+            onChangeText={search.setQuery}
+            onSubmitEditing={search.submit}
+            returnKeyType="search"
           />
-          <BookList onSelectBook={openBook} />
+
+          {search.phase.kind === 'trending' ? (
+            <>
+              <SearchSuggestions
+                queries={search.phase.queries}
+                loading={search.phase.loading}
+                isTrending
+                onSelect={search.selectSuggestion}
+              />
+              <BookList onSelectBook={openBook} />
+            </>
+          ) : null}
+
+          {search.phase.kind === 'suggesting' ? (
+            <SearchSuggestions
+              queries={search.phase.queries}
+              loading={search.phase.loading}
+              isTrending={false}
+              onSelect={search.selectSuggestion}
+            />
+          ) : null}
+
+          {search.phase.kind === 'searching' ? (
+            <Text style={styles.helperText}>{t('bible.searching')}</Text>
+          ) : null}
+
+          {search.phase.kind === 'empty' || search.phase.kind === 'failed' ? (
+            <Text style={styles.helperText}>
+              {search.phase.kind === 'empty' ? t('bible.noResults') : t('bible.errorLoading')}
+            </Text>
+          ) : null}
+
+          {search.phase.kind === 'results' ? (
+            <SearchResults
+              verses={search.phase.verses}
+              nextPage={search.phase.nextPage}
+              onSelect={openResult}
+              onLoadMore={search.loadMore}
+            />
+          ) : null}
+
+          {searchActive && search.phase.kind !== 'trending' ? (
+            <Pressable onPress={() => search.setQuery('')} accessibilityRole="button">
+              <Text style={styles.backLink}>{`← ${t('bible.books')}`}</Text>
+            </Pressable>
+          ) : null}
         </>
       ) : null}
 
-      {search.phase.kind === 'suggesting' ? (
-        <SearchSuggestions
-          queries={search.phase.queries}
-          loading={search.phase.loading}
-          isTrending={false}
-          onSelect={search.selectSuggestion}
-        />
-      ) : null}
-
-      {search.phase.kind === 'searching' ? (
-        <Text style={styles.helperText}>{t('bible.searching')}</Text>
-      ) : null}
-
-      {search.phase.kind === 'empty' || search.phase.kind === 'failed' ? (
-        <Text style={styles.helperText}>
-          {search.phase.kind === 'empty' ? t('bible.noResults') : t('bible.errorLoading')}
-        </Text>
-      ) : null}
-
-      {search.phase.kind === 'results' ? (
-        <SearchResults
-          verses={search.phase.verses}
-          nextPage={search.phase.nextPage}
-          onSelect={openResult}
-          onLoadMore={search.loadMore}
-        />
-      ) : null}
-
-      {search.phase.kind === 'trending' && view.kind === 'chapters' ? (
+      {view.kind === 'chapters' ? (
         <ChapterGrid bookId={view.bookId} onSelectChapter={openChapter} onBack={backToList} />
       ) : null}
 
-      {search.phase.kind === 'trending' && view.kind === 'reader' ? (
+      {view.kind === 'reader' ? (
         <ChapterReader
           bookId={view.bookId}
           chapter={view.chapter}
-          onBack={() => backToChapters(view.bookId)}
+          highlight={view.highlight}
+          scrollRef={scrollRef}
+          backLabel={view.from === 'search' ? t('bible.results') : t('bible.chapters')}
+          onBack={() => (view.from === 'search' ? backToList() : backToChapters(view.bookId))}
         />
       ) : null}
     </Screen>
@@ -244,25 +288,50 @@ function ChapterGrid({
 function ChapterReader({
   bookId,
   chapter,
+  highlight,
+  scrollRef,
+  backLabel,
   onBack,
 }: {
   bookId: string;
   chapter: number;
+  highlight: readonly number[];
+  scrollRef: RefObject<ScrollView | null>;
+  backLabel: string;
   onBack: () => void;
 }) {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const { t } = useTranslation();
   const { passage, loading, error } = useBibleChapterText(bookId, chapter);
   const verses = useMemo(() => (passage ? parseVerses(passage.content) : []), [passage]);
+  const firstHighlighted = highlight.length > 0 ? Math.min(...highlight) : null;
+  const firstRowRef = useRef<View>(null);
+
+  // Vindo de uma busca, rola até o primeiro versículo encontrado (os destacados).
+  useEffect(() => {
+    if (firstHighlighted === null || verses.length === 0) return;
+    const timer = setTimeout(() => {
+      const scroll = scrollRef.current;
+      const inner = (
+        scroll as unknown as { getInnerViewRef?: () => View | null } | null
+      )?.getInnerViewRef?.();
+      if (!scroll || !inner) return;
+      firstRowRef.current?.measureLayout(
+        inner,
+        (_x, y) => scroll.scrollTo({ y: Math.max(0, y - 120), animated: true }),
+        () => {},
+      );
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [firstHighlighted, verses, scrollRef]);
 
   return (
     <View style={styles.bookListContainer}>
-      <Pressable onPress={onBack}>
-        <Text style={styles.backLink}>{`← ${t('bible.chapters')}`}</Text>
+      <Pressable onPress={onBack} accessibilityRole="button">
+        <Text style={styles.backLink}>{`← ${backLabel}`}</Text>
       </Pressable>
 
-      {loading ? <Text style={styles.helperText}>{t('bible.loadingChapter')}</Text> : null}
+      {loading ? <Skeleton height={320} radius={theme.radius.lg} /> : null}
       {error ? <BibleError error={error} /> : null}
 
       {passage ? (
@@ -270,12 +339,19 @@ function ChapterReader({
           <Text style={styles.readerReference}>{passage.reference}</Text>
           {verses.length > 0 ? (
             <View style={styles.verseList}>
-              {verses.map((verse) => (
-                <View key={verse.number} style={styles.verseRow}>
-                  <Text style={styles.verseNumber}>{verse.number}</Text>
-                  <Text style={styles.verseText}>{verse.text}</Text>
-                </View>
-              ))}
+              {verses.map((verse) => {
+                const marked = highlight.includes(Number(verse.number));
+                return (
+                  <View
+                    key={verse.number}
+                    ref={Number(verse.number) === firstHighlighted ? firstRowRef : undefined}
+                    style={[styles.verseRow, marked && styles.verseRowMarked]}
+                  >
+                    <Text style={styles.verseNumber}>{verse.number}</Text>
+                    <Text style={styles.verseText}>{verse.text}</Text>
+                  </View>
+                );
+              })}
             </View>
           ) : (
             <Text style={styles.readerText}>{plainTextFromHtml(passage.content)}</Text>
@@ -341,9 +417,7 @@ function SearchResults({
   return (
     <View style={styles.bookListContainer}>
       {verses.map((result) => (
-        <Pressable key={result.id} onPress={() => onSelect(result)} style={styles.resultRow}>
-          <Text style={styles.bookChipLabel}>{result.id}</Text>
-        </Pressable>
+        <SearchResultRow key={result.id} result={result} onPress={() => onSelect(result)} />
       ))}
       {nextPage === 'available' || nextPage === 'loading' ? (
         <Pressable onPress={onLoadMore} disabled={nextPage === 'loading'}>
@@ -353,6 +427,34 @@ function SearchResults({
         </Pressable>
       ) : null}
     </View>
+  );
+}
+
+/** Um resultado de busca: referência legível (ex.: Salmos 27:14) + o texto do versículo. */
+function SearchResultRow({ result, onPress }: { result: BibleSearchResult; onPress: () => void }) {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+  const { passage, loading } = useVersePassage(DEFAULT_BIBLE_VERSION_ID, result.id);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={passage?.reference ?? result.id}
+      style={({ pressed }) => [styles.resultRow, pressed && styles.resultRowPressed]}
+    >
+      <Text style={styles.resultReference}>{passage?.reference ?? result.id}</Text>
+      {loading && !passage ? (
+        <>
+          <Skeleton height={14} radius={7} />
+          <Skeleton height={14} width="70%" radius={7} />
+        </>
+      ) : passage ? (
+        <Text style={styles.resultText} numberOfLines={3}>
+          {plainTextFromHtml(passage.content)}
+        </Text>
+      ) : null}
+    </Pressable>
   );
 }
 
@@ -453,11 +555,32 @@ const getStyles = (theme: Theme) =>
       lineHeight: 26,
       color: theme.colors.ink,
     },
+    verseRowMarked: {
+      backgroundColor: theme.colors.yellow,
+      borderRadius: theme.radius.sm,
+      marginHorizontal: -theme.spacing.xs,
+      paddingHorizontal: theme.spacing.xs,
+      paddingVertical: theme.spacing.xs,
+    },
     resultRow: {
       backgroundColor: theme.colors.white,
       borderWidth: 2.5,
       borderColor: theme.colors.ink,
       borderRadius: theme.radius.md,
       padding: theme.spacing.md,
+      gap: theme.spacing.xs,
+    },
+    resultRowPressed: {
+      opacity: 0.7,
+    },
+    resultReference: {
+      ...theme.typography.bodyStrong,
+      color: theme.colors.ink,
+    },
+    resultText: {
+      ...theme.typography.body,
+      fontSize: 15,
+      lineHeight: 21,
+      color: theme.colors.ink,
     },
   });

@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { ScrollView, StyleSheet, View, type ScrollViewProps, type ViewProps } from 'react-native';
 import { FadeIn } from './FadeIn';
 import { ScreenContainer } from './ScreenContainer';
@@ -9,6 +10,8 @@ type ScreenProps = ViewProps & {
   /** Centraliza o conteúdo verticalmente — para telas curtas de estado único (loading, erro, sucesso). */
   centered?: boolean;
   contentContainerStyle?: ScrollViewProps['contentContainerStyle'];
+  /** Ref do ScrollView interno, para telas que precisam rolar até um ponto (ex.: versículo achado). */
+  scrollRef?: Ref<ScrollView>;
 };
 
 /**
@@ -23,6 +26,7 @@ export function Screen({
   centered = false,
   style,
   contentContainerStyle,
+  scrollRef,
   children,
   ...rest
 }: ScreenProps) {
@@ -45,6 +49,7 @@ export function Screen({
     <ScreenContainer>
       <FadeIn rise={0} style={styles.fill}>
         <ScrollView
+          ref={scrollRef}
           style={styles.scrollView}
           contentContainerStyle={[
             styles.content,
