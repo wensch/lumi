@@ -53,12 +53,12 @@ export default function LumiScreen() {
                 <Text style={theme.typography.heading}>
                   {t(`lumi.milestones.d${journey.next}.title`)}
                 </Text>
-                <Text style={[theme.typography.bodyStrong, styles.mutedText]}>
+                <Text style={[theme.typography.bodyStrong, styles.onCardMuted]}>
                   {t('lumi.daysToGo', { count: journey.daysToNext })}
                 </Text>
               </View>
               <ProgressBar progress={journey.progress} theme={theme} />
-              <Text style={[theme.typography.caption, styles.mutedText]}>
+              <Text style={[theme.typography.caption, styles.onCardMuted]}>
                 {t(`lumi.milestones.d${journey.next}.reward`)}
               </Text>
             </>
@@ -158,6 +158,11 @@ const getStyles = (theme: Theme) =>
     },
     centeredText: {
       textAlign: 'center',
+    },
+    // Texto secundário sobre um card colorido: `muted` (cinza) some em fundos coloridos escuros.
+    onCardMuted: {
+      color: theme.colors.ink,
+      opacity: 0.85,
     },
     mutedText: {
       color: theme.colors.muted,

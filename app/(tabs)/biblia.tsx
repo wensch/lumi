@@ -112,11 +112,20 @@ function BibleError({ error }: { error: unknown }) {
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const detail = error instanceof Error ? error.message : String(error);
+  // Diagnóstico temporário do 401 (chave recusada): mostra só o tamanho e o final da chave
+  // embutida no app, para comparar com a do painel da YouVersion.
+  const appKey = process.env.EXPO_PUBLIC_YOUVERSION_APP_KEY ?? '';
+  const keyHint = appKey
+    ? `${t('bible.keyInApp')}: ${appKey.length} ${t('bible.characters')}, …${appKey.slice(-4)}`
+    : t('bible.keyMissing');
   return (
     <View style={styles.errorBox}>
       <Text style={styles.helperText}>{t('bible.errorLoading')}</Text>
       <Text style={styles.errorDetail} selectable>
         {detail}
+      </Text>
+      <Text style={styles.errorDetail} selectable>
+        {keyHint}
       </Text>
     </View>
   );
