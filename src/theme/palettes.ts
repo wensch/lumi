@@ -4,7 +4,7 @@
  * cada uma com sua própria fonte de identidade.
  */
 
-export type PaletteName = 'recorte' | 'trilha' | 'aurora';
+export type PaletteName = 'recorte' | 'trilha' | 'aurora' | 'noite';
 
 export type Palette = {
   name: PaletteName;
@@ -17,6 +17,10 @@ export type Palette = {
   pink: string;
   muted: string;
   white: string;
+  /** Cor das sombras duras (offset). Nas paletas claras é a própria `ink`. */
+  shadow: string;
+  /** Paleta escura: muda o estilo da barra de status. */
+  isDark: boolean;
   fontFamily: 'bricolage' | 'nunito' | 'baloo';
 };
 
@@ -32,6 +36,8 @@ export const palettes: Record<PaletteName, Palette> = {
     pink: '#FFC1D6',
     muted: '#6B6860',
     white: '#FFFFFF',
+    shadow: '#2A2A2E',
+    isDark: false,
     fontFamily: 'bricolage',
   },
   trilha: {
@@ -45,6 +51,8 @@ export const palettes: Record<PaletteName, Palette> = {
     pink: '#FFCDBE',
     muted: '#62806D',
     white: '#FFFFFF',
+    shadow: '#264A35',
+    isDark: false,
     fontFamily: 'nunito',
   },
   aurora: {
@@ -58,7 +66,30 @@ export const palettes: Record<PaletteName, Palette> = {
     pink: '#F9C5D8',
     muted: '#8F7360',
     white: '#FFFFFF',
+    shadow: '#5A3A28',
+    isDark: false,
     fontFamily: 'baloo',
+  },
+  /**
+   * Modo escuro. `ink` vira o creme (texto e contornos), `white` vira a
+   * superfície dos cards e os "pastéis" viram versões profundas dos mesmos
+   * tons — assim todo texto continua em `ink` com contraste alto, sem
+   * precisar de uma cor de texto diferente por fundo.
+   */
+  noite: {
+    name: 'noite',
+    label: 'Noite',
+    ink: '#EDE8DA',
+    bg: '#17171C',
+    green: '#286C49',
+    yellow: '#7A5C0F',
+    blue: '#3A52A0',
+    pink: '#8A3A5C',
+    muted: '#A29E92',
+    white: '#24242B',
+    shadow: '#0A0A0D',
+    isDark: true,
+    fontFamily: 'bricolage',
   },
 };
 

@@ -96,7 +96,15 @@ export const en: TranslationSchema = {
     recordHint: "Your record is {{record}} — you've done it before, you can do it again.",
     day: 'day',
     days: 'days',
-    weekdays: { sun: 'S', mon: 'M', tue: 'T', wed: 'W', thu: 'T', fri: 'F', sat: 'S' },
+    weekdays: {
+      sun: 'Sun',
+      mon: 'Mon',
+      tue: 'Tue',
+      wed: 'Wed',
+      thu: 'Thu',
+      fri: 'Fri',
+      sat: 'Sat',
+    },
     greeting: {
       firstTitle: "Hi! I'm Lumi.",
       firstSubtitle: 'Your first devotional is waiting. Ready to start?',
@@ -227,6 +235,13 @@ export const en: TranslationSchema = {
     defaultDevotionalName: 'Devotional',
   },
   settings: {
+    appearanceHint: "Pick the app's look. It changes the colors and font on every screen.",
+    palettes: {
+      recorte: { name: 'Cutout', description: 'Warm cream with bold outlines. The default look.' },
+      trilha: { name: 'Trail', description: 'Greenish background and a rounder font.' },
+      aurora: { name: 'Aurora', description: 'Peach and lavender tones, nice and warm.' },
+      noite: { name: 'Night', description: 'Dark mode with deep tones. Easy on the eyes.' },
+    },
     title: 'Settings',
     reminders: 'Reminders',
     dailyReminder: 'Daily reminder',

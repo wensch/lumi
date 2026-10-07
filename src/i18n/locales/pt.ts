@@ -99,7 +99,15 @@ export const pt = {
     recordHint: 'Seu recorde é de {{record}} — já rolou antes, rola de novo.',
     day: 'dia',
     days: 'dias',
-    weekdays: { sun: 'D', mon: 'S', tue: 'T', wed: 'Q', thu: 'Q', fri: 'S', sat: 'S' },
+    weekdays: {
+      sun: 'Dom',
+      mon: 'Seg',
+      tue: 'Ter',
+      wed: 'Qua',
+      thu: 'Qui',
+      fri: 'Sex',
+      sat: 'Sáb',
+    },
     greeting: {
       firstTitle: 'Oi! Eu sou o Lumi.',
       firstSubtitle: 'Seu primeiro devocional está esperando. Bora começar?',
@@ -230,6 +238,13 @@ export const pt = {
     defaultDevotionalName: 'Devocional',
   },
   settings: {
+    appearanceHint: 'Escolha o visual do app. Muda as cores e a fonte em todas as telas.',
+    palettes: {
+      recorte: { name: 'Recorte', description: 'Creme claro e contornos firmes. O visual padrão.' },
+      trilha: { name: 'Trilha', description: 'Fundo esverdeado e fonte mais arredondada.' },
+      aurora: { name: 'Aurora', description: 'Tons de pêssego e lavanda, bem quentinho.' },
+      noite: { name: 'Noite', description: 'Modo escuro com tons profundos. Descansa os olhos.' },
+    },
     title: 'Configurações',
     reminders: 'Lembretes',
     dailyReminder: 'Lembrete diário',

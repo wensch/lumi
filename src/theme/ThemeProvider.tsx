@@ -56,15 +56,50 @@ function buildTheme(palette: Palette) {
   const weights = FONT_WEIGHT_MAP[palette.fontFamily];
 
   const typography = {
-    display: { fontFamily: weights.extraBold, fontSize: fontSize.display, lineHeight: 44 },
-    title: { fontFamily: weights.extraBold, fontSize: fontSize.xxl, lineHeight: 38 },
-    heading: { fontFamily: weights.extraBold, fontSize: fontSize.xl, lineHeight: 30 },
-    subheading: { fontFamily: weights.bold, fontSize: fontSize.lg, lineHeight: 26 },
-    body: { fontFamily: weights.medium, fontSize: fontSize.md, lineHeight: 24 },
-    bodyStrong: { fontFamily: weights.bold, fontSize: fontSize.md, lineHeight: 24 },
-    caption: { fontFamily: weights.medium, fontSize: fontSize.sm, lineHeight: 19 },
-    label: { fontFamily: weights.bold, fontSize: fontSize.sm, lineHeight: 19 },
-    button: { fontFamily: weights.extraBold, fontSize: fontSize.md, lineHeight: 22 },
+    display: {
+      fontFamily: weights.extraBold,
+      fontSize: fontSize.display,
+      lineHeight: 44,
+      color: palette.ink,
+    },
+    title: {
+      fontFamily: weights.extraBold,
+      fontSize: fontSize.xxl,
+      lineHeight: 38,
+      color: palette.ink,
+    },
+    heading: {
+      fontFamily: weights.extraBold,
+      fontSize: fontSize.xl,
+      lineHeight: 30,
+      color: palette.ink,
+    },
+    subheading: {
+      fontFamily: weights.bold,
+      fontSize: fontSize.lg,
+      lineHeight: 26,
+      color: palette.ink,
+    },
+    body: { fontFamily: weights.medium, fontSize: fontSize.md, lineHeight: 24, color: palette.ink },
+    bodyStrong: {
+      fontFamily: weights.bold,
+      fontSize: fontSize.md,
+      lineHeight: 24,
+      color: palette.ink,
+    },
+    caption: {
+      fontFamily: weights.medium,
+      fontSize: fontSize.sm,
+      lineHeight: 19,
+      color: palette.ink,
+    },
+    label: { fontFamily: weights.bold, fontSize: fontSize.sm, lineHeight: 19, color: palette.ink },
+    button: {
+      fontFamily: weights.extraBold,
+      fontSize: fontSize.md,
+      lineHeight: 22,
+      color: palette.ink,
+    },
   } as const;
 
   return {
@@ -75,10 +110,10 @@ function buildTheme(palette: Palette) {
     radius,
     /** Sombra dura padrão de card (offset 4-5px conforme o protótipo). */
     shadow: {
-      card: hardShadow(5, palette.ink),
-      button: hardShadow(4, palette.ink),
-      buttonPressed: hardShadow(1, palette.ink),
-      chip: hardShadow(3, palette.ink),
+      card: hardShadow(5, palette.shadow),
+      button: hardShadow(4, palette.shadow),
+      buttonPressed: hardShadow(1, palette.shadow),
+      chip: hardShadow(3, palette.shadow),
     },
   };
 }

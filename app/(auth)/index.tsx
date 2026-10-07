@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useYVAuth } from '@youversion/platform-react-native-expo-core';
-import { Button, Card, ScreenContainer, TextField } from '@/components';
+import { Button, Card, FadeIn, ScreenContainer, TextField } from '@/components';
 import { isValidEmail, translateAuthError, useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
@@ -148,13 +148,20 @@ export default function AuthScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.mascotWrapper}>
-            <LumiMascot mood="normal" size={120} />
-          </View>
-          <Text style={theme.typography.title}>{t('auth.welcomeTitle')}</Text>
-          <Text style={[theme.typography.body, styles.subtitle]}>
-            {mode === 'sign_in' ? t('auth.signInSubtitle') : t('auth.signUpSubtitle')}
-          </Text>
+          <FadeIn rise={16}>
+            <View style={styles.mascotWrapper}>
+              <View style={styles.mascotBackdrop} />
+              <LumiMascot mood="normal" size={190} />
+            </View>
+          </FadeIn>
+          <FadeIn delay={80} style={styles.titleBlock}>
+            <Text style={[theme.typography.title, styles.centeredText]}>
+              {t('auth.welcomeTitle')}
+            </Text>
+            <Text style={[theme.typography.body, styles.subtitle]}>
+              {mode === 'sign_in' ? t('auth.signInSubtitle') : t('auth.signUpSubtitle')}
+            </Text>
+          </FadeIn>
 
           <Card style={styles.card}>
             <TextField
@@ -263,7 +270,29 @@ const getStyles = (theme: Theme) =>
       gap: theme.spacing.md,
     },
     mascotWrapper: {
+      alignSelf: 'center',
+      width: 190,
+      height: 190,
       alignItems: 'center',
+      justifyContent: 'flex-end',
+    },
+    // Disco amarelo atrás do Lumi (mesmo recurso da tela Hoje): dá destaque ao mascote.
+    mascotBackdrop: {
+      position: 'absolute',
+      bottom: 4,
+      width: 168,
+      height: 168,
+      borderRadius: 84,
+      backgroundColor: theme.colors.yellow,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      ...theme.shadow.card,
+    },
+    titleBlock: {
+      gap: theme.spacing.xs,
+    },
+    centeredText: {
+      textAlign: 'center',
     },
     subtitle: {
       color: theme.colors.muted,

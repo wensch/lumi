@@ -26,7 +26,7 @@ import { LoadingScreen } from '@/components';
 import { AuthProvider, useAuth } from '@/features/auth';
 import { useProfile } from '@/features/onboarding';
 import { configureNotificationHandler, useNotificationScheduler } from '@/features/notifications';
-import { ThemeProvider } from '@/theme';
+import { ThemeProvider, useTheme } from '@/theme';
 import { I18nProvider } from '@/i18n';
 
 SplashScreen.preventAutoHideAsync();
@@ -72,7 +72,7 @@ export default function RootLayout() {
           <YouVersionProvider appKey={youVersionAppKey} theme="system" auth={youVersionAuthConfig}>
             <YouVersionDataProvider appKey={youVersionAppKey ?? ''}>
               <AuthProvider>
-                <StatusBar style="dark" />
+                <ThemedStatusBar />
                 <RootNavigation />
               </AuthProvider>
             </YouVersionDataProvider>
@@ -81,6 +81,12 @@ export default function RootLayout() {
       </I18nProvider>
     </GestureHandlerRootView>
   );
+}
+
+/** Ícones da barra de status claros no tema escuro, escuros nos temas claros. */
+function ThemedStatusBar() {
+  const theme = useTheme();
+  return <StatusBar style={theme.palette.isDark ? 'light' : 'dark'} />;
 }
 
 /**

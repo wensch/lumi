@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Button, Screen, ScreenHeader, Section } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useNotificationPreferences } from '@/features/settings';
@@ -89,19 +90,34 @@ export default function ConfiguracoesScreen() {
       </Section>
 
       <Section label={t('settings.appearance')}>
-        <View style={styles.paletteRow}>
+        <Text style={styles.helperText}>{t('settings.appearanceHint')}</Text>
+        <View style={styles.paletteList}>
           {theme.availablePalettes.map((palette) => {
             const isSelected = palette.name === theme.palette.name;
             return (
               <Pressable
                 key={palette.name}
                 onPress={() => theme.setPaletteName(palette.name)}
-                style={[
-                  styles.paletteChip,
-                  { backgroundColor: isSelected ? palette.green : theme.colors.white },
-                ]}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isSelected }}
+                style={[styles.paletteCard, isSelected && styles.paletteCardSelected]}
               >
-                <Text style={styles.paletteLabel}>{palette.label}</Text>
+                <View style={styles.swatches}>
+                  {[palette.bg, palette.green, palette.yellow, palette.blue].map((color, index) => (
+                    <View key={index} style={[styles.swatch, { backgroundColor: color }]} />
+                  ))}
+                </View>
+                <View style={styles.paletteText}>
+                  <Text style={theme.typography.bodyStrong}>
+                    {t(`settings.palettes.${palette.name}.name`)}
+                  </Text>
+                  <Text style={styles.paletteDescription}>
+                    {t(`settings.palettes.${palette.name}.description`)}
+                  </Text>
+                </View>
+                {isSelected ? (
+                  <Ionicons name="checkmark-circle" size={26} color={theme.colors.ink} />
+                ) : null}
               </Pressable>
             );
           })}
@@ -197,6 +213,43 @@ const getStyles = (theme: Theme) =>
     paletteRow: {
       flexDirection: 'row',
       gap: theme.spacing.sm,
+    },
+    paletteList: {
+      gap: theme.spacing.sm,
+    },
+    paletteCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.md,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.bg,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+    },
+    paletteCardSelected: {
+      backgroundColor: theme.colors.green,
+      ...theme.shadow.chip,
+    },
+    swatches: {
+      flexDirection: 'row',
+      borderWidth: 2,
+      borderColor: theme.colors.ink,
+      borderRadius: theme.radius.pill,
+      overflow: 'hidden',
+    },
+    swatch: {
+      width: 16,
+      height: 34,
+    },
+    paletteText: {
+      flex: 1,
+    },
+    paletteDescription: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
+      opacity: 0.8,
     },
     paletteChip: {
       flex: 1,
