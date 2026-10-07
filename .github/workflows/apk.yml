@@ -101,8 +101,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp android/app/build/outputs/apk/release/app-release.apk Lumi.apk
-          gh release delete apk-latest --cleanup-tag --yes || true
-          gh release create apk-latest Lumi.apk \
-            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
-            --title "Lumi (APK mais recente)" \
-            --notes "Build #${{ github.run_number }} do commit $GITHUB_SHA"
+          # A API do GitHub às vezes responde 500 ao apagar/criar release; tenta de novo antes de falhar.
+          for attempt in 1 2 3 4; do
+            gh release delete apk-latest --cleanup-tag --yes || true
+            if gh release create apk-latest Lumi.apk \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+              --title "Lumi (APK mais recente)" \
+              --notes "Build #${{ github.run_number }} do commit $GITHUB_SHA"; then
+              exit 0
+            fi
+            echo "Tentativa $attempt de publicar a release falhou; aguardando para repetir."
+            sleep $((attempt * 15))
+          done
+          echo "::error::Não foi possível publicar a release apk-latest"
+          exit 1
