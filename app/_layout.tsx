@@ -22,6 +22,7 @@ import {
   Baloo2_700Bold,
   Baloo2_800ExtraBold,
 } from '@expo-google-fonts/baloo-2';
+import { LoadingScreen } from '@/components';
 import { AuthProvider, useAuth } from '@/features/auth';
 import { useProfile } from '@/features/onboarding';
 import { configureNotificationHandler, useNotificationScheduler } from '@/features/notifications';
@@ -159,7 +160,7 @@ function RootNavigation() {
   }, [ready, session, isPasswordRecovery, profile?.onboarding_completed_at, segments.join('/')]);
 
   if (!ready) {
-    return null;
+    return <LoadingScreen />;
   }
 
   return <Slot />;

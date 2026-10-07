@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useBibleSearch, type BibleSearchResult } from '@youversion/platform-react-hooks';
 import type { BibleBook } from '@youversion/platform-core';
-import { Card, Screen, ScreenHeader, TextField } from '@/components';
+import { Card, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
 import {
   DEFAULT_BIBLE_VERSION_ID,
   useBibleBook,
@@ -102,6 +102,26 @@ export default function BibliaScreen() {
   );
 }
 
+/**
+ * Mensagem de erro da Bíblia + linha técnica com o motivo real. A linha
+ * técnica é temporária: serve para diagnosticar falhas da API da YouVersion
+ * em aparelhos reais, onde não há console.
+ */
+function BibleError({ error }: { error: unknown }) {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+  const { t } = useTranslation();
+  const detail = error instanceof Error ? error.message : String(error);
+  return (
+    <View style={styles.errorBox}>
+      <Text style={styles.helperText}>{t('bible.errorLoading')}</Text>
+      <Text style={styles.errorDetail} selectable>
+        {detail}
+      </Text>
+    </View>
+  );
+}
+
 function BookList({ onSelectBook }: { onSelectBook: (bookId: string) => void }) {
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -118,11 +138,17 @@ function BookList({ onSelectBook }: { onSelectBook: (bookId: string) => void }) 
   }, [books]);
 
   if (loading) {
-    return <Text style={styles.helperText}>{t('bible.loadingBooks')}</Text>;
+    return (
+      <View style={styles.bookListContainer}>
+        {Array.from({ length: 8 }, (_, index) => (
+          <Skeleton key={index} height={48} radius={14} />
+        ))}
+      </View>
+    );
   }
 
   if (error) {
-    return <Text style={styles.helperText}>{t('bible.errorLoading')}</Text>;
+    return <BibleError error={error} />;
   }
 
   return (
@@ -182,7 +208,7 @@ function ChapterGrid({
       </Pressable>
 
       {loading ? <Text style={styles.helperText}>{t('bible.loadingBooks')}</Text> : null}
-      {error ? <Text style={styles.helperText}>{t('bible.errorLoading')}</Text> : null}
+      {error ? <BibleError error={error} /> : null}
 
       {book ? (
         <>
@@ -225,7 +251,7 @@ function ChapterReader({
       </Pressable>
 
       {loading ? <Text style={styles.helperText}>{t('bible.loadingChapter')}</Text> : null}
-      {error ? <Text style={styles.helperText}>{t('bible.errorLoading')}</Text> : null}
+      {error ? <BibleError error={error} /> : null}
 
       {passage ? (
         <Card style={styles.readerCard}>
@@ -309,6 +335,14 @@ function SearchResults({
 
 const getStyles = (theme: Theme) =>
   StyleSheet.create({
+    errorBox: {
+      gap: theme.spacing.sm,
+    },
+    errorDetail: {
+      ...theme.typography.caption,
+      color: theme.colors.muted,
+      textAlign: 'center',
+    },
     helperText: {
       ...theme.typography.body,
       color: theme.colors.muted,

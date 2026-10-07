@@ -1,4 +1,5 @@
 import { ScrollView, StyleSheet, View, type ScrollViewProps, type ViewProps } from 'react-native';
+import { FadeIn } from './FadeIn';
 import { ScreenContainer } from './ScreenContainer';
 import { useTheme, type Theme } from '@/theme';
 
@@ -31,34 +32,41 @@ export function Screen({
   if (!scroll) {
     return (
       <ScreenContainer>
-        <View style={[styles.content, centered && styles.centered, style]} {...rest}>
-          {children}
-        </View>
+        <FadeIn rise={0} style={styles.fill}>
+          <View style={[styles.content, centered && styles.centered, style]} {...rest}>
+            {children}
+          </View>
+        </FadeIn>
       </ScreenContainer>
     );
   }
 
   return (
     <ScreenContainer>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[
-          styles.content,
-          styles.scrollContent,
-          centered && styles.centered,
-          contentContainerStyle,
-        ]}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        {children}
-      </ScrollView>
+      <FadeIn rise={0} style={styles.fill}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={[
+            styles.content,
+            styles.scrollContent,
+            centered && styles.centered,
+            contentContainerStyle,
+          ]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {children}
+        </ScrollView>
+      </FadeIn>
     </ScreenContainer>
   );
 }
 
 const getStyles = (theme: Theme) =>
   StyleSheet.create({
+    fill: {
+      flex: 1,
+    },
     scrollView: {
       flex: 1,
     },

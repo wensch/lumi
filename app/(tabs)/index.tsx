@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, Screen, StreakBadge, XPBadge } from '@/components';
+import { Button, Card, FadeIn, Screen, Skeleton, StreakBadge, XPBadge } from '@/components';
 import { lumiGreeting, useHomeData, type WeekDay } from '@/features/home';
 import { LumiMascot } from '@/features/lumi';
 import { ShareStreakButton } from '@/features/share';
@@ -18,8 +18,24 @@ export default function HojeScreen() {
 
   if (loading) {
     return (
-      <Screen centered>
-        <Text style={theme.typography.body}>{t('common.loading')}</Text>
+      <Screen>
+        <View style={styles.header}>
+          <Skeleton width={96} height={40} radius={20} />
+          <Skeleton width={96} height={40} radius={20} />
+        </View>
+        <View style={styles.weekRow}>
+          {Array.from({ length: 7 }, (_, index) => (
+            <View key={index} style={styles.weekDay}>
+              <Skeleton width={36} height={36} radius={18} />
+              <Skeleton width={12} height={10} />
+            </View>
+          ))}
+        </View>
+        <View style={styles.mascotArea}>
+          <Skeleton width={230} height={230} radius={115} />
+        </View>
+        <Skeleton height={96} radius={theme.radius.lg} />
+        <Skeleton height={54} radius={18} />
       </Screen>
     );
   }
@@ -40,10 +56,12 @@ export default function HojeScreen() {
         ))}
       </View>
 
-      <View style={styles.mascotArea}>
-        <View style={styles.mascotBackdrop} />
-        <LumiMascot mood={greeting.mood} size={290} />
-      </View>
+      <FadeIn delay={60} rise={18}>
+        <View style={styles.mascotArea}>
+          <View style={styles.mascotBackdrop} />
+          <LumiMascot mood={greeting.mood} size={290} />
+        </View>
+      </FadeIn>
 
       {completedToday ? (
         <>

@@ -76,9 +76,10 @@ jobs:
       - name: Set versionCode
         run: sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
 
+      # Só arm64-v8a (todo celular Android atual): o APK com as 4 arquiteturas passava de 130 MB.
       - name: Assemble APK
         working-directory: android
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
 
       - uses: actions/upload-artifact@v4
         with:
