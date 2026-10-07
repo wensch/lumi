@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
+import { useTranslation } from '@/i18n';
 import {
   cancelDailyReminder,
   requestNotificationPermission,
@@ -23,6 +24,8 @@ import {
 export function useNotificationScheduler() {
   const { session } = useAuth();
   const userId = session?.user.id ?? null;
+  // O texto das notificações segue o idioma; reagenda quando o usuário troca.
+  const { language } = useTranslation();
 
   useEffect(() => {
     if (!userId) return;
@@ -54,5 +57,5 @@ export function useNotificationScheduler() {
     };
     // session muda de referência a cada onAuthStateChange (TOKEN_REFRESHED
     // incluso) — usar userId evita reagendar a notificação sem necessidade.
-  }, [userId]);
+  }, [userId, language]);
 }

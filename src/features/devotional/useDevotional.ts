@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import type { Database } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
 import { calculateDaysSince } from '@/lib/dates';
+import { translate } from '@/i18n';
 import { selectDailyContent } from './selectDailyContent';
 
 type Content = Database['public']['Tables']['content']['Row'];
@@ -78,7 +79,7 @@ export function useDevotional() {
       .single();
 
     if (insertError || !newSession) {
-      setError(insertError?.message ?? 'Não foi possível iniciar o devocional.');
+      setError(translate('errors.devotionalStart'));
       setState({ content, session: null, isReturningFromBreak });
       setLoading(false);
       return;
@@ -117,7 +118,7 @@ export function useDevotional() {
       setCompleting(false);
 
       if (rpcError || !data?.[0]) {
-        setError(rpcError?.message ?? 'Não foi possível concluir o devocional.');
+        setError(translate('errors.devotionalComplete'));
         return null;
       }
 

@@ -39,7 +39,7 @@ export const StreakShareCard = forwardRef<View, StreakShareCardProps>(function S
       <Text style={styles.subtitle}>{t('share.subtitle', { xp: totalXp })}</Text>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Projeto Lumi</Text>
+        <Text style={styles.footerText}>{t('share.footer')}</Text>
       </View>
     </View>
   );

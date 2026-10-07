@@ -96,6 +96,33 @@ export const en: TranslationSchema = {
     recordHint: "Your record is {{record}} — you've done it before, you can do it again.",
     day: 'day',
     days: 'days',
+    weekdays: { sun: 'S', mon: 'M', tue: 'T', wed: 'W', thu: 'T', fri: 'F', sat: 'S' },
+    greeting: {
+      firstTitle: "Hi! I'm Lumi.",
+      firstSubtitle: 'Your first devotional is waiting. Ready to start?',
+      todayTitle: 'You already showed up today!',
+      todaySubtitle: 'Want to add something else, or just come back tomorrow. No rush.',
+      yesterdayTitle: 'Ready for today?',
+      yesterdaySubtitle: "Today's devotional hasn't started yet. Ready?",
+      longAbsenceTitle: 'So good to see you again.',
+      longAbsenceSubtitle:
+        "Jesus spent 40 days in the desert. You've been away for {{days}} days… let's not turn this into a competition.",
+      brokenTitle: 'Oops, the streak broke.',
+      brokenSubtitle: "No stress — it's about consistency, not perfection. Ready to start again?",
+    },
+  },
+  achievements: {
+    first_moment: 'First moment',
+    streak_7_days: '7-day streak',
+    streak_30_days: '30-day streak',
+  },
+  errors: {
+    devotionalStart: "Couldn't start the devotional.",
+    devotionalComplete: "Couldn't complete the devotional.",
+    prayerSave: "Couldn't save your prayer.",
+    askFailed: "Couldn't answer right now.",
+    shareUnavailable: 'Sharing is not available on this device.',
+    shareFailed: "Couldn't share right now. Try again?",
   },
   devotional: {
     preparing: 'Preparing your devotional…',
@@ -157,6 +184,7 @@ export const en: TranslationSchema = {
     suggestions: 'Suggestions',
   },
   lumi: {
+    mascotLabel: 'Lumi, the mascot',
     journeyTitle: "Lumi's journey",
     nextMilestone: 'Next milestone',
     daysToGo: {
@@ -204,5 +232,7 @@ export const en: TranslationSchema = {
     streakManyDays: 'day streak',
     title: 'Staying consistent',
     subtitle: '{{xp}} XP earned with Lumi',
+    dialogTitle: 'Share my streak',
+    footer: 'Lumi Project',
   },
 };

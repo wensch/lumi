@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, Screen, ScreenContainer, TextField } from '@/components';
-import { ACHIEVEMENT_LABELS } from '@/features/achievements';
+import { ACHIEVEMENT_ICONS } from '@/features/achievements';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
 import { useVersePassage } from '@/features/bible';
 import { LumiMascot } from '@/features/lumi';
@@ -191,13 +191,13 @@ export default function DevocionalScreen() {
           ) : null}
 
           {result.unlockedCodes.map((code) => {
-            const achievement = ACHIEVEMENT_LABELS[code];
-            if (!achievement) return null;
+            const icon = ACHIEVEMENT_ICONS[code];
+            if (!icon) return null;
             return (
               <Card key={code} padding="compact" style={styles.achievementCard}>
-                <Text style={styles.achievementIcon}>{achievement.icon}</Text>
+                <Text style={styles.achievementIcon}>{icon}</Text>
                 <Text style={theme.typography.bodyStrong}>
-                  {t('devotional.achievementUnlocked', { title: achievement.title })}
+                  {t('devotional.achievementUnlocked', { title: t(`achievements.${code}`) })}
                 </Text>
               </Card>
             );

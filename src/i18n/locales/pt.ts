@@ -99,6 +99,33 @@ export const pt = {
     recordHint: 'Seu recorde é de {{record}} — já rolou antes, rola de novo.',
     day: 'dia',
     days: 'dias',
+    weekdays: { sun: 'D', mon: 'S', tue: 'T', wed: 'Q', thu: 'Q', fri: 'S', sat: 'S' },
+    greeting: {
+      firstTitle: 'Oi! Eu sou o Lumi.',
+      firstSubtitle: 'Seu primeiro devocional está esperando. Bora começar?',
+      todayTitle: 'Você já veio hoje!',
+      todaySubtitle: 'Quer registrar mais alguma coisa ou só voltar amanhã. Sem pressa.',
+      yesterdayTitle: 'Bora hoje?',
+      yesterdaySubtitle: 'Seu devocional de hoje ainda não começou. Bora?',
+      longAbsenceTitle: 'Que bom te ver de novo.',
+      longAbsenceSubtitle:
+        'Jesus ficou 40 dias no deserto. Você está há {{days}} dias sem aparecer… não vamos transformar isso em competição.',
+      brokenTitle: 'Ih, quebrou a sequência.',
+      brokenSubtitle: 'Sem estresse — a proposta é constância, não perfeição. Bora recomeçar?',
+    },
+  },
+  achievements: {
+    first_moment: 'Primeiro momento',
+    streak_7_days: '7 dias seguidos',
+    streak_30_days: '30 dias seguidos',
+  },
+  errors: {
+    devotionalStart: 'Não foi possível iniciar o devocional.',
+    devotionalComplete: 'Não foi possível concluir o devocional.',
+    prayerSave: 'Não foi possível salvar sua oração.',
+    askFailed: 'Não foi possível responder agora.',
+    shareUnavailable: 'Compartilhamento não disponível neste dispositivo.',
+    shareFailed: 'Não foi possível compartilhar agora. Tenta de novo?',
   },
   devotional: {
     preparing: 'Preparando seu devocional…',
@@ -160,6 +187,7 @@ export const pt = {
     suggestions: 'Sugestões',
   },
   lumi: {
+    mascotLabel: 'Lumi, o mascote',
     journeyTitle: 'A jornada do Lumi',
     nextMilestone: 'Próximo marco',
     daysToGo: {
@@ -207,6 +235,8 @@ export const pt = {
     streakManyDays: 'dias seguidos',
     title: 'Constância em dia',
     subtitle: '{{xp}} XP acumulado com o Lumi',
+    dialogTitle: 'Compartilhar minha constância',
+    footer: 'Projeto Lumi',
   },
 };
 

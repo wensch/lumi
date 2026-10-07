@@ -7,7 +7,8 @@ import { ShareStreakButton } from '@/features/share';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 
-const WEEKDAY_LETTERS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+/** Domingo=0 ... Sábado=6 — chave da letra em home.weekdays.* */
+const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
 
 export default function HojeScreen() {
   const theme = useTheme();
@@ -40,7 +41,7 @@ export default function HojeScreen() {
     );
   }
 
-  const greeting = lumiGreeting(daysSinceLastCompleted);
+  const greeting = lumiGreeting(daysSinceLastCompleted, t);
   const completedToday = daysSinceLastCompleted === 0;
 
   return (
@@ -51,8 +52,13 @@ export default function HojeScreen() {
       </View>
 
       <View style={styles.weekRow}>
-        {week.map((day, index) => (
-          <WeekDayCircle key={day.date} day={day} letter={WEEKDAY_LETTERS[index]} theme={theme} />
+        {week.map((day) => (
+          <WeekDayCircle
+            key={day.date}
+            day={day}
+            letter={t(`home.weekdays.${WEEKDAY_KEYS[day.weekday]}`)}
+            theme={theme}
+          />
         ))}
       </View>
 
@@ -114,7 +120,9 @@ function WeekDayCircle({ day, letter, theme }: { day: WeekDay; letter: string; t
           day.isToday && !day.completed && styles.weekDayCircleToday,
         ]}
       >
-        {day.completed ? <Text style={styles.weekDayCheck}>✓</Text> : null}
+        <Text style={day.completed ? styles.weekDayCheck : styles.weekDayNumber}>
+          {day.completed ? '✓' : Number(day.date.slice(8, 10))}
+        </Text>
       </View>
       <Text style={styles.weekDayLabel}>{letter}</Text>
     </View>
@@ -155,6 +163,11 @@ const getStyles = (theme: Theme) =>
       backgroundColor: theme.colors.yellow,
     },
     weekDayCheck: {
+      fontSize: 15,
+      color: theme.colors.ink,
+    },
+    weekDayNumber: {
+      ...theme.typography.bodyStrong,
       fontSize: 15,
       color: theme.colors.ink,
     },

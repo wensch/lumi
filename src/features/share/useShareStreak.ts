@@ -2,8 +2,10 @@ import { useCallback, useRef, useState } from 'react';
 import { View } from 'react-native';
 import * as Sharing from 'expo-sharing';
 import { captureRef } from 'react-native-view-shot';
+import { useTranslation } from '@/i18n';
 
 export function useShareStreak() {
+  const { t } = useTranslation();
   const cardRef = useRef<View>(null);
   const [sharing, setSharing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +19,7 @@ export function useShareStreak() {
     try {
       const isAvailable = await Sharing.isAvailableAsync();
       if (!isAvailable) {
-        setError('Compartilhamento não disponível neste dispositivo.');
+        setError(t('errors.shareUnavailable'));
         return;
       }
 
@@ -29,14 +31,14 @@ export function useShareStreak() {
 
       await Sharing.shareAsync(uri, {
         mimeType: 'image/png',
-        dialogTitle: 'Compartilhar minha constância',
+        dialogTitle: t('share.dialogTitle'),
       });
     } catch {
-      setError('Não foi possível compartilhar agora. Tenta de novo?');
+      setError(t('errors.shareFailed'));
     } finally {
       setSharing(false);
     }
-  }, []);
+  }, [t]);
 
   return { cardRef, share, sharing, error };
 }

@@ -6,6 +6,17 @@
  * salvo no profile. Pode divergir por até 1 dia para quem viaja de fuso
  * com frequência; aceitável para o MVP.
  */
+/**
+ * streaks.current_streak só é recalculado quando o usuário conclui um novo
+ * momento, então fica com o valor antigo depois que a sequência quebra. A
+ * sequência exibida é a "viva": vale se o último momento foi hoje ou ontem
+ * (ainda dá para continuar hoje); passado disso, é 0.
+ */
+export function activeStreak(storedStreak: number, daysSinceLastCompleted: number | null): number {
+  if (daysSinceLastCompleted === null || daysSinceLastCompleted > 1) return 0;
+  return storedStreak;
+}
+
 export function calculateDaysSince(dateString: string | null): number | null {
   if (!dateString) return null;
   const last = new Date(`${dateString}T00:00:00`);

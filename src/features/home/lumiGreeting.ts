@@ -1,7 +1,10 @@
 import type { LumiMoodVariant } from '@/features/lumi';
 
+type Translate = (scope: string, options?: Record<string, unknown>) => string;
+
 /**
- * Falas do Lumi na tela Hoje, variando pelo estado de streak.
+ * Falas do Lumi na tela Hoje, variando pelo estado de streak. O texto vive
+ * em i18n (home.greeting.*); aqui só se decide qual fala e qual humor.
  * Revisado contra o checklist da skill lumi-brand-guardrails:
  *   - Sem culpa/vergonha; sempre com rota de retorno.
  *   - Provoca o comportamento, nunca a identidade/espiritualidade.
@@ -13,7 +16,7 @@ import type { LumiMoodVariant } from '@/features/lumi';
  * daysSinceLastCompleted (dias desde a última conclusão), não por
  * currentStreak, que fica com o valor antigo até a próxima conclusão.
  */
-export function lumiGreeting(daysSinceLastCompleted: number | null) {
+export function lumiGreeting(daysSinceLastCompleted: number | null, t: Translate) {
   const mood: LumiMoodVariant = (() => {
     if (daysSinceLastCompleted === null || daysSinceLastCompleted === 1) return 'waiting';
     if (daysSinceLastCompleted === 0) return 'happy';
@@ -23,40 +26,38 @@ export function lumiGreeting(daysSinceLastCompleted: number | null) {
   if (daysSinceLastCompleted === null) {
     return {
       mood,
-      title: 'Oi! Eu sou o Lumi.',
-      subtitle: 'Seu primeiro devocional está esperando. Bora começar?',
+      title: t('home.greeting.firstTitle'),
+      subtitle: t('home.greeting.firstSubtitle'),
     };
   }
 
   if (daysSinceLastCompleted === 0) {
     return {
       mood,
-      title: 'Você já veio hoje!',
-      subtitle: 'Quer registrar mais alguma coisa ou só voltar amanhã. Sem pressa.',
+      title: t('home.greeting.todayTitle'),
+      subtitle: t('home.greeting.todaySubtitle'),
     };
   }
 
   if (daysSinceLastCompleted === 1) {
     return {
       mood,
-      title: 'Bora hoje?',
-      subtitle: 'Seu devocional de hoje ainda não começou. Bora?',
+      title: t('home.greeting.yesterdayTitle'),
+      subtitle: t('home.greeting.yesterdaySubtitle'),
     };
   }
 
   if (daysSinceLastCompleted >= 7) {
     return {
       mood,
-      title: 'Que bom te ver de novo.',
-      subtitle:
-        'Jesus ficou 40 dias no deserto. Você está há ' +
-        `${daysSinceLastCompleted} dias sem aparecer… não vamos transformar isso em competição.`,
+      title: t('home.greeting.longAbsenceTitle'),
+      subtitle: t('home.greeting.longAbsenceSubtitle', { days: daysSinceLastCompleted }),
     };
   }
 
   return {
     mood,
-    title: 'Ih, quebrou a sequência.',
-    subtitle: 'Sem estresse — a proposta é constância, não perfeição. Bora recomeçar?',
+    title: t('home.greeting.brokenTitle'),
+    subtitle: t('home.greeting.brokenSubtitle'),
   };
 }

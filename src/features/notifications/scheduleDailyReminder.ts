@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import { getCurrentLanguage, type LanguageCode } from '@/i18n';
 
 const DAILY_REMINDER_ID = 'lumi-daily-reminder';
 const ALTERNATE_REMINDER_ID = 'lumi-alternate-reminder';
@@ -9,17 +10,29 @@ const ALTERNATE_DELAY_HOURS = 4;
  * Copy revisada contra o checklist da skill lumi-brand-guardrails:
  *   - Persistente e contextual, sem culpa religiosa (briefing §14).
  *   - Lembrete alternativo é mais leve, nunca soa como cobrança.
+ * Texto no idioma ativo do app (getCurrentLanguage) no momento de agendar.
  */
-const DAILY_MESSAGES = [
-  'Seu devocional com o Lumi está esperando. 🐑',
-  'Hora do seu devocional diário — não precisa ser longo, só constante.',
-  'Bora? Alguns minutos são suficientes pra hoje.',
-];
-
-const ALTERNATE_MESSAGES = [
-  'Ainda dá tempo hoje, se quiser.',
-  'Passando pra lembrar — sem pressa, só um lembrete.',
-];
+const REMINDER_MESSAGES: Record<LanguageCode, { daily: string[]; alternate: string[] }> = {
+  pt: {
+    daily: [
+      'Seu devocional com o Lumi está esperando. 🐑',
+      'Hora do seu devocional diário — não precisa ser longo, só constante.',
+      'Bora? Alguns minutos são suficientes pra hoje.',
+    ],
+    alternate: [
+      'Ainda dá tempo hoje, se quiser.',
+      'Passando pra lembrar — sem pressa, só um lembrete.',
+    ],
+  },
+  en: {
+    daily: [
+      'Your devotional with Lumi is waiting. 🐑',
+      "Time for your daily devotional — it doesn't have to be long, just consistent.",
+      'Ready? A few minutes is all you need today.',
+    ],
+    alternate: ["There's still time today, if you'd like.", 'Just a reminder — no rush.'],
+  },
+};
 
 function pickRandom(messages: string[]) {
   return messages[Math.floor(Math.random() * messages.length)];
@@ -41,6 +54,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
 export async function scheduleDailyReminder(preferredTime: string) {
   await cancelDailyReminder();
 
+  const messages = REMINDER_MESSAGES[getCurrentLanguage()];
   const [hourStr, minuteStr] = preferredTime.split(':');
   const hour = Number(hourStr);
   const minute = Number(minuteStr);
@@ -51,7 +65,7 @@ export async function scheduleDailyReminder(preferredTime: string) {
     identifier: DAILY_REMINDER_ID,
     content: {
       title: 'Lumi',
-      body: pickRandom(DAILY_MESSAGES),
+      body: pickRandom(messages.daily),
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
@@ -66,7 +80,7 @@ export async function scheduleDailyReminder(preferredTime: string) {
     identifier: ALTERNATE_REMINDER_ID,
     content: {
       title: 'Lumi',
-      body: pickRandom(ALTERNATE_MESSAGES),
+      body: pickRandom(messages.alternate),
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,

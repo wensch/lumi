@@ -25,7 +25,7 @@ export default function LumiScreen() {
     );
   }
 
-  const greeting = lumiGreeting(daysSinceLastCompleted);
+  const greeting = lumiGreeting(daysSinceLastCompleted, t);
   const journey = getJourney(currentStreak, longestStreak);
 
   return (

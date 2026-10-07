@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Card, FadeIn, Screen, ScreenHeader, Section, Skeleton } from '@/components';
+import { isKnownAchievement } from '@/features/achievements';
 import { useProfileHistory } from '@/features/profile';
 import { ShareStreakButton } from '@/features/share';
 import { useTheme, type Theme } from '@/theme';
@@ -61,7 +62,11 @@ export default function PerfilScreen() {
                           {unlocked ? achievement.icon : '🔒'}
                         </Text>
                       </View>
-                      <Text style={styles.achievementLabel}>{achievement.title}</Text>
+                      <Text style={styles.achievementLabel}>
+                        {isKnownAchievement(achievement.code)
+                          ? t(`achievements.${achievement.code}`)
+                          : achievement.title}
+                      </Text>
                     </View>
                   );
                 })}

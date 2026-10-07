@@ -1,4 +1,5 @@
 import { SvgXml } from 'react-native-svg';
+import { useTranslation } from '@/i18n';
 import type { LumiMood } from '@/lib/supabase';
 import { lumiHappySvg } from './svgs/lumiHappySvg';
 import { lumiSadSvg } from './svgs/lumiSadSvg';
@@ -51,12 +52,13 @@ const SVG_BY_VARIANT: Record<LumiMoodVariant, string> = {
 };
 
 export function LumiMascot({ mood = 'normal', size = 160 }: LumiMascotProps) {
+  const { t } = useTranslation();
   return (
     <SvgXml
       xml={SVG_BY_VARIANT[mood]}
       width={size}
       height={size}
-      accessibilityLabel={`Lumi — estado ${mood}`}
+      accessibilityLabel={t('lumi.mascotLabel')}
     />
   );
 }

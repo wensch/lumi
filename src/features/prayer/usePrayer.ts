@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
+import { translate } from '@/i18n';
 
 type PrayerEntry = Database['public']['Tables']['prayer_entries']['Row'];
 
@@ -32,7 +33,7 @@ export function usePrayer() {
       setSaving(false);
 
       if (insertError || !data) {
-        setError(insertError?.message ?? 'Não foi possível salvar sua oração.');
+        setError(translate('errors.prayerSave'));
         return null;
       }
 

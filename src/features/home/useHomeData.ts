@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { LumiMood } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
-import { calculateDaysSince } from '@/lib/dates';
+import { activeStreak, calculateDaysSince } from '@/lib/dates';
 
 /** Um dia da faixa da semana exibida na tela Hoje — domingo a sábado, hoje incluso. */
 export type WeekDay = {
@@ -83,12 +83,16 @@ export function useHomeData() {
     );
     const week = emptyWeek.map((day) => ({ ...day, completed: completedDates.has(day.date) }));
 
+    const daysSinceLastCompleted = calculateDaysSince(
+      streakResult.data?.last_completed_date ?? null,
+    );
+
     setData({
-      currentStreak: streakResult.data?.current_streak ?? 0,
+      currentStreak: activeStreak(streakResult.data?.current_streak ?? 0, daysSinceLastCompleted),
       longestStreak: streakResult.data?.longest_streak ?? 0,
       totalXp: xpResult.data?.total_xp ?? 0,
       lumiMood: lumiResult.data?.mood ?? 'normal',
-      daysSinceLastCompleted: calculateDaysSince(streakResult.data?.last_completed_date ?? null),
+      daysSinceLastCompleted,
       week,
     });
     setLoading(false);

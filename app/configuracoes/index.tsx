@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
-import { Button, Screen, Section } from '@/components';
+import { Button, Screen, ScreenHeader, Section } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useNotificationPreferences } from '@/features/settings';
 import { requestNotificationPermission } from '@/features/notifications';
@@ -52,10 +52,7 @@ export default function ConfiguracoesScreen() {
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <Text style={theme.typography.display}>{t('settings.title')}</Text>
-        <Button variant="tertiary" label={t('common.back')} onPress={() => router.back()} />
-      </View>
+      <ScreenHeader title={t('settings.title')} onBackPress={() => router.back()} />
 
       <Section label={t('settings.reminders')}>
         <View style={styles.row}>
@@ -142,11 +139,6 @@ export default function ConfiguracoesScreen() {
 
 const getStyles = (theme: Theme) =>
   StyleSheet.create({
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',

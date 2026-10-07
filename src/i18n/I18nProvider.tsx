@@ -28,6 +28,16 @@ function detectDeviceLanguage(): LanguageCode {
   return deviceLocale === 'en' ? 'en' : 'pt';
 }
 
+/** Traduz fora de componentes/hooks reativos (ex.: mensagens de erro em callbacks). */
+export function translate(scope: Scope, options?: TranslateOptions): string {
+  return i18n.t(scope, options) as string;
+}
+
+/** Idioma ativo, para código fora de componentes (ex.: texto das notificações locais). */
+export function getCurrentLanguage(): LanguageCode {
+  return i18n.locale === 'en' ? 'en' : 'pt';
+}
+
 type I18nContextValue = {
   language: LanguageCode;
   setLanguage: (language: LanguageCode) => void;

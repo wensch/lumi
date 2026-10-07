@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useTheme, type Theme } from '@/theme';
+import { useTranslation } from '@/i18n';
 
 type StreakBadgeProps = {
   days: number;
@@ -9,12 +10,13 @@ type StreakBadgeProps = {
 export function StreakBadge({ days }: StreakBadgeProps) {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>🔥</Text>
       <Text style={styles.value}>
-        {days} {days === 1 ? 'dia' : 'dias'}
+        {days} {t(days === 1 ? 'home.day' : 'home.days')}
       </Text>
     </View>
   );

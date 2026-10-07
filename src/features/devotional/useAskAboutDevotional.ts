@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { translate } from '@/i18n';
 
 /**
  * Pergunta sobre o texto bíblico/devocional do dia, respondida por IA
@@ -31,7 +32,7 @@ export function useAskAboutDevotional(devotionalSessionId: string | null) {
       setAsking(false);
 
       if (fnError || !data?.answer) {
-        setError(data?.error ?? 'Não foi possível responder agora.');
+        setError(data?.error ?? translate('errors.askFailed'));
         return;
       }
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
+import { activeStreak, calculateDaysSince } from '@/lib/dates';
 
 type Achievement = Database['public']['Tables']['achievements']['Row'];
 type CompletedSession = {
@@ -41,7 +42,7 @@ export function useProfileHistory() {
       await Promise.all([
         supabase
           .from('streaks')
-          .select('current_streak, longest_streak')
+          .select('current_streak, longest_streak, last_completed_date')
           .eq('user_id', userId)
           .single(),
         supabase.from('xp_totals').select('total_xp').eq('user_id', userId).maybeSingle(),
@@ -57,7 +58,10 @@ export function useProfileHistory() {
       ]);
 
     setHistory({
-      currentStreak: streakResult.data?.current_streak ?? 0,
+      currentStreak: activeStreak(
+        streakResult.data?.current_streak ?? 0,
+        calculateDaysSince(streakResult.data?.last_completed_date ?? null),
+      ),
       longestStreak: streakResult.data?.longest_streak ?? 0,
       totalXp: xpResult.data?.total_xp ?? 0,
       recentSessions: (sessionsResult.data ?? []).map((row) => ({
