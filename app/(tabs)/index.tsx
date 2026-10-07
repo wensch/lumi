@@ -4,6 +4,7 @@ import { Button, Card, FadeIn, Screen, Skeleton, StreakBadge, XPBadge } from '@/
 import { lumiGreeting, useHomeData, type WeekDay } from '@/features/home';
 import { LumiMascot } from '@/features/lumi';
 import { ShareStreakButton } from '@/features/share';
+import { UpdateBanner } from '@/features/updates';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 
@@ -46,6 +47,8 @@ export default function HojeScreen() {
 
   return (
     <Screen>
+      <UpdateBanner />
+
       <View style={styles.header}>
         <StreakBadge days={currentStreak} />
         <XPBadge xp={totalXp} />

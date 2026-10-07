@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { Button, Screen, ScreenHeader, Section } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useNotificationPreferences } from '@/features/settings';
+import { useAppUpdate } from '@/features/updates';
 import { requestNotificationPermission } from '@/features/notifications';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation, type LanguageCode } from '@/i18n';
@@ -127,6 +128,8 @@ export default function ConfiguracoesScreen() {
         </View>
       </Section>
 
+      {Platform.OS === 'android' ? <UpdatesSection /> : null}
+
       <Section label={t('settings.account')}>
         <Text style={styles.accountEmail}>
           {t('settings.connectedAs', { email: session?.user.email ?? '' })}
@@ -134,6 +137,48 @@ export default function ConfiguracoesScreen() {
         <Button variant="tertiary" label={t('common.signOut')} onPress={signOut} />
       </Section>
     </Screen>
+  );
+}
+
+function UpdatesSection() {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+  const { t } = useTranslation();
+  const { status, latest, currentBuild, check, openDownload } = useAppUpdate();
+
+  const statusText =
+    status === 'checking'
+      ? t('updates.checking')
+      : status === 'upToDate'
+        ? t('updates.upToDate')
+        : status === 'error'
+          ? t('updates.error')
+          : status === 'available' && latest
+            ? t('updates.available', { build: latest.build })
+            : null;
+
+  return (
+    <Section label={t('updates.title')}>
+      <Text style={theme.typography.bodyStrong}>
+        {currentBuild > 0
+          ? t('updates.currentVersion', { build: currentBuild })
+          : t('updates.devVersion')}
+      </Text>
+      {statusText ? <Text style={styles.helperText}>{statusText}</Text> : null}
+      {status === 'available' ? (
+        <>
+          <Button label={t('updates.update')} onPress={openDownload} />
+          <Text style={styles.helperText}>{t('updates.hint')}</Text>
+        </>
+      ) : (
+        <Button
+          variant="secondary"
+          label={t('updates.check')}
+          onPress={check}
+          disabled={status === 'checking'}
+        />
+      )}
+    </Section>
   );
 }
 

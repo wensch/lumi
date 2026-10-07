@@ -20,6 +20,8 @@ jobs:
       EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
       EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
       EXPO_PUBLIC_YOUVERSION_APP_KEY: ${{ secrets.EXPO_PUBLIC_YOUVERSION_APP_KEY }}
+      # Número deste build, embutido no app para o aviso de atualização (ver features/updates).
+      EXPO_PUBLIC_BUILD_NUMBER: ${{ github.run_number }}
     steps:
       - uses: actions/checkout@v4
 
@@ -61,8 +63,8 @@ jobs:
       # ios/ e android/ não existem no repo (CNG): são gerados a cada build.
       - run: npx expo prebuild --platform android --no-install
 
-      # Opcional: com o secret ANDROID_DEBUG_KEYSTORE_BASE64 o APK sai sempre com a mesma
-      # assinatura e pode ser instalado por cima da versão anterior.
+      # O secret ANDROID_DEBUG_KEYSTORE_BASE64 mantém a assinatura igual em todo build, para o APK
+      # poder ser instalado por cima da versão anterior (e o aviso de atualização do app funcionar).
       - name: Use fixed signing key
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_DEBUG_KEYSTORE_BASE64 }}
@@ -70,7 +72,8 @@ jobs:
           if [ -n "$KEYSTORE_B64" ]; then
             echo "$KEYSTORE_B64" | base64 -d > android/app/debug.keystore
           else
-            echo "::warning::Sem ANDROID_DEBUG_KEYSTORE_BASE64: a assinatura muda a cada build; desinstale o app antes de atualizar."
+            echo "::error::Secret ANDROID_DEBUG_KEYSTORE_BASE64 não configurado: sem ele a assinatura muda a cada build e o app não atualiza por cima."
+            exit 1
           fi
 
       - name: Set versionCode
@@ -80,6 +83,12 @@ jobs:
       - name: Assemble APK
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
+
+      # Impressão digital (pública) do certificado: iguais entre builds = o Android aceita atualizar por cima.
+      - name: Show signing certificate
+        run: |
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs android/app/build/outputs/apk/release/app-release.apk | grep -i "SHA-256" || true
 
       - uses: actions/upload-artifact@v4
         with:
