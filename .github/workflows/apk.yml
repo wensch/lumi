@@ -39,6 +39,20 @@ jobs:
             if [ -z "${!v}" ]; then echo "::error::Secret $v não configurado"; exit 1; fi
           done
 
+      # Um secret com aspas, espaço, quebra de linha ou barra final faz o app fechar ao abrir.
+      # Só imprime o tamanho, nunca o valor.
+      - name: Validate secret formats
+        run: |
+          ok=1
+          bad() { echo "::error::$1 com formato inválido (tamanho ${#2}): sem aspas, espaços, quebras de linha"; ok=0; }
+          url="$EXPO_PUBLIC_SUPABASE_URL"
+          key="$EXPO_PUBLIC_SUPABASE_ANON_KEY"
+          yv="$EXPO_PUBLIC_YOUVERSION_APP_KEY"
+          [[ "$url" =~ ^https://[^[:space:]\"\'/]+$ ]] || bad "EXPO_PUBLIC_SUPABASE_URL (esperado https://xxxx.supabase.co, sem barra no final)" "$url"
+          [[ "$key" =~ ^[A-Za-z0-9_.-]+$ ]] || bad "EXPO_PUBLIC_SUPABASE_ANON_KEY" "$key"
+          [[ "$yv" =~ ^[A-Za-z0-9_.-]+$ ]] || bad "EXPO_PUBLIC_YOUVERSION_APP_KEY" "$yv"
+          if [ "$ok" = 1 ]; then echo "Formatos dos secrets OK (url=${#url}, anon=${#key}, yv=${#yv} caracteres)"; else exit 1; fi
+
       - run: npm ci --legacy-peer-deps
       - run: npm run format:check
       - run: npm run typecheck
