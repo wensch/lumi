@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, type Theme } from '@/theme';
 
 const ICON_BY_ROUTE: Record<string, keyof typeof Ionicons.glyphMap> = {
@@ -20,9 +21,10 @@ const ICON_BY_ROUTE: Record<string, keyof typeof Ionicons.glyphMap> = {
 export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { bottom: 16 + insets.bottom }]}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label = (options.title ?? route.name) as string;
@@ -49,7 +51,9 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
             style={[styles.tab, isFocused && styles.tabActive]}
           >
             <Ionicons name={iconName} size={22} color={theme.colors.ink} />
-            <Text style={styles.label}>{label}</Text>
+            <Text style={styles.label} maxFontSizeMultiplier={1.25}>
+              {label}
+            </Text>
           </Pressable>
         );
       })}

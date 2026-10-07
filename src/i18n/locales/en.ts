@@ -6,6 +6,7 @@ export const en: TranslationSchema = {
     back: 'Back',
     save: 'Save',
     cancel: 'Cancel',
+    retry: 'Try again',
     signOut: 'Sign out',
     email: 'Email',
     password: 'Password',
@@ -32,6 +33,8 @@ export const en: TranslationSchema = {
     usePassword: 'Sign in with password',
     forgotPassword: 'Forgot my password',
     noAccountYet: "Don't have an account yet?",
+    callbackFailed: "We couldn't sign you in with that link. It may have expired.",
+    backToLogin: 'Back to sign in',
     alreadyHaveAccount: 'Already have an account?',
     signInWithYouVersion: 'Sign in with YouVersion',
     youVersionHint: 'We sent a confirmation link to the email on your YouVersion account.',
@@ -89,7 +92,7 @@ export const en: TranslationSchema = {
   },
   home: {
     startDevotional: 'Start my devotional',
-    anotherDevotional: 'Do another devotional',
+    anotherDevotional: "Read today's devotional again",
     alreadyCameToday: 'You already showed up today!',
     alreadyCameSubtitle: 'Want to add something else, or just come back tomorrow. No rush.',
     devotionalOfTheDay: "Today's devotional",
@@ -115,8 +118,10 @@ export const en: TranslationSchema = {
       longAbsenceTitle: 'So good to see you again.',
       longAbsenceSubtitle:
         "Jesus spent 40 days in the desert. You've been away for {{days}} days… let's not turn this into a competition.",
-      brokenTitle: 'Oops, the streak broke.',
-      brokenSubtitle: "No stress — it's about consistency, not perfection. Ready to start again?",
+      welcomeBackSubtitle:
+        "It's been a few days, and that's okay. What you've already earned stays with you. Ready to pick it back up?",
+      brokenTitle: 'Ready to start again today?',
+      brokenSubtitle: "No stress — it's about consistency, not perfection.",
     },
   },
   achievements: {
@@ -139,7 +144,13 @@ export const en: TranslationSchema = {
     bannerSubtitle: 'Version #{{build}} available',
     dismiss: 'Dismiss',
   },
+  notifications: {
+    channelName: 'Daily reminders',
+  },
   errors: {
+    connection: "Can't reach the server right now. Showing what we had.",
+    onboardingFailed: "Couldn't finish right now. Try again?",
+    profileLoad: "Couldn't load your account. Check your connection and try again.",
     devotionalStart: "Couldn't start the devotional.",
     devotionalComplete: "Couldn't complete the devotional.",
     prayerSave: "Couldn't save your prayer.",
@@ -169,6 +180,10 @@ export const en: TranslationSchema = {
     continueButton: 'Continue',
     finish: 'Finish my devotional',
     completedTitle: 'Devotional complete!',
+    stepOf: 'Step {{current}} of {{total}}',
+    verseUnavailable: "Couldn't load the verse right now.",
+    aiDisclaimer:
+      "AI-generated answer based on the devotional text. It doesn't replace talking with someone you trust.",
     returnWelcomeTitle: 'Good to see you again!',
     returnWelcomeSubtitle: 'Starting over is already the part that matters most.',
     xpAndStreak: '+{{xp}} XP · {{count}} {{unit}} streak',
@@ -239,6 +254,9 @@ export const en: TranslationSchema = {
     defaultDevotionalName: 'Devotional',
   },
   settings: {
+    notificationsBlocked:
+      "Notifications are blocked in system settings, so the reminder won't show up.",
+    openSystemSettings: 'Open system settings',
     appearanceHint: "Pick the app's look. It changes the colors and font on every screen.",
     palettes: {
       recorte: { name: 'Cutout', description: 'Warm cream with bold outlines. The default look.' },

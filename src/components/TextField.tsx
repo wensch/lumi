@@ -16,7 +16,12 @@ export function TextField({ label, error, style, ...rest }: TextFieldProps) {
       <TextInput
         style={[styles.input, error && styles.inputError, style]}
         placeholderTextColor={theme.colors.muted}
-        autoCapitalize="none"
+        accessibilityLabel={label}
+        // Campos de texto livre (reflexão, pergunta, oração) pedem maiúscula no início das frases;
+        // email/senha continuam sem.
+        autoCapitalize={rest.multiline ? 'sentences' : 'none'}
+        textAlignVertical={rest.multiline ? 'top' : 'center'}
+        keyboardAppearance={theme.palette.isDark ? 'dark' : 'light'}
         {...rest}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -44,10 +49,10 @@ const getStyles = (theme: Theme) =>
       borderColor: theme.colors.ink,
     },
     inputError: {
-      borderColor: '#E05252',
+      borderColor: theme.colors.danger,
     },
     error: {
       ...theme.typography.caption,
-      color: '#E05252',
+      color: theme.colors.danger,
     },
   });

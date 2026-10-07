@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { LumiMood } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
-import { activeStreak, calculateDaysSince } from '@/lib/dates';
+import { activeStreak, calculateDaysSince, startOfLocalDay, toLocalDateKey } from '@/lib/dates';
 
 /** Um dia da faixa da semana exibida na tela Hoje — domingo a sábado, hoje incluso. */
 export type WeekDay = {
@@ -25,7 +25,7 @@ type HomeData = {
 };
 
 function buildEmptyWeek(): WeekDay[] {
-  const today = new Date();
+  const today = startOfLocalDay();
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - today.getDay());
 
@@ -33,10 +33,10 @@ function buildEmptyWeek(): WeekDay[] {
     const date = new Date(startOfWeek);
     date.setDate(startOfWeek.getDate() + i);
     return {
-      date: date.toISOString().slice(0, 10),
+      date: toLocalDateKey(date),
       weekday: i,
       completed: false,
-      isToday: date.toDateString() === today.toDateString(),
+      isToday: date.getTime() === today.getTime(),
     };
   });
 }
@@ -55,12 +55,15 @@ export function useHomeData() {
   const userId = session?.user.id ?? null;
   const [data, setData] = useState<HomeData>(DEFAULT_HOME_DATA);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const fetchHomeData = useCallback(async (userId: string) => {
     setLoading(true);
 
     const emptyWeek = buildEmptyWeek();
-    const weekStart = emptyWeek[0].date;
+    // Início da semana à meia-noite LOCAL (como instante UTC) — antes usava "T00:00:00" sem fuso.
+    const [startYear, startMonth, startDay] = emptyWeek[0].date.split('-').map(Number);
+    const weekStartInstant = new Date(startYear, startMonth - 1, startDay).toISOString();
 
     const [streakResult, xpResult, lumiResult, weekSessionsResult] = await Promise.all([
       supabase
@@ -75,11 +78,22 @@ export function useHomeData() {
         .select('completed_at')
         .eq('user_id', userId)
         .not('completed_at', 'is', null)
-        .gte('completed_at', `${weekStart}T00:00:00`),
+        .gte('completed_at', weekStartInstant),
     ]);
 
+    // Falha de rede: mantém o último dado conhecido em vez de mostrar "0 dias · 0 XP"
+    // para quem tem uma sequência de verdade.
+    if (streakResult.error) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+    setError(false);
+
     const completedDates = new Set(
-      (weekSessionsResult.data ?? []).map((row) => (row.completed_at as string).slice(0, 10)),
+      (weekSessionsResult.data ?? []).map((row) =>
+        toLocalDateKey(new Date(row.completed_at as string)),
+      ),
     );
     const week = emptyWeek.map((day) => ({ ...day, completed: completedDates.has(day.date) }));
 
@@ -116,5 +130,5 @@ export function useHomeData() {
     await fetchHomeData(userId);
   }, [userId, fetchHomeData]);
 
-  return { ...data, loading, refetch };
+  return { ...data, loading, error, refetch };
 }

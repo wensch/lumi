@@ -17,7 +17,7 @@ export default function NovaSenhaScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
-  const { updatePassword } = useAuth();
+  const { updatePassword, signOut } = useAuth();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +74,7 @@ export default function NovaSenhaScreen() {
           onPress={handleSubmit}
           disabled={submitting}
         />
+        <Button variant="ghost" label={t('common.cancel')} onPress={signOut} />
       </Card>
     </Screen>
   );
@@ -97,6 +98,6 @@ const getStyles = (theme: Theme) =>
     },
     errorText: {
       ...theme.typography.caption,
-      color: '#E05252',
+      color: theme.colors.danger,
     },
   });

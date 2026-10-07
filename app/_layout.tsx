@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text } from 'react-native';
 import { router, Slot, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -22,12 +23,12 @@ import {
   Baloo2_700Bold,
   Baloo2_800ExtraBold,
 } from '@expo-google-fonts/baloo-2';
-import { LoadingScreen } from '@/components';
+import { Button, LoadingScreen, Screen } from '@/components';
 import { AuthProvider, useAuth } from '@/features/auth';
-import { useProfile } from '@/features/onboarding';
+import { ProfileProvider, useProfile, useTimezoneSync } from '@/features/onboarding';
 import { configureNotificationHandler, useNotificationScheduler } from '@/features/notifications';
 import { ThemeProvider, useTheme } from '@/theme';
-import { I18nProvider } from '@/i18n';
+import { I18nProvider, useTranslation } from '@/i18n';
 
 SplashScreen.preventAutoHideAsync();
 configureNotificationHandler();
@@ -42,7 +43,7 @@ const youVersionAuthConfig = {
 };
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Nunito_400Regular,
     Nunito_600SemiBold,
     Nunito_700Bold,
@@ -55,13 +56,16 @@ export default function RootLayout() {
     Baloo2_800ExtraBold,
   });
 
+  // Se uma fonte falhar, o app abre mesmo assim (fonte do sistema) em vez de ficar na splash.
+  const fontsReady = fontsLoaded || !!fontError;
+
   useEffect(() => {
-    if (fontsLoaded) {
+    if (fontsReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsReady]);
 
-  if (!fontsLoaded) {
+  if (!fontsReady) {
     return null;
   }
 
@@ -72,8 +76,10 @@ export default function RootLayout() {
           <YouVersionProvider appKey={youVersionAppKey} theme="system" auth={youVersionAuthConfig}>
             <YouVersionDataProvider appKey={youVersionAppKey ?? ''}>
               <AuthProvider>
-                <ThemedStatusBar />
-                <RootNavigation />
+                <ProfileProvider>
+                  <ThemedStatusBar />
+                  <RootNavigation />
+                </ProfileProvider>
               </AuthProvider>
             </YouVersionDataProvider>
           </YouVersionProvider>
@@ -123,15 +129,13 @@ function resolveTargetRoute({
     return inAuthGroup || inAuthCallback ? null : '/(auth)';
   }
 
-  if (inAuthGroup) {
-    return '/(tabs)';
-  }
-
+  // Logado: o onboarding vem antes de qualquer outra tela (inclusive depois do login),
+  // para não encadear dois redirecionamentos seguidos (/(tabs) e depois /(onboarding)).
   if (!onboardingCompleted) {
     return inOnboardingGroup ? null : '/(onboarding)';
   }
 
-  if (inOnboardingGroup || inAuthCallback || inNovaSenha) {
+  if (inAuthGroup || inOnboardingGroup || inAuthCallback || inNovaSenha) {
     return '/(tabs)';
   }
 
@@ -140,10 +144,11 @@ function resolveTargetRoute({
 
 function RootNavigation() {
   const { session, loading: authLoading, isPasswordRecovery } = useAuth();
-  const { profile, loading: profileLoading } = useProfile();
+  const { profile, loading: profileLoading, error: profileError, refetch } = useProfile();
   const segments = useSegments();
 
   useNotificationScheduler();
+  useTimezoneSync();
 
   const ready = !authLoading && !(session && profileLoading);
 
@@ -169,5 +174,41 @@ function RootNavigation() {
     return <LoadingScreen />;
   }
 
+  // Sem conseguir ler o perfil (ex.: offline), não dá para saber se o onboarding já foi
+  // feito — melhor pedir para tentar de novo do que mandar o usuário refazê-lo.
+  if (session && !profile && profileError) {
+    return <ProfileLoadError onRetry={refetch} />;
+  }
+
   return <Slot />;
 }
+
+function ProfileLoadError({ onRetry }: { onRetry: () => Promise<void> }) {
+  const { t } = useTranslation();
+  const { signOut } = useAuth();
+  const [retrying, setRetrying] = useState(false);
+
+  return (
+    <Screen centered>
+      <Text style={styles.errorTitle}>{t('errors.profileLoad')}</Text>
+      <Button
+        label={retrying ? t('common.loading') : t('common.retry')}
+        disabled={retrying}
+        onPress={async () => {
+          setRetrying(true);
+          await onRetry();
+          setRetrying(false);
+        }}
+      />
+      <Button label={t('common.signOut')} variant="ghost" onPress={signOut} />
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  errorTitle: {
+    fontFamily: 'Nunito_700Bold',
+    fontSize: 20,
+    textAlign: 'center',
+  },
+});

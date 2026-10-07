@@ -23,5 +23,20 @@ export function calculateDaysSince(dateString: string | null): number | null {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const diffMs = today.getTime() - last.getTime();
-  return Math.round(diffMs / (1000 * 60 * 60 * 24));
+  // Nunca negativo: a data do servidor pode estar "à frente" do relógio do aparelho.
+  return Math.max(0, Math.round(diffMs / (1000 * 60 * 60 * 24)));
+}
+
+/** Chave de data (AAAA-MM-DD) no fuso LOCAL do aparelho — toISOString() usaria UTC e viraria o dia às 21h no Brasil. */
+export function toLocalDateKey(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+/** Meia-noite local de hoje (ou da data dada), como Date. */
+export function startOfLocalDay(date: Date = new Date()): Date {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  return start;
 }

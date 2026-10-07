@@ -10,6 +10,7 @@ export const pt = {
     back: 'Voltar',
     save: 'Salvar',
     cancel: 'Cancelar',
+    retry: 'Tentar de novo',
     signOut: 'Sair',
     email: 'Email',
     password: 'Senha',
@@ -36,6 +37,8 @@ export const pt = {
     usePassword: 'Entrar com senha',
     forgotPassword: 'Esqueci minha senha',
     noAccountYet: 'Ainda não tem conta?',
+    callbackFailed: 'Não deu para entrar com esse link. Ele pode ter expirado.',
+    backToLogin: 'Voltar ao login',
     alreadyHaveAccount: 'Já tem conta?',
     signInWithYouVersion: 'Entrar com YouVersion',
     youVersionHint: 'Enviamos um link de confirmação para o email da sua conta YouVersion.',
@@ -92,7 +95,7 @@ export const pt = {
   },
   home: {
     startDevotional: 'Começar meu devocional',
-    anotherDevotional: 'Fazer mais um devocional',
+    anotherDevotional: 'Reler o devocional de hoje',
     alreadyCameToday: 'Você já veio hoje!',
     alreadyCameSubtitle: 'Quer registrar mais alguma coisa ou só voltar amanhã. Sem pressa.',
     devotionalOfTheDay: 'Devocional de hoje',
@@ -118,8 +121,10 @@ export const pt = {
       longAbsenceTitle: 'Que bom te ver de novo.',
       longAbsenceSubtitle:
         'Jesus ficou 40 dias no deserto. Você está há {{days}} dias sem aparecer… não vamos transformar isso em competição.',
-      brokenTitle: 'Ih, quebrou a sequência.',
-      brokenSubtitle: 'Sem estresse — a proposta é constância, não perfeição. Bora recomeçar?',
+      welcomeBackSubtitle:
+        'Faz alguns dias, e tudo bem. O que você já conquistou continua com você. Bora retomar?',
+      brokenTitle: 'Bora recomeçar hoje?',
+      brokenSubtitle: 'Sem estresse — a proposta é constância, não perfeição.',
     },
   },
   achievements: {
@@ -142,7 +147,13 @@ export const pt = {
     bannerSubtitle: 'Versão #{{build}} disponível',
     dismiss: 'Dispensar',
   },
+  notifications: {
+    channelName: 'Lembretes diários',
+  },
   errors: {
+    connection: 'Sem conexão com o servidor agora. Mostrando o que já tínhamos.',
+    onboardingFailed: 'Não foi possível concluir agora. Tenta de novo?',
+    profileLoad: 'Não foi possível carregar sua conta. Confira a conexão e tente de novo.',
     devotionalStart: 'Não foi possível iniciar o devocional.',
     devotionalComplete: 'Não foi possível concluir o devocional.',
     prayerSave: 'Não foi possível salvar sua oração.',
@@ -172,6 +183,10 @@ export const pt = {
     continueButton: 'Continuar',
     finish: 'Concluir meu devocional',
     completedTitle: 'Devocional concluído!',
+    stepOf: 'Passo {{current}} de {{total}}',
+    verseUnavailable: 'Não foi possível carregar o versículo agora.',
+    aiDisclaimer:
+      'Resposta gerada por IA a partir do texto do devocional. Não substitui conversar com alguém de confiança.',
     returnWelcomeTitle: 'Que bom te ver de novo!',
     returnWelcomeSubtitle: 'Recomeçar já é a parte que mais importa.',
     xpAndStreak: '+{{xp}} XP · sequência de {{count}} {{unit}}',
@@ -242,6 +257,9 @@ export const pt = {
     defaultDevotionalName: 'Devocional',
   },
   settings: {
+    notificationsBlocked:
+      'As notificações estão bloqueadas no sistema, então o lembrete não vai aparecer.',
+    openSystemSettings: 'Abrir ajustes do sistema',
     appearanceHint: 'Escolha o visual do app. Muda as cores e a fonte em todas as telas.',
     palettes: {
       recorte: { name: 'Recorte', description: 'Creme claro e contornos firmes. O visual padrão.' },

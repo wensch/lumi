@@ -27,6 +27,10 @@ export function useShareStreak() {
         result: 'tmpfile',
         format: 'png',
         quality: 1,
+        // Tamanho fixo do cartão: sem isso o Android captura em dp × densidade (~3000×5300 px,
+        // dezenas de MB) e pode estourar a memória em aparelhos modestos.
+        width: 1080,
+        height: 1920,
       });
 
       await Sharing.shareAsync(uri, {

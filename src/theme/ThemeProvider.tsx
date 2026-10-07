@@ -52,7 +52,7 @@ function hardShadow(offset: number, color: string) {
   };
 }
 
-function buildTheme(palette: Palette) {
+export function buildTheme(palette: Palette) {
   const weights = FONT_WEIGHT_MAP[palette.fontFamily];
 
   const typography = {

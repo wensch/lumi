@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
+import { calculateDaysSince } from '@/lib/dates';
 import { useTranslation } from '@/i18n';
 import {
   cancelDailyReminder,
-  requestNotificationPermission,
+  cancelTodaysAlternateReminder,
+  hasNotificationPermission,
   scheduleDailyReminder,
 } from './scheduleDailyReminder';
 
@@ -46,10 +48,21 @@ export function useNotificationScheduler() {
         return;
       }
 
-      const granted = await requestNotificationPermission();
+      // Só consulta: pedir permissão a cada abertura incomodaria quem já negou.
+      const granted = await hasNotificationPermission();
       if (!granted || cancelled) return;
 
       await scheduleDailyReminder(prefs.preferred_time);
+
+      // Quem já concluiu hoje não precisa do lembrete alternativo de hoje.
+      const { data: streak } = await supabase
+        .from('streaks')
+        .select('last_completed_date')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (!cancelled && calculateDaysSince(streak?.last_completed_date ?? null) === 0) {
+        await cancelTodaysAlternateReminder();
+      }
     })();
 
     return () => {

@@ -1,7 +1,7 @@
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { LumiMascot } from '@/features/lumi';
-import { useTheme, type Theme } from '@/theme';
+import { buildTheme, palettes, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 
 type StreakShareCardProps = {
@@ -19,8 +19,9 @@ export const StreakShareCard = forwardRef<View, StreakShareCardProps>(function S
   { streak, totalXp },
   ref,
 ) {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  // A imagem compartilhada sempre usa o visual "Recorte" (identidade da marca), independente
+  // da paleta que o usuário escolheu no app — em Noite viraria um cartão verde-escuro.
+  const styles = useMemo(() => getStyles(buildTheme(palettes.recorte)), []);
   const { t } = useTranslation();
 
   return (
@@ -92,7 +93,6 @@ const getStyles = (theme: Theme) =>
       ...theme.typography.heading,
       color: theme.colors.ink,
       textAlign: 'center',
-      opacity: 0.85,
     },
     footer: {
       position: 'absolute',
@@ -101,6 +101,5 @@ const getStyles = (theme: Theme) =>
     footerText: {
       ...theme.typography.bodyStrong,
       color: theme.colors.ink,
-      opacity: 0.85,
     },
   });

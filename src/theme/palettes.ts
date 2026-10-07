@@ -16,6 +16,8 @@ export type Palette = {
   blue: string;
   pink: string;
   muted: string;
+  /** Cor de erro (texto/borda de campo): vermelho com contraste suficiente em cada paleta. */
+  danger: string;
   white: string;
   /** Cor das sombras duras (offset). Nas paletas claras é a própria `ink`. */
   shadow: string;
@@ -35,6 +37,7 @@ export const palettes: Record<PaletteName, Palette> = {
     blue: '#A9BEFF',
     pink: '#FFC1D6',
     muted: '#6B6860',
+    danger: '#B3261E',
     white: '#FFFFFF',
     shadow: '#2A2A2E',
     isDark: false,
@@ -49,7 +52,8 @@ export const palettes: Record<PaletteName, Palette> = {
     yellow: '#FFE7A0',
     blue: '#B5CEFF',
     pink: '#FFCDBE',
-    muted: '#62806D',
+    muted: '#4F6B5A',
+    danger: '#B3261E',
     white: '#FFFFFF',
     shadow: '#264A35',
     isDark: false,
@@ -64,7 +68,8 @@ export const palettes: Record<PaletteName, Palette> = {
     yellow: '#FFE0A3',
     blue: '#CFCCFF',
     pink: '#F9C5D8',
-    muted: '#8F7360',
+    muted: '#7A5E4B',
+    danger: '#B3261E',
     white: '#FFFFFF',
     shadow: '#5A3A28',
     isDark: false,
@@ -86,6 +91,7 @@ export const palettes: Record<PaletteName, Palette> = {
     blue: '#3A52A0',
     pink: '#8A3A5C',
     muted: '#A29E92',
+    danger: '#FF8A80',
     white: '#24242B',
     shadow: '#0A0A0D',
     isDark: true,

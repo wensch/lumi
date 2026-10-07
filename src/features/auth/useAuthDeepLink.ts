@@ -39,7 +39,7 @@ function extractAuthParamsFromUrl(url: string) {
 // exceeded" nos <Redirect> encadeados.
 let lastProcessedToken: string | null = null;
 
-async function handleIncomingUrl(url: string | null, onRecovery: () => void) {
+async function handleIncomingUrl(url: string | null, onRecovery: (active: boolean) => void) {
   if (!url) return;
 
   const authParams = extractAuthParamsFromUrl(url);
@@ -49,16 +49,23 @@ async function handleIncomingUrl(url: string | null, onRecovery: () => void) {
   if (access_token === lastProcessedToken) return;
   lastProcessedToken = access_token;
 
-  await supabase.auth.setSession({ access_token, refresh_token });
-
+  // A flag de recuperação sobe ANTES da sessão: senão o app navega para as abas por um
+  // instante (ou, se for fechado nesse intervalo, o usuário entra sem trocar a senha).
   if (type === 'recovery') {
-    onRecovery();
+    onRecovery(true);
+  }
+
+  const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+  if (error) {
+    // Link inválido/expirado: libera o mesmo link para uma nova tentativa.
+    lastProcessedToken = null;
+    if (type === 'recovery') onRecovery(false);
   }
 }
 
 export const AUTH_REDIRECT_URL = Linking.createURL('auth/callback');
 
-export function useAuthDeepLink(onRecovery: () => void) {
+export function useAuthDeepLink(onRecovery: (active: boolean) => void) {
   useEffect(() => {
     Linking.getInitialURL().then((url) => handleIncomingUrl(url, onRecovery));
 

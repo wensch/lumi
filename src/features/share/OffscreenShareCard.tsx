@@ -16,7 +16,12 @@ type OffscreenShareCardProps = {
 export const OffscreenShareCard = forwardRef<View, OffscreenShareCardProps>(
   function OffscreenShareCard({ streak, totalXp }, ref) {
     return (
-      <View style={styles.offscreen} pointerEvents="none">
+      <View
+        style={styles.offscreen}
+        pointerEvents="none"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
         <StreakShareCard ref={ref} streak={streak} totalXp={totalXp} />
       </View>
     );

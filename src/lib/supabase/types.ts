@@ -222,6 +222,12 @@ export interface Database {
           unlocked_achievement_codes: string[];
         }[];
       };
+      set_user_timezone: {
+        Args: {
+          p_timezone: string;
+        };
+        Returns: undefined;
+      };
       complete_onboarding: {
         Args: {
           p_display_name: string;

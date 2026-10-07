@@ -1,14 +1,19 @@
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Button, Card, Screen, ScreenContainer, TextField } from '@/components';
-import { ACHIEVEMENT_ICONS } from '@/features/achievements';
+import { ACHIEVEMENT_ICONS, isKnownAchievement } from '@/features/achievements';
+import { cancelTodaysAlternateReminder } from '@/features/notifications';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
-import { useVersePassage } from '@/features/bible';
+import { useVersePassage, verseVersionId } from '@/features/bible';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import type { Database } from '@/lib/supabase';
+
+/** XP por conquista desbloqueada (espelha complete_devotional_session). */
+const ACHIEVEMENT_XP = 20;
 
 type Content = Database['public']['Tables']['content']['Row'];
 type Result = {
@@ -69,8 +74,9 @@ function buildSteps(content: Content): DevotionalStep[] {
 export default function DevocionalScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const { t } = useTranslation();
-  const { content, session, loading, completing, error, complete, isReturningFromBreak } =
+  const { t, language } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const { content, session, loading, completing, error, complete, retry, isReturningFromBreak } =
     useDevotional();
   const [stepIndex, setStepIndex] = useState(0);
   const [reflection, setReflection] = useState('');
@@ -96,18 +102,25 @@ export default function DevocionalScreen() {
     loading: verseLoading,
     error: verseError,
   } = useVersePassage(
-    isVerseStep ? (content?.youversion_version_id ?? null) : null,
+    isVerseStep ? verseVersionId(content?.youversion_version_id ?? null, language) : null,
     isVerseStep ? (content?.passage_reference ?? null) : null,
   );
+
+  // Fecha a tela; se foi aberta direto (sem histórico), cai na aba Hoje em vez de não fazer nada.
+  const leave = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
   const handleComplete = async () => {
     const outcome = await complete(reflection.trim() || undefined);
     if (outcome) {
+      const unlockedCodes = outcome.unlocked_achievement_codes ?? [];
       setResult({
         streak: outcome.current_streak,
-        xp: outcome.xp_awarded,
-        unlockedCodes: outcome.unlocked_achievement_codes ?? [],
+        // Cada conquista desbloqueada rende +20 XP além dos 10 do momento do dia.
+        xp: outcome.xp_awarded + ACHIEVEMENT_XP * unlockedCodes.length,
+        unlockedCodes,
       });
+      // Já concluiu hoje: o lembrete alternativo de hoje não faz mais sentido.
+      cancelTodaysAlternateReminder();
     }
   };
 
@@ -146,9 +159,10 @@ export default function DevocionalScreen() {
           {t('devotional.unavailable')}
         </Text>
         <Text style={[theme.typography.body, styles.subtitle]}>
-          {t('devotional.comeBackLater')}
+          {error ?? t('devotional.comeBackLater')}
         </Text>
-        <Button label={t('common.back')} variant="tertiary" onPress={() => router.back()} />
+        {error ? <Button label={t('common.retry')} onPress={retry} /> : null}
+        <Button label={t('common.back')} variant="tertiary" onPress={leave} />
       </Screen>
     );
   }
@@ -185,19 +199,21 @@ export default function DevocionalScreen() {
                 })}
           </Text>
           {showReturnWelcome ? (
-            <Text style={[theme.typography.caption, styles.subtitle]}>
+            <Text style={[theme.typography.caption, styles.doneSubtitle]}>
               {t('devotional.returnWelcomeSubtitle')}
             </Text>
           ) : null}
 
           {result.unlockedCodes.map((code) => {
-            const icon = ACHIEVEMENT_ICONS[code];
-            if (!icon) return null;
+            // Código novo vindo do backend sem ícone/tradução ainda: celebra do mesmo jeito.
+            const icon = ACHIEVEMENT_ICONS[code] ?? '🏅';
             return (
               <Card key={code} padding="compact" style={styles.achievementCard}>
                 <Text style={styles.achievementIcon}>{icon}</Text>
                 <Text style={theme.typography.bodyStrong}>
-                  {t('devotional.achievementUnlocked', { title: t(`achievements.${code}`) })}
+                  {t('devotional.achievementUnlocked', {
+                    title: isKnownAchievement(code) ? t(`achievements.${code}`) : code,
+                  })}
                 </Text>
               </Card>
             );
@@ -222,110 +238,150 @@ export default function DevocionalScreen() {
 
   return (
     <ScreenContainer
-      style={[styles.devScreen, { backgroundColor: theme.colors[currentStep.bgKey] }]}
+      style={[
+        styles.devScreen,
+        { backgroundColor: theme.colors[currentStep.bgKey], paddingBottom: 26 + insets.bottom },
+      ]}
     >
-      <View style={styles.devHeader}>
-        <Pressable
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel={t('devotional.close')}
-          style={styles.closeButton}
-        >
-          <Text style={styles.closeButtonLabel}>✕</Text>
-        </Pressable>
-        <View style={styles.progressRow}>
-          {steps.map((step, index) => (
-            <View
-              key={step.key}
-              style={[styles.progressSegment, index <= stepIndex && styles.progressSegmentActive]}
-            />
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.stepCard}>
-        <Text style={styles.stepPill}>{t(currentStep.labelKey)}</Text>
-
-        {currentStep.kind === 'verse' ? (
-          <>
-            <Text style={styles.verseReference}>
-              {versePassage?.reference ?? content.passage_reference}
-            </Text>
-            {verseLoading ? <Text style={styles.stepText}>{t('devotional.preparing')}</Text> : null}
-            {verseError ? <Text style={styles.stepText}>{content.title}</Text> : null}
-            {versePassage ? <Text style={styles.stepText}>{versePassage.content}</Text> : null}
-          </>
-        ) : null}
-
-        {currentStep.kind === 'text' ? (
-          <Text style={styles.stepText}>{currentStep.text}</Text>
-        ) : null}
-
-        {currentStep.kind === 'reflect' ? (
-          <>
-            <Text style={theme.typography.heading}>{t('devotional.reflectQuestion')}</Text>
-            <TextField
-              label={t('devotional.reflectLabel')}
-              placeholder={t('devotional.reflectPlaceholder')}
-              value={reflection}
-              onChangeText={setReflection}
-              multiline
-              style={styles.reflectionInput}
-            />
-          </>
-        ) : null}
-
-        {canAsk ? (
-          showAsk ? (
-            <View style={styles.askBox}>
-              <TextField
-                label={t('devotional.askLabel')}
-                placeholder={t('devotional.askPlaceholder')}
-                value={question}
-                onChangeText={setQuestion}
-                multiline
-              />
-              {askError ? <Text style={styles.errorText}>{askError}</Text> : null}
-              {answer ? <Text style={styles.answerText}>{answer}</Text> : null}
-              <View style={styles.askActions}>
-                <Button
-                  label={asking ? t('devotional.asking') : t('devotional.ask')}
-                  variant="secondary"
-                  onPress={() => ask(question)}
-                  disabled={asking || !question.trim()}
-                />
-                <Button label={t('devotional.close')} variant="tertiary" onPress={closeAsk} />
-              </View>
-            </View>
-          ) : (
-            <Button
-              label={t('devotional.askAboutText')}
-              variant="ghost"
-              onPress={() => setShowAsk(true)}
-            />
-          )
-        ) : null}
-
-        <View style={styles.stepMascot}>
-          <LumiMascot mood="waiting" size={110} />
-        </View>
-      </View>
-
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-      <View style={styles.devFooter}>
-        {stepIndex > 0 ? (
-          <Pressable onPress={goBack} style={styles.backButton}>
-            <Text style={styles.backButtonLabel}>←</Text>
+      <KeyboardAvoidingView behavior="padding" style={styles.devBody}>
+        <View style={styles.devHeader}>
+          <Pressable
+            onPress={leave}
+            accessibilityRole="button"
+            accessibilityLabel={t('devotional.close')}
+            hitSlop={8}
+            style={styles.closeButton}
+          >
+            <Text style={styles.closeButtonLabel}>✕</Text>
           </Pressable>
+          <View
+            style={styles.progressRow}
+            accessible
+            accessibilityRole="progressbar"
+            accessibilityLabel={t('devotional.stepOf', {
+              current: stepIndex + 1,
+              total: steps.length,
+            })}
+          >
+            {steps.map((step, index) => (
+              <View
+                key={step.key}
+                style={[styles.progressSegment, index <= stepIndex && styles.progressSegmentActive]}
+              />
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.stepCard}>
+          <ScrollView
+            style={styles.stepScroll}
+            contentContainerStyle={styles.stepCardContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.stepPill}>{t(currentStep.labelKey)}</Text>
+
+            {currentStep.kind === 'verse' ? (
+              <>
+                <Text style={styles.verseReference}>
+                  {versePassage?.reference ?? (verseLoading ? '' : content.passage_reference)}
+                </Text>
+                {verseLoading ? (
+                  <Text style={styles.stepText}>{t('devotional.preparing')}</Text>
+                ) : null}
+                {verseError ? (
+                  <Text style={styles.stepText}>{t('devotional.verseUnavailable')}</Text>
+                ) : null}
+                {versePassage ? <Text style={styles.stepText}>{versePassage.content}</Text> : null}
+              </>
+            ) : null}
+
+            {currentStep.kind === 'text' ? (
+              <Text style={styles.stepText}>{currentStep.text}</Text>
+            ) : null}
+
+            {currentStep.kind === 'reflect' ? (
+              <>
+                <Text style={theme.typography.heading}>{t('devotional.reflectQuestion')}</Text>
+                <TextField
+                  label={t('devotional.reflectLabel')}
+                  placeholder={t('devotional.reflectPlaceholder')}
+                  value={reflection}
+                  onChangeText={setReflection}
+                  multiline
+                  style={styles.reflectionInput}
+                />
+              </>
+            ) : null}
+
+            {canAsk ? (
+              showAsk ? (
+                <View style={styles.askBox}>
+                  <TextField
+                    label={t('devotional.askLabel')}
+                    placeholder={t('devotional.askPlaceholder')}
+                    value={question}
+                    onChangeText={setQuestion}
+                    multiline
+                    maxLength={500}
+                  />
+                  {askError ? <Text style={styles.errorText}>{askError}</Text> : null}
+                  {answer ? (
+                    <>
+                      <Text style={styles.answerText}>{answer}</Text>
+                      <Text style={styles.aiDisclaimer}>{t('devotional.aiDisclaimer')}</Text>
+                    </>
+                  ) : null}
+                  <View style={styles.askActions}>
+                    <Button
+                      label={asking ? t('devotional.asking') : t('devotional.ask')}
+                      variant="secondary"
+                      onPress={() => ask(question)}
+                      disabled={asking || !question.trim()}
+                    />
+                    <Button label={t('devotional.close')} variant="tertiary" onPress={closeAsk} />
+                  </View>
+                </View>
+              ) : (
+                <Button
+                  label={t('devotional.askAboutText')}
+                  variant="ghost"
+                  onPress={() => setShowAsk(true)}
+                />
+              )
+            ) : null}
+
+            <View style={styles.stepMascot}>
+              <LumiMascot mood="waiting" size={110} />
+            </View>
+          </ScrollView>
+        </View>
+
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {error && !session ? (
+          <Button label={t('common.retry')} variant="ghost" onPress={retry} />
         ) : null}
-        <Button
-          label={isLastStep ? t('devotional.finish') : t('devotional.continueButton')}
-          onPress={goNext}
-          disabled={completing || !session}
-          style={styles.nextButton}
-        />
-      </View>
+
+        <View style={styles.devFooter}>
+          {stepIndex > 0 ? (
+            <Pressable
+              onPress={goBack}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back')}
+              style={styles.backButton}
+            >
+              <Text style={styles.backButtonLabel}>←</Text>
+            </Pressable>
+          ) : null}
+          <Button
+            label={isLastStep ? t('devotional.finish') : t('devotional.continueButton')}
+            onPress={goNext}
+            // Sem sessão só trava o "concluir": ler os passos não depende dela.
+            disabled={completing || (isLastStep && !session)}
+            style={styles.nextButton}
+          />
+        </View>
+      </KeyboardAvoidingView>
     </ScreenContainer>
   );
 }
@@ -362,12 +418,17 @@ const getStyles = (theme: Theme) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
+    doneSubtitle: {
+      color: theme.colors.ink,
+      textAlign: 'center',
+    },
     doneMascotBackdrop: {
       position: 'absolute',
       width: 242,
       height: 242,
       borderRadius: 999,
-      backgroundColor: theme.colors.bg,
+      // O contorno escuro do mascote some sobre fundo escuro: no tema Noite o disco é creme fixo.
+      backgroundColor: theme.palette.isDark ? '#FAF6EC' : theme.colors.bg,
       borderWidth: 2.5,
       borderColor: theme.colors.ink,
     },
@@ -395,6 +456,9 @@ const getStyles = (theme: Theme) =>
       paddingHorizontal: 22,
       paddingTop: theme.spacing.xl,
       paddingBottom: 26,
+    },
+    devBody: {
+      flex: 1,
       gap: theme.spacing.md,
     },
     devHeader: {
@@ -438,9 +502,16 @@ const getStyles = (theme: Theme) =>
       borderWidth: 2.5,
       borderColor: theme.colors.ink,
       borderRadius: 28,
+      ...theme.shadow.card,
+    },
+    stepScroll: {
+      flex: 1,
+      borderRadius: 25,
+    },
+    stepCardContent: {
+      flexGrow: 1,
       padding: 22,
       gap: theme.spacing.md,
-      ...theme.shadow.card,
     },
     stepPill: {
       ...theme.typography.label,
@@ -486,9 +557,21 @@ const getStyles = (theme: Theme) =>
       alignSelf: 'flex-end',
       marginTop: 'auto',
     },
+    // O erro cai sobre o fundo colorido do passo: vai numa pílula `white` para manter o contraste.
     errorText: {
       ...theme.typography.caption,
-      color: '#E05252',
+      color: theme.colors.danger,
+      backgroundColor: theme.colors.white,
+      borderWidth: 2,
+      borderColor: theme.colors.ink,
+      borderRadius: theme.radius.md,
+      paddingVertical: theme.spacing.xs,
+      paddingHorizontal: theme.spacing.sm,
+      overflow: 'hidden',
+    },
+    aiDisclaimer: {
+      ...theme.typography.caption,
+      color: theme.colors.muted,
     },
     devFooter: {
       flexDirection: 'row',

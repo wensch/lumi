@@ -15,8 +15,16 @@ export default function HojeScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
-  const { currentStreak, longestStreak, totalXp, daysSinceLastCompleted, week, loading } =
-    useHomeData();
+  const {
+    currentStreak,
+    longestStreak,
+    totalXp,
+    daysSinceLastCompleted,
+    week,
+    loading,
+    error,
+    refetch,
+  } = useHomeData();
 
   if (loading) {
     return (
@@ -48,6 +56,15 @@ export default function HojeScreen() {
   return (
     <Screen>
       <UpdateBanner />
+
+      {error ? (
+        <Card style={styles.messageCard}>
+          <Text style={[theme.typography.body, styles.messageSubtitle]}>
+            {t('errors.connection')}
+          </Text>
+          <Button label={t('common.retry')} variant="ghost" onPress={refetch} />
+        </Card>
+      ) : null}
 
       <View style={styles.header}>
         <StreakBadge days={currentStreak} />
@@ -96,6 +113,11 @@ export default function HojeScreen() {
           <Card style={styles.messageCard}>
             <Text style={styles.devotionalKicker}>{t('home.devotionalOfTheDay')}</Text>
             <Text style={theme.typography.heading}>{greeting.title}</Text>
+            {greeting.subtitle ? (
+              <Text style={[theme.typography.body, styles.messageSubtitle]}>
+                {greeting.subtitle}
+              </Text>
+            ) : null}
           </Card>
           <Button label={t('home.startDevotional')} onPress={() => router.push('/devocional')} />
         </>
@@ -127,7 +149,9 @@ function WeekDayCircle({ day, letter, theme }: { day: WeekDay; letter: string; t
           {day.completed ? '✓' : Number(day.date.slice(8, 10))}
         </Text>
       </View>
-      <Text style={styles.weekDayLabel}>{letter}</Text>
+      <Text style={styles.weekDayLabel} maxFontSizeMultiplier={1.2}>
+        {letter}
+      </Text>
     </View>
   );
 }

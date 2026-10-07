@@ -81,6 +81,6 @@ const getStyles = (theme: Theme) =>
     },
     errorText: {
       ...theme.typography.caption,
-      color: '#E05252',
+      color: theme.colors.danger,
     },
   });

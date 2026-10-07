@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { cancelDailyReminder } from '@/features/notifications/scheduleDailyReminder';
 import { AUTH_REDIRECT_URL, useAuthDeepLink } from './useAuthDeepLink';
 
 type AuthContextValue = {
@@ -26,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
-  useAuthDeepLink(() => setIsPasswordRecovery(true));
+  useAuthDeepLink(setIsPasswordRecovery);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -61,6 +62,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // se o login já tivesse funcionado, e o usuário ficava sem saber
         // que precisava confirmar o email antes de entrar.
         const needsEmailConfirmation = !error && !data.session && !!data.user;
+        // Com a proteção contra enumeração de emails, cadastrar um email que já existe
+        // "dá certo" sem erro, mas volta um usuário sem identidades (e nenhum email é enviado).
+        if (!error && data.user && data.user.identities?.length === 0) {
+          return { error: 'User already registered', needsEmailConfirmation: false };
+        }
         return { error: error?.message ?? null, needsEmailConfirmation };
       },
       signInWithMagicLink: async (email) => {
@@ -84,6 +90,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error?.message ?? null };
       },
       signOut: async () => {
+        // Os lembretes ficam agendados no aparelho, não na conta: sem isso continuariam
+        // chegando depois de sair (e outra conta herdaria o horário da anterior).
+        await cancelDailyReminder().catch(() => {});
+        setIsPasswordRecovery(false);
         await supabase.auth.signOut();
       },
     }),

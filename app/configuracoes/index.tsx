@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +7,7 @@ import { Button, Screen, ScreenHeader, Section } from '@/components';
 import { useAuth } from '@/features/auth';
 import { useNotificationPreferences } from '@/features/settings';
 import { useAppUpdate } from '@/features/updates';
-import { requestNotificationPermission } from '@/features/notifications';
+import { hasNotificationPermission, requestNotificationPermission } from '@/features/notifications';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation, type LanguageCode } from '@/i18n';
 
@@ -33,10 +33,19 @@ export default function ConfiguracoesScreen() {
   const { remindersEnabled, preferredTime, loading, updatePreferredTime, setRemindersEnabled } =
     useNotificationPreferences();
   const [showPicker, setShowPicker] = useState(false);
+  // Permissão negada no sistema: o lembrete está "ligado" no app mas nada chegaria.
+  const [permissionBlocked, setPermissionBlocked] = useState(false);
+
+  useEffect(() => {
+    hasNotificationPermission()
+      .then((granted) => setPermissionBlocked(!granted))
+      .catch(() => {});
+  }, [remindersEnabled]);
 
   const handleToggleReminders = async (enabled: boolean) => {
     if (enabled) {
       const granted = await requestNotificationPermission();
+      setPermissionBlocked(!granted);
       if (!granted) return;
     }
     await setRemindersEnabled(enabled);
@@ -63,9 +72,21 @@ export default function ConfiguracoesScreen() {
             value={remindersEnabled}
             onValueChange={handleToggleReminders}
             disabled={loading}
+            accessibilityLabel={t('settings.dailyReminder')}
             trackColor={{ true: theme.colors.green, false: theme.colors.bg }}
           />
         </View>
+
+        {remindersEnabled && permissionBlocked ? (
+          <>
+            <Text style={styles.helperText}>{t('settings.notificationsBlocked')}</Text>
+            <Button
+              variant="ghost"
+              label={t('settings.openSystemSettings')}
+              onPress={() => Linking.openSettings().catch(() => {})}
+            />
+          </>
+        ) : null}
 
         {remindersEnabled ? (
           <>
@@ -82,7 +103,9 @@ export default function ConfiguracoesScreen() {
                 value={timeStringToDate(preferredTime)}
                 mode="time"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(_event, selectedDate) => handleTimeChange(selectedDate)}
+                onChange={(event, selectedDate) =>
+                  handleTimeChange(event.type === 'set' ? selectedDate : undefined)
+                }
               />
             ) : null}
           </>
@@ -132,6 +155,8 @@ export default function ConfiguracoesScreen() {
               <Pressable
                 key={option.code}
                 onPress={() => setLanguage(option.code)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isSelected }}
                 style={[
                   styles.paletteChip,
                   { backgroundColor: isSelected ? theme.colors.green : theme.colors.white },

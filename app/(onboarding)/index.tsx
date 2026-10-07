@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { BackHandler, Platform, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { Button, Card, Screen, TextField } from '@/components';
@@ -66,6 +66,17 @@ export default function OnboardingScreen() {
     setStepIndex(Math.max(0, stepIndex - 1));
   };
 
+  // Botão voltar do Android: volta uma etapa em vez de sair do app.
+  useEffect(() => {
+    if (stepIndex === 0) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      setError(null);
+      setStepIndex((current) => Math.max(0, current - 1));
+      return true;
+    });
+    return () => subscription.remove();
+  }, [stepIndex]);
+
   const finish = async () => {
     if (!session || !ageRange) return;
     setError(null);
@@ -75,26 +86,35 @@ export default function OnboardingScreen() {
       preferredTime.getMinutes(),
     ).padStart(2, '0')}:00`;
 
-    const { error: onboardingError } = await supabase.rpc('complete_onboarding', {
-      p_display_name: displayName.trim(),
-      p_age_range: ageRange,
-      p_preferred_time: timeString,
-    });
+    try {
+      const { error: onboardingError } = await supabase.rpc('complete_onboarding', {
+        p_display_name: displayName.trim(),
+        p_age_range: ageRange,
+        p_preferred_time: timeString,
+      });
 
-    if (onboardingError) {
-      setError(onboardingError.message);
+      if (onboardingError) {
+        setError(t('errors.onboardingFailed'));
+        return;
+      }
+
+      // Lembrete é um extra: se a permissão falhar ou for negada, o onboarding já valeu.
+      try {
+        const granted = await requestNotificationPermission();
+        if (granted) {
+          await scheduleDailyReminder(timeString);
+        }
+      } catch {
+        // segue sem lembrete; dá para ligar depois em Configurações
+      }
+
+      await refetch();
+      router.replace('/(tabs)');
+    } catch {
+      setError(t('errors.onboardingFailed'));
+    } finally {
       setSubmitting(false);
-      return;
     }
-
-    const granted = await requestNotificationPermission();
-    if (granted) {
-      await scheduleDailyReminder(timeString);
-    }
-
-    await refetch();
-    setSubmitting(false);
-    router.replace('/(tabs)');
   };
 
   return (
@@ -155,11 +175,12 @@ export default function OnboardingScreen() {
                 value={preferredTime}
                 mode="time"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(_event, selectedDate) => {
+                onChange={(event, selectedDate) => {
                   if (Platform.OS === 'android') {
                     setShowPicker(false);
                   }
-                  if (selectedDate) {
+                  // 'dismissed' (Cancelar) também traz a data original: só vale se confirmou.
+                  if (event.type === 'set' && selectedDate) {
                     setPreferredTime(selectedDate);
                   }
                 }}
@@ -223,6 +244,6 @@ const getStyles = (theme: Theme) =>
     },
     errorText: {
       ...theme.typography.caption,
-      color: '#E05252',
+      color: theme.colors.danger,
     },
   });

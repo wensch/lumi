@@ -73,3 +73,10 @@ a existência do `SECURITY DEFINER` em si, não uma vulnerabilidade
 detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
+
+## Migrations 00004 a 00013
+
+Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
+A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
+conquistas, passa a validar e gravar o fuso do usuário (`set_user_timezone`) e deixa
+`complete_devotional_session` idempotente. É segura de aplicar com o app antigo no ar.

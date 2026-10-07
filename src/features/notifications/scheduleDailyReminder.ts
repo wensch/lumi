@@ -1,12 +1,14 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import { getCurrentLanguage, type LanguageCode } from '@/i18n';
+import { getCurrentLanguage, translate, type LanguageCode } from '@/i18n';
 
 const MAIN_PREFIX = 'lumi-reminder-main-';
 const ALTERNATE_PREFIX = 'lumi-reminder-alt-';
 // Identificadores da versão antiga (um lembrete diário fixo): cancelados junto, para não duplicar.
 const LEGACY_IDS = ['lumi-daily-reminder', 'lumi-alternate-reminder'];
 const ALTERNATE_DELAY_HOURS = 4;
+const REMINDER_CHANNEL_ID = 'lembretes';
+const MAX_ALTERNATE_HOUR = 22;
 
 type ReminderCopy = { title: string; body: string };
 
@@ -152,7 +154,27 @@ function allReminderIds(): string[] {
   return ids;
 }
 
+/**
+ * Canal de notificação do Android (nome visível em Ajustes > Notificações). Precisa existir
+ * antes de pedir a permissão no Android 13+ e de agendar; sem ele o sistema cria um canal
+ * genérico "Miscellaneous".
+ */
+async function ensureReminderChannel() {
+  if (Platform.OS !== 'android') return;
+  await Notifications.setNotificationChannelAsync(REMINDER_CHANNEL_ID, {
+    name: translate('notifications.channelName'),
+    importance: Notifications.AndroidImportance.DEFAULT,
+  });
+}
+
+/** Só consulta — nunca abre o diálogo do sistema (usado ao abrir o app). */
+export async function hasNotificationPermission(): Promise<boolean> {
+  const { status } = await Notifications.getPermissionsAsync();
+  return status === 'granted';
+}
+
 export async function requestNotificationPermission(): Promise<boolean> {
+  await ensureReminderChannel();
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   if (existingStatus === 'granted') return true;
 
@@ -168,6 +190,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
  */
 export async function scheduleDailyReminder(preferredTime: string) {
   await cancelDailyReminder();
+  await ensureReminderChannel();
 
   const [hourStr, minuteStr] = preferredTime.split(':');
   const hour = Number(hourStr);
@@ -176,9 +199,10 @@ export async function scheduleDailyReminder(preferredTime: string) {
   if (Number.isNaN(hour) || Number.isNaN(minute)) return;
 
   const copy = REMINDER_COPY[getCurrentLanguage()];
-  const alternateHourRaw = hour + ALTERNATE_DELAY_HOURS;
-  const alternateHour = alternateHourRaw % 24;
-  const alternateWrapsDay = alternateHourRaw >= 24;
+  // O lembrete alternativo (mais leve) vem 4h depois, mas nunca de madrugada: limita a 22h
+  // e, se o principal já é das 22h em diante, não agenda alternativo.
+  const alternateHour = Math.min(hour + ALTERNATE_DELAY_HOURS, MAX_ALTERNATE_HOUR);
+  const hasAlternate = hour < MAX_ALTERNATE_HOUR;
 
   // weekday: 1 = domingo ... 7 = sábado (WeeklyTriggerInput do expo-notifications).
   for (let weekday = 1; weekday <= 7; weekday += 1) {
@@ -192,22 +216,34 @@ export async function scheduleDailyReminder(preferredTime: string) {
         weekday,
         hour,
         minute,
+        channelId: REMINDER_CHANNEL_ID,
       },
     });
 
-    // Passando da meia-noite, o lembrete alternativo cai no dia seguinte.
-    const alternateWeekday = alternateWrapsDay ? (weekday % 7) + 1 : weekday;
+    if (!hasAlternate) continue;
     await Notifications.scheduleNotificationAsync({
       identifier: `${ALTERNATE_PREFIX}${weekday}`,
       content: copy.alternate[index],
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-        weekday: alternateWeekday,
+        weekday,
         hour: alternateHour,
         minute,
+        channelId: REMINDER_CHANNEL_ID,
       },
     });
   }
+}
+
+/**
+ * Depois de concluir o devocional, o lembrete alternativo de HOJE ("ainda dá tempo…") não faz
+ * mais sentido. Cancela só o de hoje; o agendamento completo é refeito na próxima abertura do app.
+ */
+export async function cancelTodaysAlternateReminder() {
+  const weekday = new Date().getDay() + 1;
+  await Notifications.cancelScheduledNotificationAsync(`${ALTERNATE_PREFIX}${weekday}`).catch(
+    () => {},
+  );
 }
 
 export async function cancelDailyReminder() {

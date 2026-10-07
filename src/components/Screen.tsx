@@ -1,5 +1,6 @@
 import type { Ref } from 'react';
 import { ScrollView, StyleSheet, View, type ScrollViewProps, type ViewProps } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FadeIn } from './FadeIn';
 import { ScreenContainer } from './ScreenContainer';
 import { useTheme, type Theme } from '@/theme';
@@ -32,6 +33,7 @@ export function Screen({
 }: ScreenProps) {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const insets = useSafeAreaInsets();
 
   if (!scroll) {
     return (
@@ -54,6 +56,7 @@ export function Screen({
           contentContainerStyle={[
             styles.content,
             styles.scrollContent,
+            { paddingBottom: 130 + insets.bottom },
             centered && styles.centered,
             contentContainerStyle,
           ]}

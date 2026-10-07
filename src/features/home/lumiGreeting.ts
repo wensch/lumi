@@ -18,9 +18,10 @@ type Translate = (scope: string, options?: Record<string, unknown>) => string;
  */
 export function lumiGreeting(daysSinceLastCompleted: number | null, t: Translate) {
   const mood: LumiMoodVariant = (() => {
-    if (daysSinceLastCompleted === null || daysSinceLastCompleted === 1) return 'waiting';
     if (daysSinceLastCompleted === 0) return 'happy';
-    return 'missing_you';
+    // Rosto triste só em ausência mais longa: no primeiro dia perdido seria pressão emocional.
+    if (daysSinceLastCompleted !== null && daysSinceLastCompleted >= 4) return 'missing_you';
+    return 'waiting';
   })();
 
   if (daysSinceLastCompleted === null) {
@@ -47,11 +48,20 @@ export function lumiGreeting(daysSinceLastCompleted: number | null, t: Translate
     };
   }
 
-  if (daysSinceLastCompleted >= 7) {
+  // A referência a Jesus no deserto (§8.4) só faz sentido perto dos 40 dias.
+  if (daysSinceLastCompleted >= 30) {
     return {
       mood,
       title: t('home.greeting.longAbsenceTitle'),
       subtitle: t('home.greeting.longAbsenceSubtitle', { days: daysSinceLastCompleted }),
+    };
+  }
+
+  if (daysSinceLastCompleted >= 7) {
+    return {
+      mood,
+      title: t('home.greeting.longAbsenceTitle'),
+      subtitle: t('home.greeting.welcomeBackSubtitle'),
     };
   }
 

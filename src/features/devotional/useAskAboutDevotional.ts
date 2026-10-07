@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
+import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
-import { translate } from '@/i18n';
+import { getCurrentLanguage, translate } from '@/i18n';
 
 /**
  * Pergunta sobre o texto bíblico/devocional do dia, respondida por IA
@@ -26,13 +27,26 @@ export function useAskAboutDevotional(devotionalSessionId: string | null) {
         answer?: string;
         error?: string;
       }>('ask-about-devotional', {
-        body: { question: trimmed, devotional_session_id: devotionalSessionId },
+        body: {
+          question: trimmed,
+          devotional_session_id: devotionalSessionId,
+          language: getCurrentLanguage(),
+        },
       });
 
       setAsking(false);
 
       if (fnError || !data?.answer) {
-        setError(data?.error ?? translate('errors.askFailed'));
+        // Em respostas não-2xx o invoke devolve só o erro; a mensagem do backend
+        // (ex.: "muitos pedidos agora") vem no corpo da resposta.
+        let message: string | undefined = data?.error;
+        if (!message && fnError instanceof FunctionsHttpError) {
+          message = await fnError.context
+            .json()
+            .then((body: { error?: string }) => body?.error)
+            .catch(() => undefined);
+        }
+        setError(message ?? translate('errors.askFailed'));
         return;
       }
 

@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
-import { calculateDaysSince } from '@/lib/dates';
+import { calculateDaysSince, startOfLocalDay } from '@/lib/dates';
 import { translate } from '@/i18n';
 import { selectDailyContent } from './selectDailyContent';
 
@@ -30,18 +30,28 @@ export function useDevotional() {
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Trava síncrona contra toque duplo em "concluir": o `completing` (state) só vale no próximo render.
+  const completingRef = useRef(false);
 
   const start = useCallback(async (userId: string) => {
     setLoading(true);
     setError(null);
 
-    const [{ data: allContent }, { data: streak }] = await Promise.all([
+    const [{ data: allContent, error: contentError }, { data: streak }] = await Promise.all([
       supabase.from('content').select('*').not('published_at', 'is', null),
       supabase.from('streaks').select('last_completed_date').eq('user_id', userId).single(),
     ]);
 
     const isReturningFromBreak =
       (calculateDaysSince(streak?.last_completed_date ?? null) ?? 0) >= 2;
+
+    if (contentError) {
+      // Sem rede/servidor: não é "sem devocional hoje" — avisa e deixa tentar de novo.
+      setError(translate('errors.devotionalStart'));
+      setState(EMPTY_STATE);
+      setLoading(false);
+      return;
+    }
 
     const content = selectDailyContent(allContent ?? []);
 
@@ -52,22 +62,25 @@ export function useDevotional() {
     }
 
     // Filtra por usuário + data (não por content_id): se o conteúdo do dia
-    // mudar entre uma abertura e outra da tela, ainda reaproveita a sessão
-    // aberta em vez de criar uma nova e deixar a anterior órfã sem
-    // completed_at.
-    const today = new Date().toISOString().slice(0, 10);
+    // mudar entre uma abertura e outra da tela, ainda reaproveita a sessão do dia
+    // em vez de criar outra. Vale também para sessão já concluída: reler o
+    // devocional de hoje não deve criar uma linha nova no histórico a cada vez.
+    const startOfToday = startOfLocalDay().toISOString();
     const { data: existingSession } = await supabase
       .from('devotional_sessions')
       .select('*')
       .eq('user_id', userId)
-      .gte('started_at', `${today}T00:00:00`)
-      .is('completed_at', null)
+      .gte('started_at', startOfToday)
       .order('started_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
     if (existingSession) {
-      setState({ content, session: existingSession, isReturningFromBreak });
+      // O texto exibido segue a sessão (e não o cálculo do dia): se o catálogo mudou no meio
+      // do dia, a pergunta à IA e o histórico continuam apontando para o mesmo conteúdo.
+      const sessionContent =
+        (allContent ?? []).find((item) => item.id === existingSession.content_id) ?? content;
+      setState({ content: sessionContent, session: existingSession, isReturningFromBreak });
       setLoading(false);
       return;
     }
@@ -105,8 +118,9 @@ export function useDevotional() {
 
   const complete = useCallback(
     async (reflectionText?: string) => {
-      if (!state.session) return null;
+      if (!state.session || completingRef.current) return null;
 
+      completingRef.current = true;
       setCompleting(true);
       setError(null);
 
@@ -115,6 +129,7 @@ export function useDevotional() {
         p_reflection_text: reflectionText ?? null,
       });
 
+      completingRef.current = false;
       setCompleting(false);
 
       if (rpcError || !data?.[0]) {
@@ -127,5 +142,9 @@ export function useDevotional() {
     [state.session],
   );
 
-  return { ...state, loading, completing, error, complete };
+  const retry = useCallback(() => {
+    if (userId) start(userId);
+  }, [userId, start]);
+
+  return { ...state, loading, completing, error, complete, retry };
 }

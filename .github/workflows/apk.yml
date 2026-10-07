@@ -16,6 +16,8 @@ concurrency:
 jobs:
   apk:
     runs-on: ubuntu-latest
+    # Um build normal leva ~15-20 min; o padrão do GitHub (6h) deixaria um build travado ocupando a fila.
+    timeout-minutes: 45
     env:
       EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
       EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
@@ -87,7 +89,10 @@ jobs:
           echo "Keystore OK (alias androiddebugkey)"
 
       - name: Set versionCode
-        run: sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
+        run: |
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          # Se o template do Expo mudar e o sed não casar, o APK novo não atualizaria por cima do antigo.
+          grep -q "versionCode ${{ github.run_number }}" android/app/build.gradle
 
       # Só arm64-v8a (todo celular Android atual): o APK com as 4 arquiteturas passava de 130 MB.
       - name: Assemble APK

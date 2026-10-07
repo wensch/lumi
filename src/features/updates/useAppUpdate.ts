@@ -38,7 +38,7 @@ export function useAppUpdate({ autoCheck = false }: Options = {}) {
 
   /** Abre o download do APK no navegador; ao terminar, o usuário toca no arquivo para instalar. */
   const openDownload = useCallback(() => {
-    if (latest) Linking.openURL(latest.apkUrl);
+    if (latest) Linking.openURL(latest.apkUrl).catch(() => setStatus('error'));
   }, [latest]);
 
   return { status, latest, currentBuild: CURRENT_BUILD, check, openDownload };
