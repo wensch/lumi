@@ -150,6 +150,8 @@ export const en: TranslationSchema = {
     channelName: 'Daily reminders',
   },
   errors: {
+    askDailyLimit: "You've used all of today's questions. There will be more tomorrow.",
+    askBusy: 'Too many requests right now. Try again in a moment.',
     connection: "Can't reach the server right now. Showing what we had.",
     onboardingFailed: "Couldn't finish right now. Try again?",
     profileLoad: "Couldn't load your account. Check your connection and try again.",
@@ -269,7 +271,20 @@ export const en: TranslationSchema = {
       d100: { title: '100 days', reward: 'A golden glow for Lumi' },
     },
   },
+  journal: {
+    title: 'Your history',
+    private: 'Your reflections stay with you. You can delete them whenever you like.',
+    empty: 'Your moments and reflections show up here.',
+    noReflection: 'No reflection on this day.',
+    deleteReflection: 'Delete reflection',
+    deleteConfirmTitle: 'Delete this reflection?',
+    deleteConfirmBody:
+      "The moment still counts for your streak. Only the text is deleted, and this can't be undone.",
+    deleteFailed: "Couldn't delete right now. Try again.",
+    loadError: "Couldn't load your history.",
+  },
   profile: {
+    viewAllHistory: 'View history and reflections',
     currentStreak: 'current streak',
     longestStreak: 'longest streak',
     achievements: 'Achievements',

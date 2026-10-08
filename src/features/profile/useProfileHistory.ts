@@ -9,6 +9,7 @@ type CompletedSession = {
   id: string;
   completed_at: string;
   content_title: string | null;
+  has_reflection: boolean;
 };
 
 type ProfileHistory = {
@@ -48,7 +49,7 @@ export function useProfileHistory() {
         supabase.from('xp_totals').select('total_xp').eq('user_id', userId).maybeSingle(),
         supabase
           .from('devotional_sessions')
-          .select('id, completed_at, content:content_id (title)')
+          .select('id, completed_at, reflection_text, content:content_id (title)')
           .eq('user_id', userId)
           .not('completed_at', 'is', null)
           .order('completed_at', { ascending: false })
@@ -68,6 +69,7 @@ export function useProfileHistory() {
         id: row.id,
         completed_at: row.completed_at as string,
         content_title: (row.content as unknown as { title: string } | null)?.title ?? null,
+        has_reflection: !!row.reflection_text?.trim(),
       })),
       allAchievements: achievementsResult.data ?? [],
       unlockedAchievementIds: new Set(

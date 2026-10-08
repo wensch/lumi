@@ -222,6 +222,18 @@ export interface Database {
           unlocked_achievement_codes: string[];
         }[];
       };
+      consume_ai_quota: {
+        Args: {
+          p_limit?: number;
+        };
+        Returns: { allowed: boolean; remaining: number }[];
+      };
+      clear_session_reflection: {
+        Args: {
+          p_session_id: string;
+        };
+        Returns: undefined;
+      };
       set_user_timezone: {
         Args: {
           p_timezone: string;

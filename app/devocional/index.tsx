@@ -424,7 +424,10 @@ export default function DevocionalScreen() {
             ) : null}
 
             <View style={styles.stepMascot}>
-              <LumiMascot mood="waiting" size={110} />
+              <LumiMascot
+                mood={currentStep.kind === 'reflect' ? 'thoughtful' : 'waiting'}
+                size={110}
+              />
             </View>
           </ScrollView>
         </View>

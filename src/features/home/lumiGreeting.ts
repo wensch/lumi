@@ -18,9 +18,12 @@ type Translate = (scope: string, options?: Record<string, unknown>) => string;
  */
 export function lumiGreeting(daysSinceLastCompleted: number | null, t: Translate) {
   const mood: LumiMoodVariant = (() => {
-    if (daysSinceLastCompleted === 0) return 'happy';
-    // Rosto triste só em ausência mais longa: no primeiro dia perdido seria pressão emocional.
-    if (daysSinceLastCompleted !== null && daysSinceLastCompleted >= 4) return 'missing_you';
+    if (daysSinceLastCompleted === 0) return 'proud';
+    if (daysSinceLastCompleted === null) return 'waiting';
+    // Um dia sem vir: confiante ("bora hoje?"), nunca triste — no primeiro dia seria pressão emocional.
+    if (daysSinceLastCompleted === 1) return 'determined';
+    // Rosto de saudade só em ausência mais longa.
+    if (daysSinceLastCompleted >= 4) return 'missing_you';
     return 'waiting';
   })();
 

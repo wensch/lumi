@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Card, FadeIn, Screen, ScreenHeader, Section, Skeleton } from '@/components';
+import { Button, Card, FadeIn, Screen, ScreenHeader, Section, Skeleton } from '@/components';
 import { isKnownAchievement } from '@/features/achievements';
 import { useProfileHistory } from '@/features/profile';
 import { ShareStreakButton } from '@/features/share';
@@ -80,8 +80,14 @@ export default function PerfilScreen() {
               ) : (
                 <View style={styles.historyList}>
                   {recentSessions.map((entry) => (
-                    <View key={entry.id} style={styles.historyRow}>
-                      <Text style={theme.typography.bodyStrong}>
+                    <Pressable
+                      key={entry.id}
+                      onPress={() => router.push('/historico')}
+                      accessibilityRole="button"
+                      style={styles.historyRow}
+                    >
+                      <Text style={[theme.typography.bodyStrong, styles.historyTitle]}>
+                        {entry.has_reflection ? '📝 ' : ''}
                         {entry.content_title ?? t('profile.defaultDevotionalName')}
                       </Text>
                       <Text style={styles.historyDate}>
@@ -89,8 +95,13 @@ export default function PerfilScreen() {
                           language === 'en' ? 'en-US' : 'pt-BR',
                         )}
                       </Text>
-                    </View>
+                    </Pressable>
                   ))}
+                  <Button
+                    label={t('profile.viewAllHistory')}
+                    variant="ghost"
+                    onPress={() => router.push('/historico')}
+                  />
                 </View>
               )}
             </Section>
@@ -189,6 +200,9 @@ const getStyles = (theme: Theme) =>
       justifyContent: 'space-between',
       alignItems: 'baseline',
       gap: theme.spacing.sm,
+    },
+    historyTitle: {
+      flex: 1,
     },
     historyDate: {
       ...theme.typography.caption,

@@ -26,6 +26,7 @@ export function useAskAboutDevotional(devotionalSessionId: string | null) {
       const { data, error: fnError } = await supabase.functions.invoke<{
         answer?: string;
         error?: string;
+        code?: string;
       }>('ask-about-devotional', {
         body: {
           question: trimmed,
@@ -39,14 +40,16 @@ export function useAskAboutDevotional(devotionalSessionId: string | null) {
       if (fnError || !data?.answer) {
         // Em respostas não-2xx o invoke devolve só o erro; a mensagem do backend
         // (ex.: "muitos pedidos agora") vem no corpo da resposta.
-        let message: string | undefined = data?.error;
-        if (!message && fnError instanceof FunctionsHttpError) {
-          message = await fnError.context
-            .json()
-            .then((body: { error?: string }) => body?.error)
-            .catch(() => undefined);
+        let body: { error?: string; code?: string } | undefined = data ?? undefined;
+        if (!body && fnError instanceof FunctionsHttpError) {
+          body = await fnError.context.json().catch(() => undefined);
         }
-        setError(message ?? translate('errors.askFailed'));
+        // Os códigos têm texto traduzido no app; a mensagem crua do servidor é só português.
+        const byCode: Record<string, string> = {
+          daily_limit: translate('errors.askDailyLimit'),
+          busy: translate('errors.askBusy'),
+        };
+        setError((body?.code && byCode[body.code]) || translate('errors.askFailed'));
         return;
       }
 

@@ -153,6 +153,8 @@ export const pt = {
     channelName: 'Lembretes diários',
   },
   errors: {
+    askDailyLimit: 'Você usou todas as perguntas de hoje. Amanhã tem mais.',
+    askBusy: 'Muitos pedidos agora. Tente de novo em instantes.',
     connection: 'Sem conexão com o servidor agora. Mostrando o que já tínhamos.',
     onboardingFailed: 'Não foi possível concluir agora. Tenta de novo?',
     profileLoad: 'Não foi possível carregar sua conta. Confira a conexão e tente de novo.',
@@ -272,7 +274,20 @@ export const pt = {
       d100: { title: '100 dias', reward: 'Brilho dourado para o Lumi' },
     },
   },
+  journal: {
+    title: 'Seu histórico',
+    private: 'Suas reflexões ficam só com você. Você pode apagá-las quando quiser.',
+    empty: 'Seus momentos e reflexões aparecem aqui.',
+    noReflection: 'Sem reflexão neste dia.',
+    deleteReflection: 'Apagar reflexão',
+    deleteConfirmTitle: 'Apagar esta reflexão?',
+    deleteConfirmBody:
+      'O momento continua contando na sua sequência. Só o texto é apagado, e isso não dá para desfazer.',
+    deleteFailed: 'Não foi possível apagar agora. Tente de novo.',
+    loadError: 'Não foi possível carregar o histórico.',
+  },
   profile: {
+    viewAllHistory: 'Ver histórico e reflexões',
     currentStreak: 'sequência atual',
     longestStreak: 'maior sequência',
     achievements: 'Conquistas',

@@ -87,7 +87,7 @@ export default function HojeScreen() {
       <FadeIn delay={60} rise={18}>
         <View style={styles.mascotArea}>
           <View style={styles.mascotBackdrop} />
-          <LumiMascot mood={greeting.mood} size={290} />
+          <LumiMascot mood={isVeryLate ? 'sleepy' : greeting.mood} size={290} />
         </View>
       </FadeIn>
 
