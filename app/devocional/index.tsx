@@ -15,7 +15,7 @@ import {
   useCountUp,
 } from '@/components';
 import { ACHIEVEMENT_ICONS, isKnownAchievement } from '@/features/achievements';
-import { cancelTodaysAlternateReminder } from '@/features/notifications';
+import { cancelTodaysReminders } from '@/features/notifications';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
 import { useVersePassage, verseVersionId } from '@/features/bible';
 import { getJourney, JOURNEY_MILESTONES, LumiMascot, outfitForMilestone } from '@/features/lumi';
@@ -157,7 +157,7 @@ export default function DevocionalScreen() {
         unlockedCodes,
       });
       // Já concluiu hoje: o lembrete alternativo de hoje não faz mais sentido.
-      cancelTodaysAlternateReminder();
+      cancelTodaysReminders();
     }
   };
 

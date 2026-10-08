@@ -1,27 +1,23 @@
 import { useEffect } from 'react';
+import { AppState } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
 import { calculateDaysSince } from '@/lib/dates';
 import { useTranslation } from '@/i18n';
 import {
   cancelDailyReminder,
-  cancelTodaysAlternateReminder,
   hasNotificationPermission,
   scheduleDailyReminder,
 } from './scheduleDailyReminder';
 
+/** Evita reagendar em sequência (abrir o app dispara "ativo" mais de uma vez em alguns aparelhos). */
+const MIN_SECONDS_BETWEEN_SYNCS = 30;
+
 /**
- * Sincroniza o agendamento de notificações locais com
- * notification_preferences sempre que o app abre com sessão ativa.
- * Roda no layout raiz — sem UI própria.
- *
- * Limitação conhecida: os identificadores de notificação são globais por
- * dispositivo (não por usuário). Uma troca de conta muito rápida (logout
- * seguido de login com outra conta antes do primeiro efeito terminar)
- * pode, em tese, deixar o lembrete agendado com o horário do usuário
- * anterior até o próximo reload do app. Não mitigado aqui por ser um
- * cenário raro (exige duas contas no mesmo dispositivo) — revisitar se
- * o produto passar a suportar múltiplos perfis por device.
+ * Sincroniza o agendamento de notificações locais com notification_preferences sempre que o app
+ * abre ou volta do segundo plano com sessão ativa. Cada sincronização refaz a agenda a partir de
+ * agora (ver scheduleDailyReminder), e é isso que faz os recados de "retorno" só chegarem para
+ * quem realmente ficou dias sem abrir. Roda no layout raiz — sem UI própria.
  */
 export function useNotificationScheduler() {
   const { session } = useAuth();
@@ -33,8 +29,12 @@ export function useNotificationScheduler() {
     if (!userId) return;
 
     let cancelled = false;
+    let lastSync = 0;
 
-    (async () => {
+    const sync = async () => {
+      if (Date.now() - lastSync < MIN_SECONDS_BETWEEN_SYNCS * 1000) return;
+      lastSync = Date.now();
+
       const { data: prefs } = await supabase
         .from('notification_preferences')
         .select('reminders_enabled, preferred_time')
@@ -52,23 +52,28 @@ export function useNotificationScheduler() {
       const granted = await hasNotificationPermission();
       if (!granted || cancelled) return;
 
-      await scheduleDailyReminder(prefs.preferred_time);
-
-      // Quem já concluiu hoje não precisa do lembrete alternativo de hoje.
+      // Quem já concluiu hoje não precisa dos lembretes de hoje.
       const { data: streak } = await supabase
         .from('streaks')
         .select('last_completed_date')
         .eq('user_id', userId)
         .maybeSingle();
-      if (!cancelled && calculateDaysSince(streak?.last_completed_date ?? null) === 0) {
-        await cancelTodaysAlternateReminder();
-      }
-    })();
+      if (cancelled) return;
+      const completedToday = calculateDaysSince(streak?.last_completed_date ?? null) === 0;
+
+      await scheduleDailyReminder(prefs.preferred_time, { skipToday: completedToday });
+    };
+
+    sync().catch(() => {});
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') sync().catch(() => {});
+    });
 
     return () => {
       cancelled = true;
+      subscription.remove();
     };
-    // session muda de referência a cada onAuthStateChange (TOKEN_REFRESHED
-    // incluso) — usar userId evita reagendar a notificação sem necessidade.
+    // session muda de referência a cada onAuthStateChange (TOKEN_REFRESHED incluso) — usar userId
+    // evita reagendar sem necessidade.
   }, [userId, language]);
 }

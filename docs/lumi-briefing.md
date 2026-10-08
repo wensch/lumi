@@ -253,6 +253,11 @@ horário escolhido, lembrete alternativo se não concluir, mensagens variadas,
 condicionadas à sequência/comportamento, mensagens de retorno após ausência,
 possível ajuste futuro de intensidade/frequência.
 
+**Como está implementado (Fase 2):** a cada abertura do app a agenda é refeita a partir de
+agora: lembrete principal e alternativo de hoje (se ainda não concluiu) e de amanhã, e recados
+de retorno 2, 5 e 10 dias à frente, que só chegam se a pessoa não abrir o app antes. Depois do
+recado de 10 dias, silêncio até ela voltar — insistir diariamente em quem sumiu seria cobrança.
+
 ## 15. Direção técnica inicial
 
 > Proposta inicial, não definitiva — refinar após validar UX e protótipo visual.
