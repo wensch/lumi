@@ -3,6 +3,8 @@ import { useTranslation } from '@/i18n';
 import type { LumiMood } from '@/lib/supabase';
 import { lumiHappySvg } from './svgs/lumiHappySvg';
 import { lumiSadSvg } from './svgs/lumiSadSvg';
+import { applyOutfit } from './outfits';
+import { useLumiOutfit } from './LumiOutfitProvider';
 
 export type LumiMoodVariant = 'normal' | 'happy' | 'celebrating' | 'waiting' | 'missing_you';
 
@@ -53,9 +55,10 @@ const SVG_BY_VARIANT: Record<LumiMoodVariant, string> = {
 
 export function LumiMascot({ mood = 'normal', size = 160 }: LumiMascotProps) {
   const { t } = useTranslation();
+  const { outfitId } = useLumiOutfit();
   return (
     <SvgXml
-      xml={SVG_BY_VARIANT[mood]}
+      xml={applyOutfit(SVG_BY_VARIANT[mood], outfitId)}
       width={size}
       height={size}
       accessibilityLabel={t('lumi.mascotLabel')}

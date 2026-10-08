@@ -1,7 +1,7 @@
--- Lumi — lote 3: 30 devocionais novos, escritos como RASCUNHO (published_at nulo).
+-- Lumi — lote 3: 30 devocionais novos, REVISADOS E APROVADOS (publicados ao rodar este arquivo).
 --
--- Nada disso aparece no app até ser publicado: revise primeiro (versão legível em
--- docs/devocionais-rascunho.md) e, quando aprovar, rode o update no final deste arquivo.
+-- Rode uma vez no SQL Editor do Supabase. Se você já tinha rodado a versão em rascunho, o final
+-- deste arquivo publica o que ficou pendente. Versão legível: docs/devocionais-rascunho.md.
 --
 -- Critérios (briefing §4, §8.3, §10, §11.2):
 --   1. Sem culpa, vergonha ou pressão espiritual; o tom convida, não cobra.
@@ -17,7 +17,7 @@
 
 insert into public.content
   (title, body, passage_reference, youversion_version_id, application_text, challenge_text, prayer_text, published_at)
-select v.title, v.body, v.passage_reference, 129, v.application_text, v.challenge_text, v.prayer_text, null
+select v.title, v.body, v.passage_reference, 129, v.application_text, v.challenge_text, v.prayer_text, now()
 from (values
   ($d$Descansar também é seguir o pastor$d$,
    $d$O salmo começa com a imagem de um pastor que leva as ovelhas a pastos verdes e águas tranquilas. A primeira coisa que aparece é descanso, não tarefa. Uma leitura possível é que ser cuidado vem antes de produzir. Se o seu dia foi corrido, esse momento pode ser só isso: parar um pouco, sem precisar provar nada a ninguém.$d$,
@@ -202,12 +202,11 @@ from (values
 ) as v(title, body, passage_reference, application_text, challenge_text, prayer_text)
 where not exists (select 1 from public.content c where c.title = v.title);
 
--- Depois de revisar, publique os que aprovou. Para publicar TODOS os rascunhos deste lote:
---   update public.content set published_at = now()
---   where published_at is null and youversion_version_id = 129;
---
--- Para publicar só alguns, filtre pelo título:
---   update public.content set published_at = now() where title in ('Permanecer', 'Ouvir primeiro');
---
--- Para despublicar um devocional:
+-- Se este lote já tinha sido inserido como rascunho (published_at nulo), publica agora.
+update public.content
+set published_at = now()
+where published_at is null
+  and youversion_version_id = 129;
+
+-- Para despublicar um devocional, se um dia for preciso:
 --   update public.content set published_at = null where title = 'Permanecer';

@@ -18,7 +18,7 @@ import { ACHIEVEMENT_ICONS, isKnownAchievement } from '@/features/achievements';
 import { cancelTodaysAlternateReminder } from '@/features/notifications';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
 import { useVersePassage, verseVersionId } from '@/features/bible';
-import { getJourney, JOURNEY_MILESTONES, LumiMascot } from '@/features/lumi';
+import { getJourney, JOURNEY_MILESTONES, LumiMascot, outfitForMilestone } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import type { Database } from '@/lib/supabase';
@@ -213,6 +213,7 @@ export default function DevocionalScreen() {
     const milestone = isMilestone(result.streak);
     const journey = getJourney(result.streak, result.streak);
     const bigCelebration = milestone || result.unlockedCodes.length > 0;
+    const wonOutfit = outfitForMilestone(result.streak);
     const lumiLine = t(
       lumiCompletionKey(
         result.streak,
@@ -285,13 +286,17 @@ export default function DevocionalScreen() {
             );
           })}
 
-          <Button
-            label={t('devotional.turnIntoPrayer')}
-            variant="secondary"
-            onPress={() =>
-              router.push({ pathname: '/oracao', params: { devotional_session_id: session?.id } })
-            }
-          />
+          {wonOutfit ? (
+            <PopIn delay={700} style={styles.achievementWrapper}>
+              <Card padding="compact" style={styles.achievementCard}>
+                <Text style={styles.achievementIcon}>{wonOutfit.icon}</Text>
+                <Text style={theme.typography.bodyStrong}>
+                  {t('devotional.outfitWon', { item: t(`lumi.outfits.${wonOutfit.id}`) })}
+                </Text>
+              </Card>
+            </PopIn>
+          ) : null}
+
           <Button
             label={t('devotional.backToToday')}
             variant="tertiary"

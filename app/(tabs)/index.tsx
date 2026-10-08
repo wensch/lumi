@@ -52,6 +52,8 @@ export default function HojeScreen() {
 
   const greeting = lumiGreeting(daysSinceLastCompleted, t);
   const completedToday = daysSinceLastCompleted === 0;
+  // Fala de "atrasado" (briefing §8.4): quase meia-noite e o momento de hoje ainda não aconteceu.
+  const isVeryLate = !completedToday && new Date().getHours() >= 23;
 
   return (
     <Screen>
@@ -99,6 +101,9 @@ export default function HojeScreen() {
               {t('home.alreadyCameSubtitle')}
             </Text>
           </Card>
+          <Text style={[theme.typography.caption, styles.messageSubtitle]}>
+            {t('home.speedrun')}
+          </Text>
           <Button
             label={t('home.anotherDevotional')}
             variant="ghost"
@@ -113,9 +118,9 @@ export default function HojeScreen() {
           <Card style={styles.messageCard}>
             <Text style={styles.devotionalKicker}>{t('home.devotionalOfTheDay')}</Text>
             <Text style={theme.typography.heading}>{greeting.title}</Text>
-            {greeting.subtitle ? (
+            {isVeryLate || greeting.subtitle ? (
               <Text style={[theme.typography.body, styles.messageSubtitle]}>
-                {greeting.subtitle}
+                {isVeryLate ? t('home.veryLate') : greeting.subtitle}
               </Text>
             ) : null}
           </Card>

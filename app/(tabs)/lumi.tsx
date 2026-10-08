@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
 import { lumiGreeting, useHomeData } from '@/features/home';
-import { getJourney, JOURNEY_MILESTONES, LumiMascot, type JourneyMilestone } from '@/features/lumi';
+import {
+  getJourney,
+  JOURNEY_MILESTONES,
+  LumiMascot,
+  OUTFITS,
+  useLumiOutfit,
+  type JourneyMilestone,
+} from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 
@@ -11,6 +18,7 @@ export default function LumiScreen() {
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const { currentStreak, longestStreak, daysSinceLastCompleted, loading } = useHomeData();
+  const { outfitId, setOutfitId } = useLumiOutfit();
 
   if (loading) {
     return (
@@ -66,6 +74,37 @@ export default function LumiScreen() {
         </Card>
       </FadeIn>
 
+      <Text style={styles.sectionTitle}>{t('lumi.wardrobeTitle')}</Text>
+      <Text style={[theme.typography.caption, styles.mutedText]}>{t('lumi.wardrobeHint')}</Text>
+      <View style={styles.wardrobeGrid}>
+        <WardrobeTile
+          icon="🐑"
+          label={t('lumi.outfitNone')}
+          selected={outfitId === null}
+          unlocked
+          onPress={() => setOutfitId(null)}
+          theme={theme}
+        />
+        {OUTFITS.map((outfit) => {
+          const unlocked = journey.reached.includes(outfit.milestone);
+          return (
+            <WardrobeTile
+              key={outfit.id}
+              icon={outfit.icon}
+              label={
+                unlocked
+                  ? t(`lumi.outfits.${outfit.id}`)
+                  : t('lumi.outfitLocked', { days: outfit.milestone })
+              }
+              selected={outfitId === outfit.id}
+              unlocked={unlocked}
+              onPress={() => setOutfitId(outfit.id)}
+              theme={theme}
+            />
+          );
+        })}
+      </View>
+
       <Text style={styles.sectionTitle}>{t('lumi.milestonesTitle')}</Text>
 
       <View style={styles.milestoneList}>
@@ -85,10 +124,45 @@ export default function LumiScreen() {
       <Text style={[theme.typography.caption, styles.mutedText, styles.centeredText]}>
         {t('lumi.keepsForever')}
       </Text>
-      <Text style={[theme.typography.caption, styles.mutedText, styles.centeredText]}>
-        {t('lumi.itemsSoon')}
-      </Text>
     </Screen>
+  );
+}
+
+function WardrobeTile({
+  icon,
+  label,
+  selected,
+  unlocked,
+  onPress,
+  theme,
+}: {
+  icon: string;
+  label: string;
+  selected: boolean;
+  unlocked: boolean;
+  onPress: () => void;
+  theme: Theme;
+}) {
+  const styles = getStyles(theme);
+  return (
+    <Pressable
+      onPress={unlocked ? onPress : undefined}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected, disabled: !unlocked }}
+      style={[
+        styles.wardrobeTile,
+        selected && styles.wardrobeTileSelected,
+        !unlocked && styles.wardrobeTileLocked,
+      ]}
+    >
+      <Text style={[styles.wardrobeIcon, !unlocked && styles.wardrobeIconLocked]}>
+        {unlocked ? icon : '🔒'}
+      </Text>
+      <Text style={styles.wardrobeLabel} numberOfLines={2}>
+        {label}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -198,6 +272,42 @@ const getStyles = (theme: Theme) =>
       ...theme.typography.subheading,
       color: theme.colors.ink,
       marginTop: theme.spacing.xs,
+    },
+    wardrobeGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: theme.spacing.sm,
+    },
+    wardrobeTile: {
+      width: '31%',
+      minHeight: 92,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 4,
+      padding: theme.spacing.sm,
+      borderRadius: theme.radius.md,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      backgroundColor: theme.colors.white,
+    },
+    wardrobeTileSelected: {
+      backgroundColor: theme.colors.green,
+    },
+    wardrobeTileLocked: {
+      backgroundColor: 'transparent',
+      borderStyle: 'dashed',
+      borderColor: theme.colors.muted,
+    },
+    wardrobeIcon: {
+      fontSize: 28,
+    },
+    wardrobeIconLocked: {
+      opacity: 0.7,
+    },
+    wardrobeLabel: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
+      textAlign: 'center',
     },
     milestoneList: {
       gap: theme.spacing.sm,

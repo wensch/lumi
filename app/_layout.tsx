@@ -27,6 +27,7 @@ import { Button, LoadingScreen, Screen } from '@/components';
 import { AuthProvider, useAuth } from '@/features/auth';
 import { ProfileProvider, useProfile, useTimezoneSync } from '@/features/onboarding';
 import { configureNotificationHandler, useNotificationScheduler } from '@/features/notifications';
+import { LumiOutfitProvider } from '@/features/lumi';
 import { ThemeProvider, useTheme } from '@/theme';
 import { I18nProvider, useTranslation } from '@/i18n';
 
@@ -77,8 +78,10 @@ export default function RootLayout() {
             <YouVersionDataProvider appKey={youVersionAppKey ?? ''}>
               <AuthProvider>
                 <ProfileProvider>
-                  <ThemedStatusBar />
-                  <RootNavigation />
+                  <LumiOutfitProvider>
+                    <ThemedStatusBar />
+                    <RootNavigation />
+                  </LumiOutfitProvider>
                 </ProfileProvider>
               </AuthProvider>
             </YouVersionDataProvider>

@@ -1,14 +1,8 @@
-# Devocionais — rascunho para revisão
+# Devocionais — lote 3 (aprovado)
 
-30 devocionais novos, prontos para revisão. **Nenhum está no app ainda**: ficam como rascunho no banco (`published_at` nulo) até você aprovar.
+30 devocionais novos, **revisados e aprovados**. Para publicá-los no app, rode `supabase/seed-content-batch-3.sql` no SQL Editor do Supabase (uma vez; é seguro repetir).
 
-Cada um tem: título, passagem (o texto bíblico vem da NVI dentro do app), texto explicativo, aplicação, desafio do dia e oração. O que você precisa conferir:
-
-- O tom está acolhedor, sem culpa e sem soar como autoridade espiritual?
-- Alguma frase afirma o que o texto "quer dizer" como verdade única? (As interpretações estão marcadas como "uma leitura possível".)
-- Algum tema precisa de cuidado extra com a fé da sua igreja ou denominação?
-
-Para aprovar: me diga os números que quer ajustar ou tirar. Para publicar tudo de uma vez, rode o `update` que está no final de `supabase/seed-content-batch-3.sql`.
+Cada um tem: título, passagem (o texto bíblico vem da NVI dentro do app), texto explicativo, aplicação, desafio do dia e oração.
 
 ---
 
