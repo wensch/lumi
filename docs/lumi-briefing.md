@@ -61,7 +61,7 @@ falta de conhecimento religioso.
 4. Usuário inicia seu momento diário.
 5. Contato com passagem bíblica/conteúdo devocional simples.
 6. Reflexão curta.
-7. Pode registrar ou gerar uma oração orientada pela Bíblia.
+7. Pode registrar uma oração, escrita por ele mesmo.
 8. Conclui o momento.
 9. Feedback imediato: XP, streak, animação e reação do Lumi.
 10. App registra a constância e prepara o próximo retorno.
@@ -73,7 +73,7 @@ falta de conhecimento religioso.
 | Onboarding | Criar conta, preferências, horário desejado, faixa etária para personalização. |
 | Hoje | Tela principal com o momento diário e uma única ação: começar. |
 | Devocional | Experiência curta de leitura/reflexão baseada em Bíblia + conteúdo editorial. |
-| Oração | Registro de oração e/ou geração de oração orientada por Bíblia via IA. |
+| Oração | Registro de oração escrita pelo próprio usuário. **Decisão:** o app não gera orações por IA. |
 | Streak | Contabilização da sequência de dias com momento concluído. |
 | XP | Pontuação de constância e progressão, sem representar espiritualidade. |
 | Lumi | Reações, estados, humor, lembretes e pequenas animações. |
@@ -204,14 +204,13 @@ versão antes de definir traduções e armazenar/distribuir texto bíblico.
 
 ## 11. IA
 
-Recurso auxiliar para facilitar a interação do usuário com a Bíblia e a
-oração. **Não** é autoridade espiritual.
+Recurso auxiliar para facilitar a interação do usuário com a Bíblia. **Não** é
+autoridade espiritual. **Decisão: a IA não escreve orações** — a oração é do
+usuário (escrita por ele ou a sugestão editorial de cada devocional).
 
 ### 11.1 A IA pode
 - Encontrar passagens bíblicas relevantes para uma busca.
-- Gerar uma oração orientada por passagens e temas bíblicos.
 - Sugerir temas e livros bíblicos para leitura.
-- Ajudar a transformar um texto pessoal em oração, mantendo a base bíblica.
 - Ajudar a localizar conteúdos já existentes no acervo do produto.
 
 ### 11.2 A IA não pode
@@ -221,6 +220,7 @@ oração. **Não** é autoridade espiritual.
 - Afirmar que sabe a vontade de Deus para o usuário.
 - Incentivar algo que contradiga a Bíblia ou a política editorial do produto.
 - Substituir aconselhamento pastoral, profissional ou comunitário quando a situação exigir.
+- Gerar, escrever ou "melhorar" orações do usuário.
 
 ### 11.3 Guardrail principal
 Fluxo: **Bíblia / conteúdo editorial aprovado → recuperação de contexto → IA →

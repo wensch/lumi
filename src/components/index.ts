@@ -1,5 +1,6 @@
 export * from './Button';
 export * from './Card';
+export * from './Celebration';
 export * from './FadeIn';
 export * from './LoadingScreen';
 export * from './Screen';

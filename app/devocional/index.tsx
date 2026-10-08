@@ -1,16 +1,39 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Button, Card, Screen, ScreenContainer, TextField } from '@/components';
+import * as Haptics from 'expo-haptics';
+import {
+  Bob,
+  Button,
+  Card,
+  Confetti,
+  PopIn,
+  Screen,
+  ScreenContainer,
+  TextField,
+  useCountUp,
+} from '@/components';
 import { ACHIEVEMENT_ICONS, isKnownAchievement } from '@/features/achievements';
 import { cancelTodaysAlternateReminder } from '@/features/notifications';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
 import { useVersePassage, verseVersionId } from '@/features/bible';
-import { LumiMascot } from '@/features/lumi';
+import { getJourney, JOURNEY_MILESTONES, LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import type { Database } from '@/lib/supabase';
+
+function isMilestone(streak: number) {
+  return (JOURNEY_MILESTONES as readonly number[]).includes(streak);
+}
+
+/** Fala do Lumi na conclusão: varia pelo contexto e, nos dias comuns, pelo dia do mês (sem sorteio a cada render). */
+function lumiCompletionKey(streak: number, unlocked: number, isFirst: boolean) {
+  if (isMilestone(streak)) return 'devotional.lumiSays.milestone';
+  if (isFirst) return 'devotional.lumiSays.first';
+  if (unlocked > 0) return 'devotional.lumiSays.achievement';
+  return `devotional.lumiSays.normal${(new Date().getDate() % 3) + 1}`;
+}
 
 /** XP por conquista desbloqueada (espelha complete_devotional_session). */
 const ACHIEVEMENT_XP = 20;
@@ -81,6 +104,20 @@ export default function DevocionalScreen() {
   const [stepIndex, setStepIndex] = useState(0);
   const [reflection, setReflection] = useState('');
   const [result, setResult] = useState<Result | null>(null);
+  // XP "sobe" de 0 até o valor na tela de conclusão.
+  const xpShown = useCountUp(result?.xp ?? 0);
+
+  // Ao concluir: vibração de sucesso; marco de sequência ou conquista ganham um segundo toque.
+  useEffect(() => {
+    if (!result) return;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    if (result.unlockedCodes.length > 0 || isMilestone(result.streak)) {
+      const timer = setTimeout(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
+      }, 450);
+      return () => clearTimeout(timer);
+    }
+  }, [result]);
   const [showAsk, setShowAsk] = useState(false);
   const [question, setQuestion] = useState('');
   const {
@@ -173,49 +210,78 @@ export default function DevocionalScreen() {
     // "momento concluído" — sem soar como se a quebra nunca tivesse
     // acontecido, nem como cobrança por ter sumido (briefing §7.2, §8.3).
     const showReturnWelcome = isReturningFromBreak && result.streak === 1;
+    const milestone = isMilestone(result.streak);
+    const journey = getJourney(result.streak, result.streak);
+    const bigCelebration = milestone || result.unlockedCodes.length > 0;
+    const lumiLine = t(
+      lumiCompletionKey(
+        result.streak,
+        result.unlockedCodes.length,
+        result.unlockedCodes.includes('first_moment'),
+      ),
+      { count: result.streak },
+    );
 
     return (
       <ScreenContainer style={styles.doneScreen}>
-        <View style={styles.doneContent}>
-          <View style={styles.doneMascotArea}>
-            <View style={styles.doneMascotBackdrop} />
-            <LumiMascot mood="celebrating" size={290} />
-          </View>
-          <Text style={[theme.typography.heading, styles.centeredText]}>
-            {showReturnWelcome
-              ? t('devotional.returnWelcomeTitle')
-              : t('devotional.completedTitle')}
+        <ScrollView contentContainerStyle={styles.doneContent} showsVerticalScrollIndicator={false}>
+          <PopIn>
+            <View style={styles.doneMascotArea}>
+              <View style={styles.doneMascotBackdrop} />
+              <Bob>
+                <LumiMascot mood="celebrating" size={290} />
+              </Bob>
+            </View>
+          </PopIn>
+          <PopIn delay={150}>
+            <Text style={[theme.typography.heading, styles.centeredText]}>
+              {showReturnWelcome
+                ? t('devotional.returnWelcomeTitle')
+                : milestone
+                  ? t('devotional.milestoneTitle', { count: result.streak })
+                  : t('devotional.completedTitle')}
+            </Text>
+          </PopIn>
+          <PopIn delay={300}>
+            <Text style={styles.doneChip}>
+              {result.xp > 0
+                ? t('devotional.xpAndStreak', {
+                    xp: xpShown,
+                    count: result.streak,
+                    unit: t(result.streak === 1 ? 'devotional.day' : 'devotional.days'),
+                  })
+                : t('devotional.streakOnly', {
+                    count: result.streak,
+                    unit: t(result.streak === 1 ? 'devotional.day' : 'devotional.days'),
+                  })}
+            </Text>
+          </PopIn>
+          <Text style={[theme.typography.caption, styles.doneSubtitle]}>
+            {showReturnWelcome ? t('devotional.returnWelcomeSubtitle') : lumiLine}
           </Text>
-          <Text style={styles.doneChip}>
-            {result.xp > 0
-              ? t('devotional.xpAndStreak', {
-                  xp: result.xp,
-                  count: result.streak,
-                  unit: t(result.streak === 1 ? 'devotional.day' : 'devotional.days'),
-                })
-              : t('devotional.streakOnly', {
-                  count: result.streak,
-                  unit: t(result.streak === 1 ? 'devotional.day' : 'devotional.days'),
-                })}
-          </Text>
-          {showReturnWelcome ? (
+          {journey.next !== null ? (
             <Text style={[theme.typography.caption, styles.doneSubtitle]}>
-              {t('devotional.returnWelcomeSubtitle')}
+              {t('devotional.nextMilestone', {
+                title: t(`lumi.milestones.d${journey.next}.title`),
+                count: journey.daysToNext,
+              })}
             </Text>
           ) : null}
 
-          {result.unlockedCodes.map((code) => {
+          {result.unlockedCodes.map((code, index) => {
             // Código novo vindo do backend sem ícone/tradução ainda: celebra do mesmo jeito.
             const icon = ACHIEVEMENT_ICONS[code] ?? '🏅';
             return (
-              <Card key={code} padding="compact" style={styles.achievementCard}>
-                <Text style={styles.achievementIcon}>{icon}</Text>
-                <Text style={theme.typography.bodyStrong}>
-                  {t('devotional.achievementUnlocked', {
-                    title: isKnownAchievement(code) ? t(`achievements.${code}`) : code,
-                  })}
-                </Text>
-              </Card>
+              <PopIn key={code} delay={500 + index * 200} style={styles.achievementWrapper}>
+                <Card padding="compact" style={styles.achievementCard}>
+                  <Text style={styles.achievementIcon}>{icon}</Text>
+                  <Text style={theme.typography.bodyStrong}>
+                    {t('devotional.achievementUnlocked', {
+                      title: isKnownAchievement(code) ? t(`achievements.${code}`) : code,
+                    })}
+                  </Text>
+                </Card>
+              </PopIn>
             );
           })}
 
@@ -231,7 +297,8 @@ export default function DevocionalScreen() {
             variant="tertiary"
             onPress={() => router.replace('/(tabs)')}
           />
-        </View>
+        </ScrollView>
+        <Confetti count={bigCelebration ? 56 : 14} />
       </ScreenContainer>
     );
   }
@@ -404,8 +471,11 @@ const getStyles = (theme: Theme) =>
     doneScreen: {
       backgroundColor: theme.colors.yellow,
     },
+    achievementWrapper: {
+      width: '100%',
+    },
     doneContent: {
-      flex: 1,
+      flexGrow: 1,
       alignItems: 'center',
       justifyContent: 'center',
       gap: theme.spacing.sm,

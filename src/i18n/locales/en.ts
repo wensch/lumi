@@ -180,6 +180,16 @@ export const en: TranslationSchema = {
     continueButton: 'Continue',
     finish: 'Finish my devotional',
     completedTitle: 'Devotional complete!',
+    milestoneTitle: '{{count}} days in a row!',
+    nextMilestone: 'Next milestone: {{title}}, in {{count}} days.',
+    lumiSays: {
+      first: 'First moment logged. Starting is the hardest part. 🐑',
+      milestone: "{{count}} days in a row! I'm pretending I'm not emotional. 🐑",
+      achievement: 'New achievement unlocked. Consistency pays off. 🐑',
+      normal1: 'Done! See you tomorrow. 🐑',
+      normal2: 'Another day of consistency saved. 🐑',
+      normal3: "Small and steady. That's how you go far. 🐑",
+    },
     stepOf: 'Step {{current}} of {{total}}',
     verseUnavailable: "Couldn't load the verse right now.",
     aiDisclaimer:

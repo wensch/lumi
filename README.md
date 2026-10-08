@@ -4,8 +4,8 @@ Aplicativo de constância devocional cristã — hábito diário de oração e
 Bíblia, com o mascote Lumi (cordeiro). Contexto completo do produto em
 [docs/lumi-briefing.md](docs/lumi-briefing.md).
 
-> **Status:** Fase 1 (MVP) completa, exceto IA para oração — próxima etapa,
-> bloqueada por escolha de fornecedor de modelo. Onboarding, Hoje,
+> **Status:** Fase 1 (MVP) completa. O app não gera orações por IA (decisão de
+> produto): a oração é escrita pelo usuário. Onboarding, Hoje,
 > devocional (YouVersion + reflexão), streak/XP, conquistas, histórico, 5
 > estados do Lumi e lembretes locais já funcionam. Arte final do Lumi
 > pendente (produzida à parte).

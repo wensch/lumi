@@ -183,6 +183,16 @@ export const pt = {
     continueButton: 'Continuar',
     finish: 'Concluir meu devocional',
     completedTitle: 'Devocional concluído!',
+    milestoneTitle: '{{count}} dias seguidos!',
+    nextMilestone: 'Próximo marco: {{title}}, em {{count}} dias.',
+    lumiSays: {
+      first: 'Primeiro momento registrado. Começar é a parte mais difícil. 🐑',
+      milestone: '{{count}} dias seguidos! Estou fingindo que não estou emocionado. 🐑',
+      achievement: 'Conquista nova no bolso. Constância rende. 🐑',
+      normal1: 'Feito! Amanhã a gente se vê. 🐑',
+      normal2: 'Mais um dia de constância guardado. 🐑',
+      normal3: 'Pequeno e constante. É assim que se chega longe. 🐑',
+    },
     stepOf: 'Passo {{current}} de {{total}}',
     verseUnavailable: 'Não foi possível carregar o versículo agora.',
     aiDisclaimer:
