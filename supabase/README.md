@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00014
+## Migrations 00004 a 00015
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -85,3 +85,6 @@ função `consume_ai_quota`, usada pela edge function `ask-about-devotional`) e 
 `clear_session_reflection`, usada pelo botão de apagar reflexão no histórico. Depois de aplicá-la,
 reimplante a edge function para o limite passar a valer (sem a função no banco, a edge function
 segue sem limite em vez de quebrar).
+
+A `00015_circles.sql` cria os círculos (Fase 3, social): tabelas fechadas para o cliente e funções
+que conferem a participação. Sem ela a aba Círculos mostra "estão sendo preparados".

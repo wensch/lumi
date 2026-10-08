@@ -222,6 +222,63 @@ export interface Database {
           unlocked_achievement_codes: string[];
         }[];
       };
+      my_circles: {
+        Args: Record<string, never>;
+        Returns: unknown;
+      };
+      circle_detail: {
+        Args: { p_circle_id: string };
+        Returns: unknown;
+      };
+      create_circle: {
+        Args: { p_name: string };
+        Returns: unknown;
+      };
+      join_circle: {
+        Args: { p_code: string };
+        Returns: string | null;
+      };
+      leave_circle: {
+        Args: { p_circle_id: string };
+        Returns: undefined;
+      };
+      remove_circle_member: {
+        Args: { p_circle_id: string; p_user_id: string };
+        Returns: undefined;
+      };
+      cheer_circle_member: {
+        Args: { p_circle_id: string; p_to_user: string };
+        Returns: undefined;
+      };
+      list_prayer_requests: {
+        Args: { p_circle_id: string };
+        Returns: unknown;
+      };
+      create_prayer_request: {
+        Args: { p_circle_id: string; p_body: string };
+        Returns: string;
+      };
+      pray_for_request: {
+        Args: { p_request_id: string };
+        Returns: undefined;
+      };
+      resolve_prayer_request: {
+        Args: { p_request_id: string };
+        Returns: undefined;
+      };
+      delete_prayer_request: {
+        Args: { p_request_id: string };
+        Returns: undefined;
+      };
+      report_circle_content: {
+        Args: {
+          p_circle_id: string;
+          p_request_id: string | null;
+          p_reported_user_id: string | null;
+          p_reason: string;
+        };
+        Returns: undefined;
+      };
       consume_ai_quota: {
         Args: {
           p_limit?: number;

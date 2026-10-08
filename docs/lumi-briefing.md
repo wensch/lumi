@@ -237,6 +237,15 @@ pedidos de oração, reações de apoio, momentos compartilhados, orar por algu�
 do círculo. **Regra:** nunca comparar pessoas como "mais espirituais" ou
 "melhores cristãos".
 
+**Primeira versão (Fase 3):** aba **Círculos**. Círculos pequenos e fechados (até 12 pessoas, até 5
+círculos por pessoa), entrada só por código de convite, sem feed público. Cada círculo mostra quem
+já fez o momento *hoje* (presença, sem número de sequência e sem ranking) e um total coletivo da
+semana; "Torcer" 💛 (um apoio por pessoa por dia); pedidos de oração de até 280 letras com "Orei
+por isso" 🙏 e "Gratidão" 💛 ao ser atendido. Moderação: o criador remove pessoas e apaga pedidos,
+qualquer membro denuncia, quem sai leva os próprios pedidos. Os dados só passam por funções do
+banco que conferem a participação no círculo (migration 00015). Fica para depois: notificações
+push entre membros, fotos, comentários.
+
 ## 13. UX e navegação
 
 | Área | Função |

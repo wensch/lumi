@@ -8,6 +8,7 @@ const ICON_BY_ROUTE: Record<string, keyof typeof Ionicons.glyphMap> = {
   index: 'sunny',
   biblia: 'book',
   lumi: 'paw',
+  circulos: 'people',
   perfil: 'person-circle',
 };
 
@@ -22,6 +23,8 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
   const theme = useTheme();
   const styles = getStyles(theme);
   const insets = useSafeAreaInsets();
+  // Com 5 abas o botão perde o respiro lateral para o rótulo caber em telas de ~360dp.
+  const compact = state.routes.length > 4;
 
   return (
     <View style={[styles.container, { bottom: 16 + insets.bottom }]}>
@@ -48,7 +51,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
             onPress={onPress}
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
-            style={[styles.tab, isFocused && styles.tabActive]}
+            style={[styles.tab, compact && styles.tabCompact, isFocused && styles.tabActive]}
           >
             <Ionicons name={iconName} size={22} color={theme.colors.ink} />
             <Text style={styles.label} maxFontSizeMultiplier={1.25}>
@@ -86,6 +89,9 @@ const getStyles = (theme: Theme) =>
       borderRadius: 16,
       borderWidth: 2,
       borderColor: 'transparent',
+    },
+    tabCompact: {
+      paddingHorizontal: 8,
     },
     tabActive: {
       backgroundColor: theme.colors.green,
