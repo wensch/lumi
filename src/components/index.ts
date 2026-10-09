@@ -4,6 +4,7 @@ export * from './Celebration';
 export * from './FadeIn';
 export * from './LoadingScreen';
 export * from './Screen';
+export * from './useScrollFocusedInput';
 export * from './ScreenContainer';
 export * from './ScreenHeader';
 export * from './Section';

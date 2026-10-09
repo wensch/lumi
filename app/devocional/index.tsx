@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } f
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { Ionicons } from '@expo/vector-icons';
 import {
   Bob,
   Button,
@@ -13,6 +14,7 @@ import {
   ScreenContainer,
   TextField,
   useCountUp,
+  useScrollFocusedInput,
 } from '@/components';
 import { ACHIEVEMENT_ICONS, isKnownAchievement } from '@/features/achievements';
 import { cancelTodaysReminders } from '@/features/notifications';
@@ -121,6 +123,7 @@ export default function DevocionalScreen() {
     }
   }, [result]);
   const [showAsk, setShowAsk] = useState(false);
+  const { ref: stepScrollRef, onScroll: onStepScroll } = useScrollFocusedInput();
   const [question, setQuestion] = useState('');
   const {
     ask,
@@ -344,7 +347,7 @@ export default function DevocionalScreen() {
             hitSlop={8}
             style={styles.closeButton}
           >
-            <Text style={styles.closeButtonLabel}>✕</Text>
+            <Ionicons name="close" size={26} color={theme.colors.ink} />
           </Pressable>
           <View
             style={styles.progressRow}
@@ -366,6 +369,9 @@ export default function DevocionalScreen() {
 
         <View style={styles.stepCard}>
           <ScrollView
+            ref={stepScrollRef}
+            onScroll={onStepScroll}
+            scrollEventThrottle={16}
             style={styles.stepScroll}
             contentContainerStyle={styles.stepCardContent}
             keyboardShouldPersistTaps="handled"
@@ -406,44 +412,49 @@ export default function DevocionalScreen() {
               </>
             ) : null}
 
-            {canAsk ? (
-              showAsk ? (
-                <View style={styles.askBox}>
-                  <TextField
-                    label={t('devotional.askLabel')}
-                    placeholder={t('devotional.askPlaceholder')}
-                    value={question}
-                    onChangeText={setQuestion}
-                    multiline
-                    maxLength={500}
-                  />
-                  {askError ? <Text style={styles.errorText}>{askError}</Text> : null}
-                  {answer ? (
-                    <>
-                      <Text style={styles.answerText}>{answer}</Text>
-                      <Text style={styles.aiDisclaimer}>{t('devotional.aiDisclaimer')}</Text>
-                    </>
-                  ) : null}
-                  <View style={styles.askActions}>
-                    <Button
-                      label={asking ? t('devotional.asking') : t('devotional.ask')}
-                      variant="secondary"
-                      onPress={() => ask(question)}
-                      disabled={asking || !question.trim()}
-                    />
-                    <Button label={t('devotional.close')} variant="tertiary" onPress={closeAsk} />
-                  </View>
-                </View>
-              ) : (
-                <Button
-                  label={t('devotional.askAboutText')}
-                  variant="ghost"
-                  onPress={() => setShowAsk(true)}
+            {canAsk && showAsk ? (
+              <View style={styles.askBox}>
+                <TextField
+                  label={t('devotional.askLabel')}
+                  placeholder={t('devotional.askPlaceholder')}
+                  value={question}
+                  onChangeText={setQuestion}
+                  multiline
+                  maxLength={500}
                 />
-              )
+                {askError ? <Text style={styles.errorText}>{askError}</Text> : null}
+                {answer ? (
+                  <>
+                    <Text style={styles.answerText}>{answer}</Text>
+                    <Text style={styles.aiDisclaimer}>{t('devotional.aiDisclaimer')}</Text>
+                  </>
+                ) : null}
+                <View style={styles.askActions}>
+                  <Button
+                    label={asking ? t('devotional.asking') : t('devotional.ask')}
+                    variant="secondary"
+                    onPress={() => ask(question)}
+                    disabled={asking || !question.trim()}
+                  />
+                  <Button label={t('devotional.close')} variant="tertiary" onPress={closeAsk} />
+                </View>
+              </View>
             ) : null}
 
-            <View style={styles.stepMascot}>
+            <View style={styles.stepBottomRow}>
+              {canAsk && !showAsk ? (
+                <Pressable
+                  onPress={() => setShowAsk(true)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('devotional.askAboutText')}
+                  hitSlop={8}
+                  style={styles.askIconButton}
+                >
+                  <Ionicons name="chatbubble-ellipses-outline" size={26} color={theme.colors.ink} />
+                </Pressable>
+              ) : (
+                <View />
+              )}
               <LumiMascot
                 mood={currentStep.kind === 'reflect' ? 'thoughtful' : 'waiting'}
                 size={110}
@@ -465,7 +476,7 @@ export default function DevocionalScreen() {
               accessibilityLabel={t('common.back')}
               style={styles.backButton}
             >
-              <Text style={styles.backButtonLabel}>←</Text>
+              <Ionicons name="arrow-back" size={28} color={theme.colors.ink} />
             </Pressable>
           ) : null}
           <Button
@@ -568,9 +579,9 @@ const getStyles = (theme: Theme) =>
       gap: theme.spacing.md,
     },
     closeButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 46,
+      height: 46,
+      borderRadius: 23,
       backgroundColor: theme.colors.white,
       borderWidth: 2.5,
       borderColor: theme.colors.ink,
@@ -654,9 +665,22 @@ const getStyles = (theme: Theme) =>
       borderRadius: theme.radius.md,
       padding: theme.spacing.md,
     },
-    stepMascot: {
-      alignSelf: 'flex-end',
+    stepBottomRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      justifyContent: 'space-between',
       marginTop: 'auto',
+    },
+    askIconButton: {
+      width: 52,
+      height: 52,
+      borderRadius: 26,
+      backgroundColor: theme.colors.white,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      alignItems: 'center',
+      justifyContent: 'center',
+      ...theme.shadow.chip,
     },
     // O erro cai sobre o fundo colorido do passo: vai numa pílula `white` para manter o contraste.
     errorText: {

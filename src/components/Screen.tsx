@@ -1,8 +1,16 @@
-import type { Ref } from 'react';
-import { ScrollView, StyleSheet, View, type ScrollViewProps, type ViewProps } from 'react-native';
+import { useImperativeHandle, type Ref } from 'react';
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  StyleSheet,
+  View,
+  type ScrollViewProps,
+  type ViewProps,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FadeIn } from './FadeIn';
 import { ScreenContainer } from './ScreenContainer';
+import { useScrollFocusedInput } from './useScrollFocusedInput';
 import { useTheme, type Theme } from '@/theme';
 
 type ScreenProps = ViewProps & {
@@ -34,6 +42,9 @@ export function Screen({
   const theme = useTheme();
   const styles = getStyles(theme);
   const insets = useSafeAreaInsets();
+  const { ref: innerRef, onScroll } = useScrollFocusedInput();
+  // Repassa o ScrollView interno ao ref externo (se houver) sem perder o uso interno.
+  useImperativeHandle(scrollRef, () => innerRef.current as ScrollView);
 
   if (!scroll) {
     return (
@@ -49,23 +60,27 @@ export function Screen({
 
   return (
     <ScreenContainer>
-      <FadeIn rise={0} style={styles.fill}>
-        <ScrollView
-          ref={scrollRef}
-          style={styles.scrollView}
-          contentContainerStyle={[
-            styles.content,
-            styles.scrollContent,
-            { paddingBottom: 130 + insets.bottom },
-            centered && styles.centered,
-            contentContainerStyle,
-          ]}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {children}
-        </ScrollView>
-      </FadeIn>
+      <KeyboardAvoidingView behavior="padding" style={styles.fill}>
+        <FadeIn rise={0} style={styles.fill}>
+          <ScrollView
+            ref={innerRef}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+            style={styles.scrollView}
+            contentContainerStyle={[
+              styles.content,
+              styles.scrollContent,
+              { paddingBottom: 130 + insets.bottom },
+              centered && styles.centered,
+              contentContainerStyle,
+            ]}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {children}
+          </ScrollView>
+        </FadeIn>
+      </KeyboardAvoidingView>
     </ScreenContainer>
   );
 }

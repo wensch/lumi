@@ -32,7 +32,7 @@ export function ScreenHeader({ title, onBackPress, onSettingsPress }: ScreenHead
           hitSlop={8}
           style={styles.circleButton}
         >
-          <Ionicons name="chevron-back" size={22} color={theme.colors.ink} />
+          <Ionicons name="chevron-back" size={30} color={theme.colors.ink} />
         </Pressable>
       ) : null}
       <Text
@@ -51,7 +51,7 @@ export function ScreenHeader({ title, onBackPress, onSettingsPress }: ScreenHead
           hitSlop={8}
           style={styles.circleButton}
         >
-          <Ionicons name="settings-outline" size={18} color={theme.colors.ink} />
+          <Ionicons name="settings-outline" size={22} color={theme.colors.ink} />
         </Pressable>
       )}
     </View>
@@ -70,9 +70,9 @@ const getStyles = (theme: Theme) =>
       color: theme.colors.ink,
     },
     circleButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 46,
+      height: 46,
+      borderRadius: 23,
       backgroundColor: theme.colors.white,
       borderWidth: 2.5,
       borderColor: theme.colors.ink,
