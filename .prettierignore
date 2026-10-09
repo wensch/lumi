@@ -2,3 +2,6 @@ node_modules
 dist
 .expo
 docs
+
+# arquivo gerado pelo Firebase: não reformatar
+google-services.json
