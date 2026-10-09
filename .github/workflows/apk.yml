@@ -62,14 +62,19 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
 
-      # Push dos círculos (opcional): o secret GOOGLE_SERVICES_JSON_BASE64 é o google-services.json do
-      # Firebase em base64. Sem ele o app compila normalmente, só sem notificações push remotas.
+      # Push dos círculos (opcional): usa o secret GOOGLE_SERVICES_JSON_BASE64 (google-services.json em
+      # base64) ou, sem ele, um google-services.json na raiz do repositório. Sem nenhum dos dois o app
+      # compila normalmente, só sem notificações push remotas.
       - name: Firebase config (optional)
         env:
           GOOGLE_SERVICES_B64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
         run: |
           if [ -z "$GOOGLE_SERVICES_B64" ]; then
-            echo "::warning::GOOGLE_SERVICES_JSON_BASE64 não configurado: este build não recebe push dos círculos."
+            if [ -f google-services.json ]; then
+              echo "Usando o google-services.json do repositório."
+            else
+              echo "::warning::Sem google-services.json (arquivo ou secret GOOGLE_SERVICES_JSON_BASE64): este build não recebe push dos círculos."
+            fi
             exit 0
           fi
           cleaned=$(printf '%s' "$GOOGLE_SERVICES_B64" | tr -d '[:space:]"'"'")

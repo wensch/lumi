@@ -47,6 +47,3 @@ supabase/.temp/
 # generated native folders
 /ios
 /android
-
-# Firebase (push): gravado pelo CI a partir de um secret, nunca versionado
-google-services.json

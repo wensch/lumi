@@ -11,11 +11,13 @@ Sem eles nada quebra: só não chega a notificação, e os avisos continuam dent
 3. Nome do pacote Android: **`com.lumi.app`** (exatamente assim). Apelido opcional. Toque em **Registrar app**.
 4. **Baixe o `google-services.json`** e avance até o fim (pode ignorar os passos de código).
 
-## 2. Entregar o `google-services.json` ao build (GitHub)
-1. Converta o arquivo em uma linha de base64. No Termux/Linux/Mac: `base64 -w0 google-services.json`
-   (no Mac: `base64 -i google-services.json`). Pelo celular, também serve um site "arquivo para base64".
-2. GitHub → repositório `wensch/lumi` → **Settings → Secrets and variables → Actions → New repository secret**.
-3. Nome: **`GOOGLE_SERVICES_JSON_BASE64`**. Valor: o texto de uma linha só. Salve.
+## 2. Entregar o `google-services.json` ao build
+Duas formas (basta uma):
+- **Arquivo no repositório (mais simples):** envie o `google-services.json` para a **raiz** da branch do
+  app (`ccr-e909a7de-9uiqzb`), pelo botão *Add file → Upload files* do GitHub. Ele só tem a
+  configuração pública do app no Firebase (ids e uma chave de cliente), sem chave privada.
+- **Secret:** GitHub → Settings → Secrets and variables → Actions → `GOOGLE_SERVICES_JSON_BASE64`
+  com o arquivo em base64 numa linha (`base64 -w0 google-services.json`). Se existir, tem prioridade.
 
 ## 3. Entregar a chave do servidor ao Supabase
 1. Firebase → ⚙️ **Configurações do projeto → Contas de serviço → Gerar nova chave privada**. Baixa um `.json`.
