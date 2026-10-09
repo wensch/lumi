@@ -1,0 +1,35 @@
+name: Publish site
+
+# Publica a pasta site/ (página dos links de convite) na branch gh-pages.
+# No GitHub: Settings > Pages > Source = "Deploy from a branch" > gh-pages / (root).
+on:
+  push:
+    branches: [master, main, 'ccr-*']
+    paths: ['site/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: site
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publicar em gh-pages
+        run: |
+          set -euo pipefail
+          cp -r site "$RUNNER_TEMP/site"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan gh-pages
+          git rm -rf . > /dev/null
+          cp -r "$RUNNER_TEMP/site/." .
+          git add -A
+          git commit -m "Publica site (${GITHUB_SHA::7})"
+          git push --force origin gh-pages

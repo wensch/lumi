@@ -3,7 +3,7 @@ name: Build APK
 on:
   push:
     branches: [main, fase-1-mvp, 'claude/**', 'ccr-*']
-    paths-ignore: ['docs/**', 'supabase/**', '**/*.md']
+    paths-ignore: ['docs/**', 'supabase/**', 'site/**', '**/*.md']
   workflow_dispatch:
 
 permissions:

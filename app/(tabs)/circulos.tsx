@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
-import { circlesApi, useCircles, type CircleSummary } from '@/features/circles';
+import { circlesApi, takePendingInvite, useCircles, type CircleSummary } from '@/features/circles';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -19,6 +19,18 @@ export default function CirculosScreen() {
   const [code, setCode] = useState('');
   const [working, setWorking] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  // Veio de um link de convite: abre "Entrar com código" já preenchido.
+  useFocusEffect(
+    useCallback(() => {
+      takePendingInvite().then((invite) => {
+        if (!invite) return;
+        setCode(invite);
+        setFormError(null);
+        setMode('join');
+      });
+    }, []),
+  );
 
   const openMode = (next: Mode) => {
     setFormError(null);

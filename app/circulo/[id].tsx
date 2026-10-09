@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Alert, Pressable, Share, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
 import {
   circlesApi,
+  InviteShare,
   PRAYER_REQUEST_MAX_LENGTH,
   useCircle,
   type CircleMember,
@@ -44,13 +45,6 @@ export default function CirculoScreen() {
     await Clipboard.setStringAsync(detail.invite_code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const shareInvite = () => {
-    if (!detail) return;
-    Share.share({
-      message: t('circles.shareMessage', { name: detail.name, code: detail.invite_code }),
-    }).catch(() => {});
   };
 
   const cheer = async (member: CircleMember) => {
@@ -345,7 +339,7 @@ export default function CirculoScreen() {
                 variant="secondary"
                 onPress={copyCode}
               />
-              <Button label={t('circles.share')} variant="ghost" onPress={shareInvite} />
+              <InviteShare circleName={detail.name} code={detail.invite_code} />
             </Card>
           </FadeIn>
 
