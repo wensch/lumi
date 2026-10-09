@@ -3,7 +3,7 @@
  * constância, não espiritualidade: o que foi desbloqueado nunca se perde
  * quando a sequência quebra (briefing §4, "retorno fácil").
  */
-export const JOURNEY_MILESTONES = [7, 14, 30, 50, 100] as const;
+export const JOURNEY_MILESTONES = [7, 14, 21, 30, 50, 100, 200, 365] as const;
 
 export type JourneyMilestone = (typeof JOURNEY_MILESTONES)[number];
 

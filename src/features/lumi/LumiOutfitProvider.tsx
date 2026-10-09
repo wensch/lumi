@@ -8,39 +8,82 @@ import {
   type ReactNode,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { OUTFITS, type OutfitId } from './outfits';
+import { outfitById, toggleOutfit, type OutfitId } from './outfits';
 
-const STORAGE_KEY = 'lumi.outfit';
+const STORAGE_KEY = 'lumi.outfits';
+/** Versão antiga: um único item guardado como texto. */
+const LEGACY_STORAGE_KEY = 'lumi.outfit';
 
 type OutfitContextValue = {
-  outfitId: OutfitId | null;
-  setOutfitId: (id: OutfitId | null) => void;
+  outfitIds: OutfitId[];
+  /** Veste ou tira um item (vestir tira o da mesma categoria). */
+  toggleOutfit: (id: OutfitId) => void;
+  clearOutfits: () => void;
 };
 
-const OutfitContext = createContext<OutfitContextValue>({ outfitId: null, setOutfitId: () => {} });
+const OutfitContext = createContext<OutfitContextValue>({
+  outfitIds: [],
+  toggleOutfit: () => {},
+  clearOutfits: () => {},
+});
 
-/** Item que o Lumi está vestindo, guardado no aparelho (é preferência visual, não dado da conta). */
+function parseStored(raw: string | null): OutfitId[] {
+  if (!raw) return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    // toggleOutfit garante um item por categoria e descarta ids desconhecidos.
+    return parsed.reduce<OutfitId[]>(
+      (list, id) =>
+        typeof id === 'string' && outfitById(id) ? toggleOutfit(list, id as OutfitId) : list,
+      [],
+    );
+  } catch {
+    return [];
+  }
+}
+
+/** Itens que o Lumi está vestindo, guardados no aparelho (é preferência visual, não dado da conta). */
 export function LumiOutfitProvider({ children }: { children: ReactNode }) {
-  const [outfitId, setOutfitIdState] = useState<OutfitId | null>(null);
+  const [outfitIds, setOutfitIds] = useState<OutfitId[]>([]);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then((stored) => {
-        if (OUTFITS.some((outfit) => outfit.id === stored)) {
-          setOutfitIdState(stored as OutfitId);
-        }
-      })
-      .catch(() => {});
+    (async () => {
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        setOutfitIds(parseStored(stored));
+        return;
+      }
+      // Migra o item único da versão anterior.
+      const legacy = await AsyncStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacy && outfitById(legacy)) setOutfitIds([legacy as OutfitId]);
+    })().catch(() => {});
   }, []);
 
-  const setOutfitId = useCallback((id: OutfitId | null) => {
-    setOutfitIdState(id);
-    (id ? AsyncStorage.setItem(STORAGE_KEY, id) : AsyncStorage.removeItem(STORAGE_KEY)).catch(
-      () => {},
-    );
+  const persist = useCallback((next: OutfitId[]) => {
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {});
   }, []);
 
-  const value = useMemo(() => ({ outfitId, setOutfitId }), [outfitId, setOutfitId]);
+  const toggle = useCallback(
+    (id: OutfitId) => {
+      setOutfitIds((current) => {
+        const next = toggleOutfit(current, id);
+        persist(next);
+        return next;
+      });
+    },
+    [persist],
+  );
+
+  const clearOutfits = useCallback(() => {
+    setOutfitIds([]);
+    persist([]);
+  }, [persist]);
+
+  const value = useMemo(
+    () => ({ outfitIds, toggleOutfit: toggle, clearOutfits }),
+    [outfitIds, toggle, clearOutfits],
+  );
   return <OutfitContext.Provider value={value}>{children}</OutfitContext.Provider>;
 }
 

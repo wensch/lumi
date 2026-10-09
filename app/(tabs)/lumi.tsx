@@ -6,6 +6,7 @@ import {
   getJourney,
   JOURNEY_MILESTONES,
   LumiMascot,
+  OUTFIT_SLOTS,
   OUTFITS,
   useLumiOutfit,
   type JourneyMilestone,
@@ -18,7 +19,7 @@ export default function LumiScreen() {
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const { currentStreak, longestStreak, daysSinceLastCompleted, loading } = useHomeData();
-  const { outfitId, setOutfitId } = useLumiOutfit();
+  const { outfitIds, toggleOutfit, clearOutfits } = useLumiOutfit();
 
   if (loading) {
     return (
@@ -76,34 +77,39 @@ export default function LumiScreen() {
 
       <Text style={styles.sectionTitle}>{t('lumi.wardrobeTitle')}</Text>
       <Text style={[theme.typography.caption, styles.mutedText]}>{t('lumi.wardrobeHint')}</Text>
-      <View style={styles.wardrobeGrid}>
-        <WardrobeTile
-          icon="🐑"
-          label={t('lumi.outfitNone')}
-          selected={outfitId === null}
-          unlocked
-          onPress={() => setOutfitId(null)}
-          theme={theme}
-        />
-        {OUTFITS.map((outfit) => {
-          const unlocked = journey.reached.includes(outfit.milestone);
-          return (
-            <WardrobeTile
-              key={outfit.id}
-              icon={outfit.icon}
-              label={
-                unlocked
-                  ? t(`lumi.outfits.${outfit.id}`)
-                  : t('lumi.outfitLocked', { days: outfit.milestone })
-              }
-              selected={outfitId === outfit.id}
-              unlocked={unlocked}
-              onPress={() => setOutfitId(outfit.id)}
-              theme={theme}
-            />
-          );
-        })}
-      </View>
+      <Pressable
+        onPress={clearOutfits}
+        accessibilityRole="button"
+        disabled={outfitIds.length === 0}
+        style={[styles.clearButton, outfitIds.length === 0 && styles.clearButtonDisabled]}
+      >
+        <Text style={styles.clearButtonLabel}>🐑 {t('lumi.outfitNone')}</Text>
+      </Pressable>
+      {OUTFIT_SLOTS.map((slot) => (
+        <View key={slot} style={styles.slotSection}>
+          <Text style={styles.slotTitle}>{t(`lumi.slots.${slot}`)}</Text>
+          <View style={styles.wardrobeGrid}>
+            {OUTFITS.filter((outfit) => outfit.slot === slot).map((outfit) => {
+              const unlocked = journey.reached.includes(outfit.milestone);
+              return (
+                <WardrobeTile
+                  key={outfit.id}
+                  icon={outfit.icon}
+                  label={
+                    unlocked
+                      ? t(`lumi.outfits.${outfit.id}`)
+                      : t('lumi.outfitLocked', { days: outfit.milestone })
+                  }
+                  selected={outfitIds.includes(outfit.id)}
+                  unlocked={unlocked}
+                  onPress={() => toggleOutfit(outfit.id)}
+                  theme={theme}
+                />
+              );
+            })}
+          </View>
+        </View>
+      ))}
 
       <Text style={styles.sectionTitle}>{t('lumi.milestonesTitle')}</Text>
 
@@ -272,6 +278,31 @@ const getStyles = (theme: Theme) =>
       ...theme.typography.subheading,
       color: theme.colors.ink,
       marginTop: theme.spacing.xs,
+    },
+    clearButton: {
+      alignSelf: 'flex-start',
+      backgroundColor: theme.colors.white,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      borderRadius: theme.radius.pill,
+      paddingVertical: 6,
+      paddingHorizontal: 14,
+    },
+    clearButtonDisabled: {
+      opacity: 0.45,
+    },
+    clearButtonLabel: {
+      ...theme.typography.bodyStrong,
+      color: theme.colors.ink,
+    },
+    slotSection: {
+      gap: theme.spacing.xs,
+    },
+    slotTitle: {
+      ...theme.typography.caption,
+      color: theme.colors.muted,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
     },
     wardrobeGrid: {
       flexDirection: 'row',

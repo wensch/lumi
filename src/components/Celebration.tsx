@@ -1,6 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import {
-  AccessibilityInfo,
   Animated,
   Easing,
   StyleSheet,
@@ -9,18 +8,8 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { useReduceMotion } from '@/lib/useReduceMotion';
 import { useTheme } from '@/theme';
-
-/** Respeita "reduzir movimento" do sistema: sem confete nem molas, só o conteúdo aparecendo. */
-function useReduceMotion() {
-  const [reduce, setReduce] = useState(false);
-  useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled()
-      .then(setReduce)
-      .catch(() => {});
-  }, []);
-  return reduce;
-}
 
 type PopInProps = {
   children: ReactNode;

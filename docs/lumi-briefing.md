@@ -148,12 +148,15 @@ Normal, Feliz, Comemorando, Debochado, Desconfiado, Esperando, Com saudade,
 Surpreso, Pensativo, Com sono, Determinado, Orgulhoso, Triste.
 
 ### 8.7 Evolução
-Representa constância do usuário, não nível de espiritualidade.
+Representa constância do usuário, não nível de espiritualidade. O que foi desbloqueado nunca se
+perde, mesmo se a sequência quebrar. O Lumi pode usar um item de cada tipo (cabeça, rosto,
+pescoço, costas e brilho) ao mesmo tempo.
 - Dia 1: Lumi básico.
-- 7 dias: primeiro item cosmético.
-- 14–30 dias: novas personalizações.
-- 50 dias: animações/itens especiais.
-- 100+ dias: itens comemorativos e raros.
+- 7 dias: cachecol (primeiro item).
+- 14 dias: óculos e gravata-borboleta. 21 dias: gorro. 30 dias: coroa de flores e óculos escuros.
+- 50 dias: capa e asas — o Lumi ganha movimento (balança ou flutua), respeitando "reduzir movimento".
+- 100 dias: brilho dourado e coroa.
+- 200 dias: arco-íris. 1 ano: estrela.
 
 ## 9. Identidade visual
 

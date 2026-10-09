@@ -6,7 +6,7 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 ## Bloco A — Fechar a experiência (Fase 2)
 1. ✅ **Folga** (proteção de sequência) — 1 dia perdido não zera a sequência. Ganha 1 Folga a cada 7 dias seguidos (máx. 2), usada sozinha. Sem culpa e sem nome religioso (o briefing §7.3 pede cuidado para não banalizar "Graça").
 2. ✅ **Mais conquistas** (14, migration 00017) — marcos de sequência (3, 14, 50, 100), primeira reflexão, primeira vez no círculo, volta depois de uma pausa.
-3. **Evolução do Lumi** — itens liberados por constância (7, 14, 30, 50, 100 dias), conforme briefing §8.7.
+3. ✅ **Evolução do Lumi** (12 itens em 5 categorias, marcos 7/14/21/30/50/100/200/365, movimento nos itens especiais) — itens liberados por constância (7, 14, 30, 50, 100 dias), conforme briefing §8.7.
 
 ## Bloco B — Social completo (Fase 3)
 4. **Notificação push entre membros** — "fulano orou por você", "fulano torceu por você" (token no banco + Edge Function, respeitando as preferências).
