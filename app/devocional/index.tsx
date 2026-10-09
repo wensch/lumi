@@ -43,6 +43,8 @@ type Result = {
   streak: number;
   xp: number;
   unlockedCodes: string[];
+  freezeUsed: boolean;
+  freezeEarned: boolean;
 };
 
 type DevotionalStep = {
@@ -155,6 +157,8 @@ export default function DevocionalScreen() {
         // Cada conquista desbloqueada rende +20 XP além dos 10 do momento do dia.
         xp: outcome.xp_awarded + ACHIEVEMENT_XP * unlockedCodes.length,
         unlockedCodes,
+        freezeUsed: outcome.freeze_used ?? false,
+        freezeEarned: outcome.freeze_earned ?? false,
       });
       // Já concluiu hoje: o lembrete alternativo de hoje não faz mais sentido.
       cancelTodaysReminders();
@@ -285,6 +289,22 @@ export default function DevocionalScreen() {
               </PopIn>
             );
           })}
+
+          {(
+            [
+              [result.freezeUsed, 'devotional.freezeUsed', 600],
+              [result.freezeEarned, 'devotional.freezeEarned', 650],
+            ] as const
+          ).map(([show, key, delay]) =>
+            show ? (
+              <PopIn key={key} delay={delay} style={styles.achievementWrapper}>
+                <Card padding="compact" style={styles.achievementCard}>
+                  <Text style={styles.achievementIcon}>🌿</Text>
+                  <Text style={[theme.typography.bodyStrong, styles.freezeText]}>{t(key)}</Text>
+                </Card>
+              </PopIn>
+            ) : null,
+          )}
 
           {wonOutfit ? (
             <PopIn delay={700} style={styles.achievementWrapper}>
@@ -528,6 +548,9 @@ const getStyles = (theme: Theme) =>
     },
     achievementIcon: {
       fontSize: 28,
+    },
+    freezeText: {
+      flexShrink: 1,
     },
     // Fluxo em passos
     devScreen: {

@@ -96,10 +96,12 @@ conhecimento bíblico ou qualidade da oração.
 Mecânica de retenção inspirada no Duolingo, mas quebrar a sequência **nunca**
 é tratado como falha moral. Deve sempre existir uma rota clara de retorno.
 
-### 7.3 "Graça" como mecânica — hipótese
-Possível mecânica futura de proteção/recuperação de sequência com o conceito
-de "Graça". Precisa ser validada antes de implementada — conceitos religiosos
-usados como mecânica de jogo exigem cuidado para não banalizar a fé.
+### 7.3 Folga (proteção de sequência)
+Decisão (out/2026): em vez de usar "Graça" — conceito religioso que não deve virar mecânica de
+jogo —, a proteção se chama **Folga**. A cada 7 dias seguidos a pessoa ganha 1 Folga (guarda até
+2). Se faltar exatamente um dia e tiver Folga, a sequência continua sozinha quando voltar, sem
+nenhum custo e sem culpa. Faltar mais de um dia reinicia a sequência (o recorde fica salvo) e o
+app mostra o caminho de volta. Implementada em `complete_devotional_session` (migration 00016).
 
 ## 8. LUMI — personagem principal
 

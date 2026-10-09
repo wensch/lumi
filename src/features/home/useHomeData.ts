@@ -17,6 +17,8 @@ type HomeData = {
   currentStreak: number;
   longestStreak: number;
   totalXp: number;
+  /** Folgas guardadas (0 a 2). */
+  freezes: number;
   lumiMood: LumiMood;
   /** Dias desde a última conclusão, ou null se nunca completou nenhuma. 0 = hoje. */
   daysSinceLastCompleted: number | null;
@@ -45,6 +47,7 @@ const DEFAULT_HOME_DATA: HomeData = {
   currentStreak: 0,
   longestStreak: 0,
   totalXp: 0,
+  freezes: 0,
   lumiMood: 'normal',
   daysSinceLastCompleted: null,
   week: buildEmptyWeek(),
@@ -68,7 +71,7 @@ export function useHomeData() {
     const [streakResult, xpResult, lumiResult, weekSessionsResult] = await Promise.all([
       supabase
         .from('streaks')
-        .select('current_streak, longest_streak, last_completed_date')
+        .select('current_streak, longest_streak, last_completed_date, freezes')
         .eq('user_id', userId)
         .single(),
       supabase.from('xp_totals').select('total_xp').eq('user_id', userId).maybeSingle(),
@@ -102,9 +105,14 @@ export function useHomeData() {
     );
 
     setData({
-      currentStreak: activeStreak(streakResult.data?.current_streak ?? 0, daysSinceLastCompleted),
+      currentStreak: activeStreak(
+        streakResult.data?.current_streak ?? 0,
+        daysSinceLastCompleted,
+        streakResult.data?.freezes ?? 0,
+      ),
       longestStreak: streakResult.data?.longest_streak ?? 0,
       totalXp: xpResult.data?.total_xp ?? 0,
+      freezes: streakResult.data?.freezes ?? 0,
       lumiMood: lumiResult.data?.mood ?? 'normal',
       daysSinceLastCompleted,
       week,

@@ -10,11 +10,18 @@
  * streaks.current_streak só é recalculado quando o usuário conclui um novo
  * momento, então fica com o valor antigo depois que a sequência quebra. A
  * sequência exibida é a "viva": vale se o último momento foi hoje ou ontem
- * (ainda dá para continuar hoje); passado disso, é 0.
+ * (ainda dá para continuar hoje); com uma Folga guardada, também vale se faltou
+ * exatamente um dia (a Folga cobre ao voltar); passado disso, é 0.
  */
-export function activeStreak(storedStreak: number, daysSinceLastCompleted: number | null): number {
-  if (daysSinceLastCompleted === null || daysSinceLastCompleted > 1) return 0;
-  return storedStreak;
+export function activeStreak(
+  storedStreak: number,
+  daysSinceLastCompleted: number | null,
+  freezes = 0,
+): number {
+  if (daysSinceLastCompleted === null) return 0;
+  if (daysSinceLastCompleted <= 1) return storedStreak;
+  if (daysSinceLastCompleted === 2 && freezes > 0) return storedStreak;
+  return 0;
 }
 
 export function calculateDaysSince(dateString: string | null): number | null {

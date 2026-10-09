@@ -43,7 +43,7 @@ export function useProfileHistory() {
       await Promise.all([
         supabase
           .from('streaks')
-          .select('current_streak, longest_streak, last_completed_date')
+          .select('current_streak, longest_streak, last_completed_date, freezes')
           .eq('user_id', userId)
           .single(),
         supabase.from('xp_totals').select('total_xp').eq('user_id', userId).maybeSingle(),
@@ -62,6 +62,7 @@ export function useProfileHistory() {
       currentStreak: activeStreak(
         streakResult.data?.current_streak ?? 0,
         calculateDaysSince(streakResult.data?.last_completed_date ?? null),
+        streakResult.data?.freezes ?? 0,
       ),
       longestStreak: streakResult.data?.longest_streak ?? 0,
       totalXp: xpResult.data?.total_xp ?? 0,

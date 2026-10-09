@@ -19,6 +19,7 @@ export default function HojeScreen() {
     currentStreak,
     longestStreak,
     totalXp,
+    freezes,
     daysSinceLastCompleted,
     week,
     loading,
@@ -53,6 +54,8 @@ export default function HojeScreen() {
   const greeting = lumiGreeting(daysSinceLastCompleted, t);
   const completedToday = daysSinceLastCompleted === 0;
   // Fala de "atrasado" (briefing §8.4): quase meia-noite e o momento de hoje ainda não aconteceu.
+  // Faltou exatamente um dia e há Folga guardada: a sequência continua se vier hoje.
+  const freezeCoversYesterday = !completedToday && daysSinceLastCompleted === 2 && freezes > 0;
   const isVeryLate = !completedToday && new Date().getHours() >= 23;
 
   return (
@@ -83,6 +86,12 @@ export default function HojeScreen() {
           />
         ))}
       </View>
+
+      {freezes > 0 ? (
+        <Text style={styles.freezeHint}>
+          {freezes === 1 ? t('home.freezeOne') : t('home.freezeMany', { count: freezes })}
+        </Text>
+      ) : null}
 
       <FadeIn delay={60} rise={18}>
         <View style={styles.mascotArea}>
@@ -118,9 +127,13 @@ export default function HojeScreen() {
           <Card style={styles.messageCard}>
             <Text style={styles.devotionalKicker}>{t('home.devotionalOfTheDay')}</Text>
             <Text style={theme.typography.heading}>{greeting.title}</Text>
-            {isVeryLate || greeting.subtitle ? (
+            {freezeCoversYesterday || isVeryLate || greeting.subtitle ? (
               <Text style={[theme.typography.body, styles.messageSubtitle]}>
-                {isVeryLate ? t('home.veryLate') : greeting.subtitle}
+                {freezeCoversYesterday
+                  ? t('home.freezeCovers')
+                  : isVeryLate
+                    ? t('home.veryLate')
+                    : greeting.subtitle}
               </Text>
             ) : null}
           </Card>
@@ -167,6 +180,12 @@ const getStyles = (theme: Theme) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+    },
+    freezeHint: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
+      opacity: 0.75,
+      textAlign: 'center',
     },
     weekRow: {
       flexDirection: 'row',

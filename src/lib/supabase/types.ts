@@ -50,6 +50,9 @@ export interface Database {
           longest_streak: number;
           last_completed_date: string | null;
           grace_available: boolean;
+          /** Folgas guardadas (0 a 2): cobrem UM dia perdido. Ganha 1 a cada 7 dias seguidos. */
+          freezes: number;
+          last_freeze_date: string | null;
           updated_at: string;
         };
         Insert: Partial<Database['public']['Tables']['streaks']['Row']> & { user_id: string };
@@ -220,6 +223,9 @@ export interface Database {
           longest_streak: number;
           xp_awarded: number;
           unlocked_achievement_codes: string[];
+          freeze_used: boolean;
+          freeze_earned: boolean;
+          freezes_left: number;
         }[];
       };
       my_circles: {
