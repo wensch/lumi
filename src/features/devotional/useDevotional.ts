@@ -4,6 +4,7 @@ import type { Database } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
 import { calculateDaysSince, startOfLocalDay } from '@/lib/dates';
 import { translate } from '@/i18n';
+import type { ActivePlan } from '@/features/plans/types';
 import { selectDailyContent } from './selectDailyContent';
 
 type Content = Database['public']['Tables']['content']['Row'];
@@ -19,9 +20,16 @@ type DevotionalState = {
    * teste diário, relatório de 24/09: comemorar mais o retorno).
    */
   isReturningFromBreak: boolean;
+  /** Plano de leitura em andamento cujo dia de hoje é este devocional (nulo no devocional do dia comum). */
+  plan: { planId: string; title: string; day: number; days: number } | null;
 };
 
-const EMPTY_STATE: DevotionalState = { content: null, session: null, isReturningFromBreak: false };
+const EMPTY_STATE: DevotionalState = {
+  content: null,
+  session: null,
+  isReturningFromBreak: false,
+  plan: null,
+};
 
 export function useDevotional() {
   const { session: authSession } = useAuth();
@@ -37,10 +45,14 @@ export function useDevotional() {
     setLoading(true);
     setError(null);
 
-    const [{ data: allContent, error: contentError }, { data: streak }] = await Promise.all([
-      supabase.from('content').select('*').not('published_at', 'is', null),
-      supabase.from('streaks').select('last_completed_date').eq('user_id', userId).single(),
-    ]);
+    const [{ data: allContent, error: contentError }, { data: streak }, planResult] =
+      await Promise.all([
+        supabase.from('content').select('*').not('published_at', 'is', null),
+        supabase.from('streaks').select('last_completed_date').eq('user_id', userId).single(),
+        // Sem plano (ou sem rede para consultá-lo) cai no devocional do dia comum.
+        supabase.rpc('active_reading_plan'),
+      ]);
+    const activePlan = (planResult.error ? null : planResult.data) as ActivePlan | null;
 
     const isReturningFromBreak =
       (calculateDaysSince(streak?.last_completed_date ?? null) ?? 0) >= 2;
@@ -53,7 +65,21 @@ export function useDevotional() {
       return;
     }
 
-    const content = selectDailyContent(allContent ?? []);
+    // Com plano ativo e o dia de hoje ainda não feito, o devocional é o próximo dia do plano.
+    const planContent =
+      activePlan && !activePlan.done_today
+        ? ((allContent ?? []).find((item) => item.id === activePlan.content_id) ?? null)
+        : null;
+    const plan =
+      activePlan && planContent
+        ? {
+            planId: activePlan.plan_id,
+            title: activePlan.title,
+            day: activePlan.next_day,
+            days: activePlan.days,
+          }
+        : null;
+    const content = planContent ?? selectDailyContent(allContent ?? []);
 
     if (!content) {
       setState({ ...EMPTY_STATE, isReturningFromBreak });
@@ -66,11 +92,15 @@ export function useDevotional() {
     // em vez de criar outra. Vale também para sessão já concluída: reler o
     // devocional de hoje não deve criar uma linha nova no histórico a cada vez.
     const startOfToday = startOfLocalDay().toISOString();
-    const { data: existingSession } = await supabase
+    let sessionQuery = supabase
       .from('devotional_sessions')
       .select('*')
       .eq('user_id', userId)
-      .gte('started_at', startOfToday)
+      .gte('started_at', startOfToday);
+    // Dia de plano: reaproveita só a sessão de hoje DESTE devocional; uma sessão aberta antes com outro
+    // texto não vale (senão o plano nunca avançaria).
+    if (plan) sessionQuery = sessionQuery.eq('content_id', content.id);
+    const { data: existingSession } = await sessionQuery
       .order('started_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -80,7 +110,7 @@ export function useDevotional() {
       // do dia, a pergunta à IA e o histórico continuam apontando para o mesmo conteúdo.
       const sessionContent =
         (allContent ?? []).find((item) => item.id === existingSession.content_id) ?? content;
-      setState({ content: sessionContent, session: existingSession, isReturningFromBreak });
+      setState({ content: sessionContent, session: existingSession, isReturningFromBreak, plan });
       setLoading(false);
       return;
     }
@@ -93,12 +123,12 @@ export function useDevotional() {
 
     if (insertError || !newSession) {
       setError(translate('errors.devotionalStart'));
-      setState({ content, session: null, isReturningFromBreak });
+      setState({ content, session: null, isReturningFromBreak, plan });
       setLoading(false);
       return;
     }
 
-    setState({ content, session: newSession, isReturningFromBreak });
+    setState({ content, session: newSession, isReturningFromBreak, plan });
     setLoading(false);
   }, []);
 

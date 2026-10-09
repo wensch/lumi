@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00018
+## Migrations 00004 a 00019
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -107,3 +107,9 @@ aplicá-la, publique a edge function `supabase/functions/notify-circle-events` e
 `docs/push-setup.md` (Firebase + os segredos `FCM_SERVICE_ACCOUNT` no Supabase e
 `GOOGLE_SERVICES_JSON_BASE64` no GitHub). Sem os segredos o push não sai, mas os avisos aparecem
 dentro do app.
+
+A `00019_reading_plans.sql` cria os planos de leitura (`reading_plans`, `reading_plan_days`,
+`user_reading_plans`), as funções para listar, começar, pausar e consultar o plano ativo, a conquista
+"Plano concluído" e recria `complete_devotional_session` (agora avança o plano e avalia as conquistas a
+cada conclusão). Depois dela, rode `supabase/seed-reading-plans.sql` (6 planos montados só com
+devocionais já aprovados). Sem `DROP` nem `DELETE`: o conector do Supabase aplica sozinho.

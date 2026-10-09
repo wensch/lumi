@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, FadeIn, Screen, Skeleton, StreakBadge, XPBadge } from '@/components';
+import { useActivePlan } from '@/features/plans';
 import { lumiGreeting, useHomeData, type WeekDay } from '@/features/home';
 import { LumiMascot } from '@/features/lumi';
 import { ShareStreakButton } from '@/features/share';
@@ -26,6 +27,8 @@ export default function HojeScreen() {
     error,
     refetch,
   } = useHomeData();
+
+  const { active: activePlan } = useActivePlan();
 
   if (loading) {
     return (
@@ -141,6 +144,32 @@ export default function HojeScreen() {
         </>
       )}
 
+      {activePlan ? (
+        <Pressable
+          onPress={() => router.push(`/planos/${activePlan.plan_id}`)}
+          accessibilityRole="button"
+          accessibilityLabel={activePlan.title}
+        >
+          <Card style={styles.planCard}>
+            <Text style={styles.devotionalKicker}>{t('plans.todayCardKicker')}</Text>
+            <Text style={theme.typography.bodyStrong}>
+              {activePlan.icon ?? '📖'} {activePlan.title}
+            </Text>
+            <Text style={[theme.typography.caption, styles.messageSubtitle]}>
+              {activePlan.done_today
+                ? t('plans.todayCardDone', { day: activePlan.last_day_done })
+                : t('plans.todayCardDay', { day: activePlan.next_day, total: activePlan.days })}
+            </Text>
+          </Card>
+        </Pressable>
+      ) : (
+        <Button
+          label={t('plans.browse')}
+          variant="tertiary"
+          onPress={() => router.push('/planos')}
+        />
+      )}
+
       {longestStreak > currentStreak ? (
         <Text style={styles.recordHint}>
           {t('home.recordHint', {
@@ -250,6 +279,9 @@ const getStyles = (theme: Theme) =>
     messageSubtitle: {
       color: theme.colors.ink,
       textAlign: 'center',
+    },
+    planCard: {
+      gap: 2,
     },
     devotionalKicker: {
       ...theme.typography.bodyStrong,

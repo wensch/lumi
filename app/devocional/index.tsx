@@ -103,8 +103,17 @@ export default function DevocionalScreen() {
   const styles = getStyles(theme);
   const { t, language } = useTranslation();
   const insets = useSafeAreaInsets();
-  const { content, session, loading, completing, error, complete, retry, isReturningFromBreak } =
-    useDevotional();
+  const {
+    content,
+    session,
+    loading,
+    completing,
+    error,
+    complete,
+    retry,
+    isReturningFromBreak,
+    plan,
+  } = useDevotional();
   const [stepIndex, setStepIndex] = useState(0);
   const [reflection, setReflection] = useState('');
   const [result, setResult] = useState<Result | null>(null);
@@ -273,6 +282,14 @@ export default function DevocionalScreen() {
                 title: t(`lumi.milestones.d${journey.next}.title`),
                 count: journey.daysToNext,
               })}
+            </Text>
+          ) : null}
+
+          {plan ? (
+            <Text style={[theme.typography.bodyStrong, styles.doneSubtitle]}>
+              {plan.day >= plan.days
+                ? t('plans.completedLine', { title: plan.title })
+                : t('plans.dayDoneLine', { day: plan.day, days: plan.days, title: plan.title })}
             </Text>
           ) : null}
 

@@ -307,6 +307,26 @@ export interface Database {
         Args: { p_token: string };
         Returns: undefined;
       };
+      list_reading_plans: {
+        Args: Record<string, never>;
+        Returns: unknown;
+      };
+      reading_plan_detail: {
+        Args: { p_plan_id: string };
+        Returns: unknown;
+      };
+      active_reading_plan: {
+        Args: Record<string, never>;
+        Returns: unknown;
+      };
+      start_reading_plan: {
+        Args: { p_plan_id: string };
+        Returns: undefined;
+      };
+      pause_reading_plan: {
+        Args: { p_plan_id: string };
+        Returns: undefined;
+      };
       consume_ai_quota: {
         Args: {
           p_limit?: number;

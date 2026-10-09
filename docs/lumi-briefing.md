@@ -257,6 +257,11 @@ Cada pessoa liga ou desliga os avisos dos círculos, os lembretes e os recados d
 Configurações (migration 00018, edge function `notify-circle-events`, `docs/push-setup.md`).
 Fica para depois: fotos e comentários.
 
+**Planos de leitura (Fase 4):** sequências de devocionais já aprovados sobre um tema (6 a 30 dias).
+Um plano ativo por vez (os outros ficam em pausa com o progresso guardado) e um dia do plano por dia
+do calendário: o devocional da tela Hoje passa a ser o próximo dia do plano. Terminar um plano libera
+a conquista "Plano concluído". Planos não criam texto novo: reorganizam o conteúdo editorial aprovado.
+
 ## 13. UX e navegação
 
 | Área | Função |
