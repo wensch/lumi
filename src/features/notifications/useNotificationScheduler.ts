@@ -37,7 +37,7 @@ export function useNotificationScheduler() {
 
       const { data: prefs } = await supabase
         .from('notification_preferences')
-        .select('reminders_enabled, preferred_time')
+        .select('reminders_enabled, preferred_time, return_enabled')
         .eq('user_id', userId)
         .single();
 
@@ -61,7 +61,10 @@ export function useNotificationScheduler() {
       if (cancelled) return;
       const completedToday = calculateDaysSince(streak?.last_completed_date ?? null) === 0;
 
-      await scheduleDailyReminder(prefs.preferred_time, { skipToday: completedToday });
+      await scheduleDailyReminder(prefs.preferred_time, {
+        skipToday: completedToday,
+        returnNotes: prefs.return_enabled,
+      });
     };
 
     sync().catch(() => {});

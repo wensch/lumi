@@ -248,8 +248,14 @@ já fez o momento *hoje* (presença, sem número de sequência e sem ranking) e 
 semana; "Torcer" 💛 (um apoio por pessoa por dia); pedidos de oração de até 280 letras com "Orei
 por isso" 🙏 e "Gratidão" 💛 ao ser atendido. Moderação: o criador remove pessoas e apaga pedidos,
 qualquer membro denuncia, quem sai leva os próprios pedidos. Os dados só passam por funções do
-banco que conferem a participação no círculo (migration 00015). Fica para depois: notificações
-push entre membros, fotos, comentários.
+banco que conferem a participação no círculo (migration 00015).
+
+**Avisos (Bloco B):** quando alguém torce, ora por um pedido, marca gratidão ou compartilha um
+pedido, a pessoa afetada recebe um aviso: aparece em "Novidades" na aba Círculos (com selo na aba)
+e, se ela ativou, como notificação push (Firebase). O texto do pedido nunca vai na notificação.
+Cada pessoa liga ou desliga os avisos dos círculos, os lembretes e os recados de retorno em
+Configurações (migration 00018, edge function `notify-circle-events`, `docs/push-setup.md`).
+Fica para depois: fotos e comentários.
 
 ## 13. UX e navegação
 

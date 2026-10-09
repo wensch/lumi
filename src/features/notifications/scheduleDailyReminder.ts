@@ -216,7 +216,7 @@ export type PlannedReminder = { identifier: string; date: Date; content: Reminde
  *  - hoje e amanhã: o lembrete principal no horário escolhido e o alternativo (mais leve, 4h depois,
  *    nunca depois das 22h), cada um com um texto diferente por dia da semana;
  *  - 2, 5 e 10 dias à frente: recado de retorno, que só chega se a pessoa não abrir o app antes
- *    (abrir reagenda tudo e o recado nunca dispara).
+ *    (abrir reagenda tudo e o recado nunca dispara). `returnNotes: false` desliga esses recados.
  * Passado o último, nada mais é planejado até o app ser aberto de novo. `skipToday` é para quem já
  * concluiu o momento de hoje. Horário que já passou (ou está a segundos de passar) fica de fora.
  */
@@ -225,7 +225,7 @@ export function planReminders(
   hour: number,
   minute: number,
   language: LanguageCode,
-  options: { skipToday?: boolean } = {},
+  options: { skipToday?: boolean; returnNotes?: boolean } = {},
 ): PlannedReminder[] {
   const copy = REMINDER_COPY[language];
   const returns = RETURN_COPY[language];
@@ -250,8 +250,10 @@ export function planReminders(
     }
   }
 
-  for (const [index, offset] of RETURN_OFFSETS.entries()) {
-    add(`${RETURN_PREFIX}${offset}`, dayAt(offset, hour), returns[index]);
+  if (options.returnNotes !== false) {
+    for (const [index, offset] of RETURN_OFFSETS.entries()) {
+      add(`${RETURN_PREFIX}${offset}`, dayAt(offset, hour), returns[index]);
+    }
   }
 
   return planned;
@@ -260,7 +262,7 @@ export function planReminders(
 /** Agenda no sistema o que `planReminders` calculou, substituindo qualquer agendamento anterior. */
 export async function scheduleDailyReminder(
   preferredTime: string,
-  options: { skipToday?: boolean } = {},
+  options: { skipToday?: boolean; returnNotes?: boolean } = {},
 ) {
   await cancelDailyReminder();
 

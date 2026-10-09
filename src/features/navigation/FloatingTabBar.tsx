@@ -53,7 +53,16 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
             accessibilityState={isFocused ? { selected: true } : {}}
             style={[styles.tab, compact && styles.tabCompact, isFocused && styles.tabActive]}
           >
-            <Ionicons name={iconName} size={22} color={theme.colors.ink} />
+            <View>
+              <Ionicons name={iconName} size={22} color={theme.colors.ink} />
+              {options.tabBarBadge ? (
+                <View style={styles.badge} accessibilityElementsHidden>
+                  <Text style={styles.badgeText} maxFontSizeMultiplier={1}>
+                    {Number(options.tabBarBadge) > 9 ? '9+' : String(options.tabBarBadge)}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
             <Text style={styles.label} maxFontSizeMultiplier={1.25}>
               {label}
             </Text>
@@ -66,6 +75,26 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
 
 const getStyles = (theme: Theme) =>
   StyleSheet.create({
+    badge: {
+      position: 'absolute',
+      top: -5,
+      right: -9,
+      minWidth: 17,
+      height: 17,
+      paddingHorizontal: 3,
+      borderRadius: 9,
+      backgroundColor: theme.colors.danger,
+      borderWidth: 1.5,
+      borderColor: theme.colors.white,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    badgeText: {
+      color: theme.colors.white,
+      fontSize: 10,
+      lineHeight: 12,
+      fontWeight: '800',
+    },
     container: {
       position: 'absolute',
       left: 14,

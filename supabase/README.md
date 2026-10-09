@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00017
+## Migrations 00004 a 00018
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -99,3 +99,11 @@ A `00017_more_achievements.sql` amplia o catálogo de 3 para 14 conquistas (sequ
 10/50/100 momentos, primeira reflexão, recomeço, primeiro círculo e primeira torcida) e recria
 `complete_devotional_session` avaliando todas ao concluir o momento. Não usa `DROP` nem `DELETE`,
 então o conector do Supabase aplica sozinho.
+
+A `00018_circle_events_and_push.sql` cria os avisos dos círculos (`circle_events`), os tokens de push
+(`device_tokens`), as colunas `return_enabled`, `circles_enabled` e `language` em
+`notification_preferences`, e faz torcer/orar/gratidão/novo pedido gerarem avisos. Depois de
+aplicá-la, publique a edge function `supabase/functions/notify-circle-events` e siga
+`docs/push-setup.md` (Firebase + os segredos `FCM_SERVICE_ACCOUNT` no Supabase e
+`GOOGLE_SERVICES_JSON_BASE64` no GitHub). Sem os segredos o push não sai, mas os avisos aparecem
+dentro do app.

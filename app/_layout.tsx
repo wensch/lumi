@@ -26,7 +26,11 @@ import {
 import { Button, LoadingScreen, Screen } from '@/components';
 import { AuthProvider, useAuth } from '@/features/auth';
 import { ProfileProvider, useProfile, useTimezoneSync } from '@/features/onboarding';
-import { configureNotificationHandler, useNotificationScheduler } from '@/features/notifications';
+import {
+  configureNotificationHandler,
+  usePushSetup,
+  useNotificationScheduler,
+} from '@/features/notifications';
 import { LumiOutfitProvider } from '@/features/lumi';
 import { ThemeProvider, useTheme } from '@/theme';
 import { I18nProvider, useTranslation } from '@/i18n';
@@ -151,6 +155,7 @@ function RootNavigation() {
   const segments = useSegments();
 
   useNotificationScheduler();
+  usePushSetup();
   useTimezoneSync();
 
   const ready = !authLoading && !(session && profileLoading);

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { CircleDetail, CircleSummary, PrayerRequest } from './types';
+import type { CircleDetail, CircleEventsResult, CircleSummary, PrayerRequest } from './types';
 
 /** Códigos de erro que as funções do banco levantam (migration 00015); o app os traduz. */
 export type CircleErrorCode =
@@ -49,6 +49,23 @@ async function call<T>(
   }
 }
 
+/**
+ * Pede à edge function que envie o push dos avisos que acabei de gerar (torcida, oração...).
+ * Sem esperar e sem falhar: o aviso já está salvo e aparece dentro do app de qualquer jeito.
+ */
+function notifyCircleEvents() {
+  Promise.resolve(supabase.functions.invoke('notify-circle-events')).catch(() => {});
+}
+
+/** Depois de uma ação que gera aviso, dispara o push se ela deu certo. */
+async function callAndNotify<T>(
+  run: () => PromiseLike<{ data: unknown; error: { message?: string } | null }>,
+): Promise<Result<T>> {
+  const result = await call<T>(run);
+  if (!result.error) notifyCircleEvents();
+  return result;
+}
+
 export const circlesApi = {
   list: () => call<CircleSummary[]>(() => supabase.rpc('my_circles')),
   detail: (circleId: string) =>
@@ -66,21 +83,24 @@ export const circlesApi = {
       supabase.rpc('remove_circle_member', { p_circle_id: circleId, p_user_id: userId }),
     ),
   cheer: (circleId: string, toUser: string) =>
-    call<null>(() =>
+    callAndNotify<null>(() =>
       supabase.rpc('cheer_circle_member', { p_circle_id: circleId, p_to_user: toUser }),
     ),
   prayers: (circleId: string) =>
     call<PrayerRequest[]>(() => supabase.rpc('list_prayer_requests', { p_circle_id: circleId })),
   createPrayer: (circleId: string, body: string) =>
-    call<string>(() =>
+    callAndNotify<string>(() =>
       supabase.rpc('create_prayer_request', { p_circle_id: circleId, p_body: body }),
     ),
   pray: (requestId: string) =>
-    call<null>(() => supabase.rpc('pray_for_request', { p_request_id: requestId })),
+    callAndNotify<null>(() => supabase.rpc('pray_for_request', { p_request_id: requestId })),
   resolvePrayer: (requestId: string) =>
-    call<null>(() => supabase.rpc('resolve_prayer_request', { p_request_id: requestId })),
+    callAndNotify<null>(() => supabase.rpc('resolve_prayer_request', { p_request_id: requestId })),
   deletePrayer: (requestId: string) =>
     call<null>(() => supabase.rpc('delete_prayer_request', { p_request_id: requestId })),
+  events: (limit = 30) =>
+    call<CircleEventsResult>(() => supabase.rpc('my_circle_events', { p_limit: limit })),
+  markEventsRead: () => call<null>(() => supabase.rpc('mark_circle_events_read')),
   report: (circleId: string, requestId: string | null, userId: string | null, reason: string) =>
     call<null>(() =>
       supabase.rpc('report_circle_content', {

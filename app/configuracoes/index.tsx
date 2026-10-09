@@ -30,8 +30,17 @@ export default function ConfiguracoesScreen() {
   const styles = getStyles(theme);
   const { t, language, setLanguage } = useTranslation();
   const { session, signOut } = useAuth();
-  const { remindersEnabled, preferredTime, loading, updatePreferredTime, setRemindersEnabled } =
-    useNotificationPreferences();
+  const {
+    remindersEnabled,
+    preferredTime,
+    returnEnabled,
+    circlesEnabled,
+    loading,
+    updatePreferredTime,
+    setRemindersEnabled,
+    setReturnEnabled,
+    setCirclesEnabled,
+  } = useNotificationPreferences();
   const [showPicker, setShowPicker] = useState(false);
   // Permissão negada no sistema: o lembrete está "ligado" no app mas nada chegaria.
   const [permissionBlocked, setPermissionBlocked] = useState(false);
@@ -49,6 +58,15 @@ export default function ConfiguracoesScreen() {
       if (!granted) return;
     }
     await setRemindersEnabled(enabled);
+  };
+
+  const handleToggleCircles = async (enabled: boolean) => {
+    if (enabled) {
+      const granted = await requestNotificationPermission();
+      setPermissionBlocked(!granted);
+      if (!granted) return;
+    }
+    await setCirclesEnabled(enabled);
   };
 
   const handleTimeChange = async (selectedDate: Date | undefined) => {
@@ -108,7 +126,44 @@ export default function ConfiguracoesScreen() {
                 }
               />
             ) : null}
+
+            <View style={styles.row}>
+              <Text style={[theme.typography.bodyStrong, styles.rowLabel]}>
+                {t('settings.returnNotes')}
+              </Text>
+              <Switch
+                value={returnEnabled}
+                onValueChange={setReturnEnabled}
+                disabled={loading}
+                accessibilityLabel={t('settings.returnNotes')}
+                trackColor={{ true: theme.colors.green, false: theme.colors.bg }}
+              />
+            </View>
+            <Text style={styles.helperText}>{t('settings.returnNotesHint')}</Text>
           </>
+        ) : null}
+      </Section>
+
+      <Section label={t('tabs.circles')}>
+        <View style={styles.row}>
+          <Text style={[theme.typography.bodyStrong, styles.rowLabel]}>
+            {t('settings.circleAlerts')}
+          </Text>
+          <Switch
+            value={circlesEnabled}
+            onValueChange={handleToggleCircles}
+            disabled={loading}
+            accessibilityLabel={t('settings.circleAlerts')}
+            trackColor={{ true: theme.colors.green, false: theme.colors.bg }}
+          />
+        </View>
+        <Text style={styles.helperText}>{t('settings.circleAlertsHint')}</Text>
+        {circlesEnabled && permissionBlocked ? (
+          <Button
+            variant="ghost"
+            label={t('settings.openSystemSettings')}
+            onPress={() => Linking.openSettings().catch(() => {})}
+          />
         ) : null}
       </Section>
 
@@ -229,6 +284,10 @@ const getStyles = (theme: Theme) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      gap: theme.spacing.sm,
+    },
+    rowLabel: {
+      flex: 1,
     },
     helperText: {
       ...theme.typography.caption,

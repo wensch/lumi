@@ -9,8 +9,8 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 3. ✅ **Evolução do Lumi** (12 itens em 5 categorias, marcos 7/14/21/30/50/100/200/365, movimento nos itens especiais) — itens liberados por constância (7, 14, 30, 50, 100 dias), conforme briefing §8.7.
 
 ## Bloco B — Social completo (Fase 3)
-4. **Notificação push entre membros** — "fulano orou por você", "fulano torceu por você" (token no banco + Edge Function, respeitando as preferências).
-5. **Preferências de notificação** — ligar/desligar lembretes, recados de retorno e avisos do círculo.
+4. ✅ **Notificação push entre membros** (código pronto; falta o Firebase: docs/push-setup.md) — "fulano orou por você", "fulano torceu por você" (token no banco + Edge Function, respeitando as preferências).
+5. ✅ **Preferências de notificação** — ligar/desligar lembretes, recados de retorno e avisos do círculo.
 
 ## Bloco C — Expansão (Fase 4)
 6. **Planos de leitura** — séries de 7 a 30 dias sobre um tema, com progresso.

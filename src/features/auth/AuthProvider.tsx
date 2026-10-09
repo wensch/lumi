@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { cancelDailyReminder } from '@/features/notifications/scheduleDailyReminder';
+import { unregisterPushToken } from '@/features/notifications/pushToken';
 import { AUTH_REDIRECT_URL, useAuthDeepLink } from './useAuthDeepLink';
 
 type AuthContextValue = {
@@ -93,6 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Os lembretes ficam agendados no aparelho, não na conta: sem isso continuariam
         // chegando depois de sair (e outra conta herdaria o horário da anterior).
         await cancelDailyReminder().catch(() => {});
+        // Precisa da sessão ainda ativa: depois do signOut o servidor não saberia de quem é o token.
+        await unregisterPushToken();
         setIsPasswordRecovery(false);
         await supabase.auth.signOut();
       },

@@ -1,8 +1,21 @@
-import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
-import { circlesApi, takePendingInvite, useCircles, type CircleSummary } from '@/features/circles';
+import {
+  circlesApi,
+  takePendingInvite,
+  useCircleEvents,
+  useCircles,
+  type CircleEvent,
+  type CircleSummary,
+} from '@/features/circles';
+import {
+  hasNotificationPermission,
+  registerPushToken,
+  requestNotificationPermission,
+} from '@/features/notifications';
+import { useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -14,6 +27,35 @@ export default function CirculosScreen() {
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const { circles, loading, error, refetch } = useCircles();
+  const { session } = useAuth();
+  const userId = session?.user.id ?? null;
+  const { items: events, refresh: refreshEvents, markAllRead } = useCircleEvents();
+  // Já tem permissão para avisos? Sem ela, oferecemos ativar (só para quem tem círculo).
+  const [pushGranted, setPushGranted] = useState(true);
+  const [pushBlocked, setPushBlocked] = useState(false);
+
+  useEffect(() => {
+    hasNotificationPermission()
+      .then((granted) => setPushGranted(granted))
+      .catch(() => {});
+  }, []);
+
+  // Ao entrar na aba traz os avisos; ao sair, considera tudo visto.
+  useFocusEffect(
+    useCallback(() => {
+      refreshEvents();
+      return () => {
+        markAllRead();
+      };
+    }, [refreshEvents, markAllRead]),
+  );
+
+  const enablePush = async () => {
+    const granted = await requestNotificationPermission();
+    setPushGranted(granted);
+    setPushBlocked(!granted);
+    if (granted && userId) await registerPushToken(userId);
+  };
   const [mode, setMode] = useState<Mode>('none');
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
@@ -110,6 +152,31 @@ export default function CirculosScreen() {
             </>
           )}
 
+          {events.length > 0 ? (
+            <Card style={styles.newsCard}>
+              <Text style={styles.newsTitle}>{t('circles.newsTitle')}</Text>
+              {events.slice(0, 5).map((event) => (
+                <EventRow key={event.id} event={event} theme={theme} />
+              ))}
+            </Card>
+          ) : null}
+
+          {circles.length > 0 && !pushGranted ? (
+            <Card style={styles.newsCard}>
+              <Text style={theme.typography.bodyStrong}>{t('circles.pushPromptTitle')}</Text>
+              <Text style={[theme.typography.caption, styles.mutedText]}>
+                {pushBlocked ? t('circles.pushPromptBlocked') : t('circles.pushPromptBody')}
+              </Text>
+              <Button
+                label={
+                  pushBlocked ? t('settings.openSystemSettings') : t('circles.pushPromptAction')
+                }
+                variant="secondary"
+                onPress={pushBlocked ? () => Linking.openSettings().catch(() => {}) : enablePush}
+              />
+            </Card>
+          ) : null}
+
           <View style={styles.actions}>
             <Button
               label={t('circles.create')}
@@ -168,6 +235,26 @@ export default function CirculosScreen() {
         </>
       )}
     </Screen>
+  );
+}
+
+function EventRow({ event, theme }: { event: CircleEvent; theme: Theme }) {
+  const styles = getStyles(theme);
+  const { t } = useTranslation();
+  return (
+    <Pressable
+      onPress={() => router.push(`/circulo/${event.circle_id}`)}
+      accessibilityRole="button"
+      style={[styles.eventRow, !event.read && styles.eventRowUnread]}
+    >
+      <Text style={[theme.typography.body, !event.read && styles.eventTextUnread]}>
+        {t(`circles.events.${event.kind}`, { name: event.actor_name })}
+      </Text>
+      <Text style={[theme.typography.caption, styles.mutedText]} numberOfLines={1}>
+        {event.circle_name}
+        {event.snippet ? ` · ${event.snippet}` : ''}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -238,6 +325,27 @@ const getStyles = (theme: Theme) =>
     },
     presenceDotOn: {
       backgroundColor: theme.colors.green,
+    },
+    newsCard: {
+      gap: theme.spacing.sm,
+    },
+    newsTitle: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    eventRow: {
+      gap: 2,
+      paddingVertical: 6,
+      paddingHorizontal: theme.spacing.sm,
+      borderRadius: theme.radius.md,
+    },
+    eventRowUnread: {
+      backgroundColor: theme.colors.yellow,
+    },
+    eventTextUnread: {
+      fontFamily: theme.typography.bodyStrong.fontFamily,
     },
     actions: {
       gap: theme.spacing.sm,

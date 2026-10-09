@@ -4,3 +4,4 @@ export * from './useCircles';
 export * from './useCircle';
 export * from './inviteLinks';
 export * from './InviteShare';
+export * from './CircleEventsProvider';

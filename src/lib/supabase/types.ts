@@ -194,6 +194,12 @@ export interface Database {
           reminders_enabled: boolean;
           preferred_time: string | null;
           intensity: NotificationIntensity;
+          /** Recados de retorno (2, 5 e 10 dias sem abrir o app). */
+          return_enabled: boolean;
+          /** Avisos dos círculos (push). */
+          circles_enabled: boolean;
+          /** Idioma dos textos das notificações push. */
+          language: 'pt' | 'en';
           updated_at: string;
         };
         Insert: Partial<Database['public']['Tables']['notification_preferences']['Row']> & {
@@ -283,6 +289,22 @@ export interface Database {
           p_reported_user_id: string | null;
           p_reason: string;
         };
+        Returns: undefined;
+      };
+      my_circle_events: {
+        Args: { p_limit?: number };
+        Returns: unknown;
+      };
+      mark_circle_events_read: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
+      register_device_token: {
+        Args: { p_token: string; p_platform: 'android' | 'ios' };
+        Returns: undefined;
+      };
+      deactivate_device_token: {
+        Args: { p_token: string };
         Returns: undefined;
       };
       consume_ai_quota: {

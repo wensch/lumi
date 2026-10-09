@@ -1,16 +1,24 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
-import { scheduleDailyReminder, cancelDailyReminder } from '@/features/notifications';
+import {
+  scheduleDailyReminder,
+  cancelDailyReminder,
+  registerPushToken,
+} from '@/features/notifications';
 
 type Preferences = {
   remindersEnabled: boolean;
   preferredTime: string | null;
+  returnEnabled: boolean;
+  circlesEnabled: boolean;
 };
 
 const DEFAULT_PREFERENCES: Preferences = {
   remindersEnabled: true,
   preferredTime: null,
+  returnEnabled: true,
+  circlesEnabled: true,
 };
 
 export function useNotificationPreferences() {
@@ -23,13 +31,15 @@ export function useNotificationPreferences() {
     setLoading(true);
     const { data } = await supabase
       .from('notification_preferences')
-      .select('reminders_enabled, preferred_time')
+      .select('reminders_enabled, preferred_time, return_enabled, circles_enabled')
       .eq('user_id', userId)
       .single();
 
     setPreferences({
       remindersEnabled: data?.reminders_enabled ?? true,
       preferredTime: data?.preferred_time ?? null,
+      returnEnabled: data?.return_enabled ?? true,
+      circlesEnabled: data?.circles_enabled ?? true,
     });
     setLoading(false);
   }, []);
@@ -56,10 +66,10 @@ export function useNotificationPreferences() {
       setPreferences((prev) => ({ ...prev, preferredTime: time }));
 
       if (preferences.remindersEnabled) {
-        await scheduleDailyReminder(time);
+        await scheduleDailyReminder(time, { returnNotes: preferences.returnEnabled });
       }
     },
-    [userId, preferences.remindersEnabled],
+    [userId, preferences.remindersEnabled, preferences.returnEnabled],
   );
 
   const setRemindersEnabled = useCallback(
@@ -74,13 +84,55 @@ export function useNotificationPreferences() {
       setPreferences((prev) => ({ ...prev, remindersEnabled: enabled }));
 
       if (enabled && preferences.preferredTime) {
-        await scheduleDailyReminder(preferences.preferredTime);
+        await scheduleDailyReminder(preferences.preferredTime, {
+          returnNotes: preferences.returnEnabled,
+        });
       } else {
         await cancelDailyReminder();
       }
     },
-    [userId, preferences.preferredTime],
+    [userId, preferences.preferredTime, preferences.returnEnabled],
   );
 
-  return { ...preferences, loading, updatePreferredTime, setRemindersEnabled };
+  const setReturnEnabled = useCallback(
+    async (enabled: boolean) => {
+      if (!userId) return;
+
+      await supabase
+        .from('notification_preferences')
+        .update({ return_enabled: enabled, updated_at: new Date().toISOString() })
+        .eq('user_id', userId);
+
+      setPreferences((prev) => ({ ...prev, returnEnabled: enabled }));
+
+      if (preferences.remindersEnabled && preferences.preferredTime) {
+        await scheduleDailyReminder(preferences.preferredTime, { returnNotes: enabled });
+      }
+    },
+    [userId, preferences.remindersEnabled, preferences.preferredTime],
+  );
+
+  const setCirclesEnabled = useCallback(
+    async (enabled: boolean) => {
+      if (!userId) return;
+
+      await supabase
+        .from('notification_preferences')
+        .update({ circles_enabled: enabled, updated_at: new Date().toISOString() })
+        .eq('user_id', userId);
+
+      setPreferences((prev) => ({ ...prev, circlesEnabled: enabled }));
+      if (enabled) await registerPushToken(userId);
+    },
+    [userId],
+  );
+
+  return {
+    ...preferences,
+    loading,
+    updatePreferredTime,
+    setRemindersEnabled,
+    setReturnEnabled,
+    setCirclesEnabled,
+  };
 }
