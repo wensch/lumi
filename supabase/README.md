@@ -99,4 +99,3 @@ A `00017_more_achievements.sql` amplia o catálogo de 3 para 14 conquistas (sequ
 10/50/100 momentos, primeira reflexão, recomeço, primeiro círculo e primeira torcida) e recria
 `complete_devotional_session` avaliando todas ao concluir o momento. Não usa `DROP` nem `DELETE`,
 então o conector do Supabase aplica sozinho.
-
