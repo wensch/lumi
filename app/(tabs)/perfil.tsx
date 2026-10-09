@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Section, Skeleton } from '@/components';
 import { isKnownAchievement } from '@/features/achievements';
@@ -53,8 +53,25 @@ export default function PerfilScreen() {
               <View style={styles.achievementsGrid}>
                 {allAchievements.map((achievement) => {
                   const unlocked = unlockedAchievementIds.has(achievement.id);
+                  const known = isKnownAchievement(achievement.code);
+                  const title = known ? t(`achievements.${achievement.code}`) : achievement.title;
                   return (
-                    <View key={achievement.id} style={styles.achievementItem}>
+                    <Pressable
+                      key={achievement.id}
+                      accessibilityRole="button"
+                      accessibilityLabel={title}
+                      onPress={() =>
+                        Alert.alert(
+                          `${unlocked ? achievement.icon : '🔒'} ${title}`,
+                          `${t(unlocked ? 'achievementTap.unlocked' : 'achievementTap.locked')}\n${
+                            known
+                              ? t(`achievementHints.${achievement.code}`)
+                              : achievement.description
+                          }`,
+                        )
+                      }
+                      style={styles.achievementItem}
+                    >
                       <View
                         style={[styles.achievementCircle, !unlocked && styles.achievementLocked]}
                       >
@@ -62,12 +79,8 @@ export default function PerfilScreen() {
                           {unlocked ? achievement.icon : '🔒'}
                         </Text>
                       </View>
-                      <Text style={styles.achievementLabel}>
-                        {isKnownAchievement(achievement.code)
-                          ? t(`achievements.${achievement.code}`)
-                          : achievement.title}
-                      </Text>
-                    </View>
+                      <Text style={styles.achievementLabel}>{title}</Text>
+                    </Pressable>
                   );
                 })}
               </View>

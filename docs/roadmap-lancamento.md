@@ -4,8 +4,8 @@ Decisão do produto (09/10/2026): terminar **tudo**, inclusive a Fase 4, antes d
 Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 
 ## Bloco A — Fechar a experiência (Fase 2)
-1. **Folga** (proteção de sequência) — 1 dia perdido não zera a sequência. Ganha 1 Folga a cada 7 dias seguidos (máx. 2), usada sozinha. Sem culpa e sem nome religioso (o briefing §7.3 pede cuidado para não banalizar "Graça").
-2. **Mais conquistas** — marcos de sequência (3, 14, 50, 100), primeira reflexão, primeira vez no círculo, volta depois de uma pausa.
+1. ✅ **Folga** (proteção de sequência) — 1 dia perdido não zera a sequência. Ganha 1 Folga a cada 7 dias seguidos (máx. 2), usada sozinha. Sem culpa e sem nome religioso (o briefing §7.3 pede cuidado para não banalizar "Graça").
+2. ✅ **Mais conquistas** (14, migration 00017) — marcos de sequência (3, 14, 50, 100), primeira reflexão, primeira vez no círculo, volta depois de uma pausa.
 3. **Evolução do Lumi** — itens liberados por constância (7, 14, 30, 50, 100 dias), conforme briefing §8.7.
 
 ## Bloco B — Social completo (Fase 3)

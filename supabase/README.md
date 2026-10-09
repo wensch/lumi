@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00016
+## Migrations 00004 a 00017
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -94,3 +94,9 @@ A `00016_streak_freeze.sql` cria a **Folga** (proteção de sequência): colunas
 `freeze_used`, `freeze_earned` e `freezes_left`. O conector do Supabase cancela SQL com `DROP` ou
 `DELETE`; nesse caso rode `supabase/patches/00016_streak_freeze_function.sql` pelo SQL Editor.
 Seguro com o app antigo no ar (os campos novos são só extras no retorno).
+
+A `00017_more_achievements.sql` amplia o catálogo de 3 para 14 conquistas (sequências de 3 a 100 dias,
+10/50/100 momentos, primeira reflexão, recomeço, primeiro círculo e primeira torcida) e recria
+`complete_devotional_session` avaliando todas ao concluir o momento. Não usa `DROP` nem `DELETE`,
+então o conector do Supabase aplica sozinho.
+
