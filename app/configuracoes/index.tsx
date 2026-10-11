@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Screen, ScreenHeader, Section } from '@/components';
 import { useAuth } from '@/features/auth';
@@ -10,6 +9,7 @@ import { useAppUpdate } from '@/features/updates';
 import { hasNotificationPermission, requestNotificationPermission } from '@/features/notifications';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation, type LanguageCode } from '@/i18n';
+import { goBackOrHome } from '@/lib/navigation';
 
 function timeStringToDate(time: string | null): Date {
   if (!time) return new Date(2000, 0, 1, 8, 0);
@@ -81,7 +81,7 @@ export default function ConfiguracoesScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={t('settings.title')} onBackPress={() => router.back()} />
+      <ScreenHeader title={t('settings.title')} onBackPress={goBackOrHome} />
 
       <Section label={t('settings.reminders')}>
         <View style={styles.row}>

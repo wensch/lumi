@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { cancelDailyReminder } from '@/features/notifications/scheduleDailyReminder';
 import { unregisterPushToken } from '@/features/notifications/pushToken';
+import { takePendingInvite } from '@/features/circles/inviteLinks';
 import { AUTH_REDIRECT_URL, useAuthDeepLink } from './useAuthDeepLink';
 
 type AuthContextValue = {
@@ -31,13 +32,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useAuthDeepLink(setIsPasswordRecovery);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => setSession(data.session))
+      // Falha ao ler a sessão guardada (armazenamento): segue como deslogado em vez de travar na abertura.
+      .catch(() => {})
+      .finally(() => setLoading(false));
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, nextSession) => {
       setSession(nextSession);
+      // Sessão expirada ou revogada também encerra a conta neste aparelho: lembretes locais não ficam.
+      if (event === 'SIGNED_OUT') cancelDailyReminder().catch(() => {});
     });
 
     return () => subscription.subscription.unsubscribe();
@@ -93,11 +98,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut: async () => {
         // Os lembretes ficam agendados no aparelho, não na conta: sem isso continuariam
         // chegando depois de sair (e outra conta herdaria o horário da anterior).
-        await cancelDailyReminder().catch(() => {});
-        // Precisa da sessão ainda ativa: depois do signOut o servidor não saberia de quem é o token.
-        await unregisterPushToken();
+        // A limpeza tem no máximo 3 s: com rede ruim o "Sair" não pode parecer travado.
+        const cleanup = (async () => {
+          await cancelDailyReminder().catch(() => {});
+          // Precisa da sessão ainda ativa: depois do signOut o servidor não saberia de quem é o token.
+          await unregisterPushToken();
+          // Um convite pendente é da pessoa que abriu o link, não da próxima conta do aparelho.
+          await takePendingInvite().catch(() => {});
+        })();
+        await Promise.race([cleanup, new Promise((resolve) => setTimeout(resolve, 3000))]);
         setIsPasswordRecovery(false);
-        await supabase.auth.signOut();
+        // Só neste aparelho: o padrão ('global') também deslogaria a pessoa dos outros aparelhos.
+        await supabase.auth.signOut({ scope: 'local' });
       },
     }),
     [session, loading, isPasswordRecovery],

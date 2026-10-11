@@ -35,6 +35,7 @@ export function useProfileHistory() {
   const userId = session?.user.id ?? null;
   const [history, setHistory] = useState<ProfileHistory>(EMPTY_HISTORY);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const fetchHistory = useCallback(async (userId: string) => {
     setLoading(true);
@@ -57,6 +58,14 @@ export function useProfileHistory() {
         supabase.from('achievements').select('*').order('sort_order'),
         supabase.from('user_achievements').select('achievement_id').eq('user_id', userId),
       ]);
+
+    // Falha de rede: não mostra "0 dias, 0 XP, sem conquistas" como se fosse a verdade.
+    if (streakResult.error || sessionsResult.error || achievementsResult.error) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+    setError(false);
 
     setHistory({
       currentStreak: activeStreak(
@@ -92,5 +101,9 @@ export function useProfileHistory() {
     // incluso) — usar userId em vez de session evita refetch espúrio.
   }, [userId, fetchHistory]);
 
-  return { ...history, loading };
+  const refetch = useCallback(async () => {
+    if (userId) await fetchHistory(userId);
+  }, [userId, fetchHistory]);
+
+  return { ...history, loading, error, refetch };
 }

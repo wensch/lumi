@@ -37,7 +37,8 @@ export async function fetchLatestBuild(): Promise<LatestBuild | null> {
     const build = Number(/Build #(\d+)/.exec(release.body ?? '')?.[1]);
     const apkUrl = release.assets?.find((asset) => asset.name === APK_NAME)?.browser_download_url;
 
-    if (!build || !apkUrl) return null;
+    // O link vai para o navegador/instalador: só aceita download do GitHub.
+    if (!build || !apkUrl || !apkUrl.startsWith('https://github.com/')) return null;
     return { build, apkUrl };
   } finally {
     clearTimeout(timeout);

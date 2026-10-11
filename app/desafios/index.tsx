@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
-import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
 import {
@@ -12,6 +11,7 @@ import {
 } from '@/features/challenges';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
+import { goBackOrHome } from '@/lib/navigation';
 
 export default function DesafiosScreen() {
   const theme = useTheme();
@@ -48,7 +48,7 @@ export default function DesafiosScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={t('challenges.title')} onBackPress={() => router.back()} />
+      <ScreenHeader title={t('challenges.title')} onBackPress={goBackOrHome} />
       <Text style={[theme.typography.caption, styles.muted]}>{t('challenges.intro')}</Text>
 
       {loading ? (

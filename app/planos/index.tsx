@@ -4,6 +4,7 @@ import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/componen
 import { usePlans, type PlanSummary } from '@/features/plans';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
+import { goBackOrHome } from '@/lib/navigation';
 
 export default function PlanosScreen() {
   const theme = useTheme();
@@ -13,7 +14,7 @@ export default function PlanosScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={t('plans.title')} onBackPress={() => router.back()} />
+      <ScreenHeader title={t('plans.title')} onBackPress={goBackOrHome} />
       <Text style={[theme.typography.caption, styles.muted]}>{t('plans.intro')}</Text>
 
       {loading ? (

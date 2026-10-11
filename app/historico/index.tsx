@@ -1,9 +1,9 @@
 import { Alert, StyleSheet, Text, View } from 'react-native';
-import { router } from 'expo-router';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
 import { useJournal, type JournalEntry } from '@/features/profile';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
+import { goBackOrHome } from '@/lib/navigation';
 
 export default function HistoricoScreen() {
   const theme = useTheme();
@@ -27,7 +27,7 @@ export default function HistoricoScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={t('journal.title')} onBackPress={() => router.back()} />
+      <ScreenHeader title={t('journal.title')} onBackPress={goBackOrHome} />
       <Text style={[theme.typography.caption, styles.muted]}>{t('journal.private')}</Text>
 
       {loading ? (

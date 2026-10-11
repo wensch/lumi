@@ -51,8 +51,9 @@ export async function unregisterPushToken(): Promise<void> {
     const marker = await AsyncStorage.getItem(TOKEN_KEY);
     if (!marker) return;
     const token = marker.slice(marker.indexOf(':') + 1);
-    await supabase.rpc('deactivate_device_token', { p_token: token });
-    await AsyncStorage.removeItem(TOKEN_KEY);
+    const { error } = await supabase.rpc('deactivate_device_token', { p_token: token });
+    // Falhou (sem rede, sessão já inválida): mantém o marcador para uma próxima tentativa.
+    if (!error) await AsyncStorage.removeItem(TOKEN_KEY);
   } catch {
     // Melhor esforço.
   }

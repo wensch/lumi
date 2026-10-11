@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -35,6 +36,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Usuário atual: resposta atrasada de quem já saiu/trocou de conta é descartada.
+  const activeUserId = useRef<string | null>(null);
 
   const fetchProfile = useCallback(async (id: string) => {
     const { data, error: fetchError } = await supabase
@@ -42,6 +45,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       .select('*')
       .eq('id', id)
       .single();
+
+    if (activeUserId.current !== id) return;
 
     if (fetchError) {
       // Falha de rede/servidor: mantém o último perfil conhecido em vez de
@@ -61,6 +66,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setError(null);
     setLoadedFor(null);
     /* eslint-enable react-hooks/set-state-in-effect */
+    activeUserId.current = userId;
     if (!userId) return;
     fetchProfile(userId);
     // session muda de referência a cada onAuthStateChange (inclui

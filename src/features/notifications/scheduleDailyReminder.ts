@@ -259,12 +259,30 @@ export function planReminders(
   return planned;
 }
 
+/**
+ * Agendar e cancelar lembretes são várias chamadas ao sistema; duas operações ao mesmo tempo (o seletor
+ * de hora mexendo, sincronização ao abrir, sair da conta) se misturariam. Tudo entra numa fila.
+ */
+let reminderQueue: Promise<unknown> = Promise.resolve();
+function enqueueReminderWork<T>(work: () => Promise<T>): Promise<T> {
+  const next = reminderQueue.then(work, work);
+  reminderQueue = next.catch(() => {});
+  return next;
+}
+
 /** Agenda no sistema o que `planReminders` calculou, substituindo qualquer agendamento anterior. */
-export async function scheduleDailyReminder(
+export function scheduleDailyReminder(
   preferredTime: string,
   options: { skipToday?: boolean; returnNotes?: boolean } = {},
 ) {
-  await cancelDailyReminder();
+  return enqueueReminderWork(() => scheduleNow(preferredTime, options));
+}
+
+async function scheduleNow(
+  preferredTime: string,
+  options: { skipToday?: boolean; returnNotes?: boolean },
+) {
+  await cancelAllScheduled();
 
   const [hourStr, minuteStr] = preferredTime.split(':');
   const hour = Number(hourStr);
@@ -301,7 +319,11 @@ export async function cancelTodaysReminders() {
 }
 
 /** O app só agenda lembretes próprios, então limpar tudo também apaga os agendamentos das versões antigas. */
-export async function cancelDailyReminder() {
+export function cancelDailyReminder() {
+  return enqueueReminderWork(cancelAllScheduled);
+}
+
+async function cancelAllScheduled() {
   await Notifications.cancelAllScheduledNotificationsAsync().catch(() => {});
 }
 

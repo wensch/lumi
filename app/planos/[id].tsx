@@ -11,6 +11,7 @@ import {
 } from '@/features/plans';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
+import { goBackOrHome } from '@/lib/navigation';
 
 export default function PlanoScreen() {
   const theme = useTheme();
@@ -52,7 +53,7 @@ export default function PlanoScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={plan?.title ?? t('plans.title')} onBackPress={() => router.back()} />
+      <ScreenHeader title={plan?.title ?? t('plans.title')} onBackPress={goBackOrHome} />
 
       {loading ? (
         <>

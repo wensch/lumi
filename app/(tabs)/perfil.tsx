@@ -19,6 +19,8 @@ export default function PerfilScreen() {
     allAchievements,
     unlockedAchievementIds,
     loading,
+    error,
+    refetch,
   } = useProfileHistory();
 
   return (
@@ -30,6 +32,11 @@ export default function PerfilScreen() {
 
       {loading ? (
         <PerfilSkeleton />
+      ) : error ? (
+        <Card style={styles.errorCard}>
+          <Text style={[theme.typography.body, styles.centeredText]}>{t('errors.connection')}</Text>
+          <Button label={t('common.retry')} variant="ghost" onPress={refetch} />
+        </Card>
       ) : (
         <>
           <FadeIn>
@@ -155,6 +162,13 @@ function PerfilSkeleton() {
 
 const getStyles = (theme: Theme) =>
   StyleSheet.create({
+    errorCard: {
+      alignItems: 'center',
+      gap: theme.spacing.md,
+    },
+    centeredText: {
+      textAlign: 'center',
+    },
     skeletonFlex: {
       flex: 1,
     },

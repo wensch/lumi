@@ -50,6 +50,9 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
             key={route.key}
             onPress={onPress}
             accessibilityRole="button"
+            accessibilityLabel={
+              options.tabBarBadge ? `${label}, ${String(options.tabBarBadge)}` : label
+            }
             accessibilityState={isFocused ? { selected: true } : {}}
             style={[styles.tab, compact && styles.tabCompact, isFocused && styles.tabActive]}
           >

@@ -138,6 +138,7 @@ export default function OnboardingScreen() {
               value={displayName}
               onChangeText={setDisplayName}
               autoCapitalize="words"
+              maxLength={100}
             />
           </>
         ) : null}

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import { router } from 'expo-router';
 import * as Notifications from 'expo-notifications';
@@ -6,6 +6,8 @@ import { useAuth } from '@/features/auth';
 import { useTranslation } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { registerPushToken, syncPushLanguage } from './pushToken';
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Mantém o push dos círculos em dia: registra o aparelho (se a pessoa quer os avisos e a permissão
@@ -45,8 +47,13 @@ export function usePushSetup() {
   const lastResponse = Notifications.useLastNotificationResponse();
   const responseId = lastResponse?.notification.request.identifier ?? null;
   const circleId = lastResponse?.notification.request.content.data?.circleId;
+  // Cada toque abre o círculo uma vez só: sair e entrar de novo na conta não repete a navegação.
+  const handledResponse = useRef<string | null>(null);
   useEffect(() => {
-    if (!userId || !responseId || typeof circleId !== 'string' || !circleId) return;
+    if (!userId || !responseId || handledResponse.current === responseId) return;
+    // O id vem do payload da notificação e vai para a rota: só aceita um UUID.
+    if (typeof circleId !== 'string' || !UUID_PATTERN.test(circleId)) return;
+    handledResponse.current = responseId;
     router.push(`/circulo/${circleId}`);
   }, [userId, responseId, circleId]);
 }

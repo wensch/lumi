@@ -20,6 +20,7 @@ import {
 } from '@/features/circles';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
+import { goBackOrHome } from '@/lib/navigation';
 
 export default function CirculoScreen() {
   const theme = useTheme();
@@ -142,7 +143,7 @@ export default function CirculoScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={detail?.name ?? t('tabs.circles')} onBackPress={() => router.back()} />
+      <ScreenHeader title={detail?.name ?? t('tabs.circles')} onBackPress={goBackOrHome} />
 
       {loading ? (
         <>

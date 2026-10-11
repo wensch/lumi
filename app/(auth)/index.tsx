@@ -33,11 +33,15 @@ export default function AuthScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [youVersionError, setYouVersionError] = useState<string | null>(null);
   const bridgedYvUserId = useRef<string | null>(null);
+  // O SDK do YouVersion restaura a sessão dele ao abrir; só continua para o login do Lumi (e-mail) se a
+  // pessoa tocou no botão, senão abrir a tela mandaria um link por e-mail sem ninguém pedir.
+  const youVersionFlowStarted = useRef(false);
 
   const handleYouVersionSignIn = async () => {
     setYouVersionError(null);
     setError(null);
     setSubmitting(true);
+    youVersionFlowStarted.current = true;
     try {
       await signInWithYouVersion();
       // userInfo só fica disponível no estado do hook depois que signIn()
@@ -45,11 +49,16 @@ export default function AuthScreen() {
       // no useEffect abaixo, reagindo a yvAuthenticated/yvUserInfo.
     } catch {
       setYouVersionError(t('auth.youVersionError'));
+    } finally {
+      // Cancelar a janela do YouVersion não lança erro nem muda o estado do SDK: sem isto os botões
+      // ficariam desabilitados até fechar o app.
       setSubmitting(false);
     }
   };
 
   useEffect(() => {
+    if (!youVersionFlowStarted.current) return;
+
     if (yvAuthError) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza com erro reportado pelo SDK YouVersion (sistema externo)
       setYouVersionError(t('auth.youVersionError'));
@@ -74,6 +83,8 @@ export default function AuthScreen() {
       const { error: authError } = await signInWithMagicLink(yvUserInfo.email as string);
       setSubmitting(false);
       if (authError) {
+        // Libera a ponte para uma nova tentativa.
+        bridgedYvUserId.current = null;
         setError(translateAuthError(authError, t));
         return;
       }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
+import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
 import { lumiGreeting, useHomeData } from '@/features/home';
 import {
   getJourney,
@@ -18,7 +18,8 @@ export default function LumiScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
-  const { currentStreak, longestStreak, daysSinceLastCompleted, loading } = useHomeData();
+  const { currentStreak, longestStreak, daysSinceLastCompleted, loading, error, refetch } =
+    useHomeData();
   const { outfitIds, toggleOutfit, clearOutfits } = useLumiOutfit();
 
   if (loading) {
@@ -30,6 +31,19 @@ export default function LumiScreen() {
         {Array.from({ length: 5 }, (_, index) => (
           <Skeleton key={index} height={64} radius={theme.radius.md} />
         ))}
+      </Screen>
+    );
+  }
+
+  // Sem rede o Hoje/Lumi ficaria com "0 dias" e o guarda-roupa todo trancado: avisa em vez de mentir.
+  if (error) {
+    return (
+      <Screen>
+        <ScreenHeader title={t('tabs.lumi')} />
+        <Card style={styles.errorCard}>
+          <Text style={[theme.typography.body, styles.centeredText]}>{t('errors.connection')}</Text>
+          <Button label={t('common.retry')} variant="ghost" onPress={refetch} />
+        </Card>
       </Screen>
     );
   }
@@ -235,6 +249,10 @@ const getStyles = (theme: Theme) =>
       alignItems: 'center',
       gap: theme.spacing.xs,
       paddingVertical: theme.spacing.lg,
+    },
+    errorCard: {
+      alignItems: 'center',
+      gap: theme.spacing.md,
     },
     centeredText: {
       textAlign: 'center',

@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00020
+## Migrations 00004 a 00022
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -120,3 +120,11 @@ funções `list_challenges`, `start_challenge`, `abandon_challenge`, `circle_cha
 fim" e recria `complete_devotional_session` (atualiza o progresso dos desafios a cada conclusão).
 Depois dela, rode `supabase/seed-challenges.sql` (6 desafios pessoais e 3 de círculo). Sem `DROP` nem
 `DELETE`.
+
+A `00021_policy_initplan_and_fk_indexes.sql` e a `00022_pente_fino_hardening.sql` vêm do pente fino de
+11/10/2026. A 00021 só melhora desempenho (RLS com `(select auth.uid())` e índices de chaves
+estrangeiras). A 00022 fecha falhas: o cliente deixa de inserir/apagar `profiles` (um fuso inválido
+derrubava os círculos dos outros), tira privilégios sobrantes, faz o prazo dos desafios valer, limita
+quem para o desafio do círculo, endurece `complete_devotional_session` (uma falha nos desafios não
+bloqueia o momento do dia; "momentos" contam dias distintos) e limita 10 sessões abertas por dia.
+Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.
