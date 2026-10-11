@@ -219,6 +219,10 @@ export const en: TranslationSchema = {
     reflectPlaceholder: 'What stuck with you today...',
     close: 'Close',
     askAboutText: 'Ask a question about this text',
+    listen: 'Listen to this text',
+    stopListening: 'Stop reading',
+    listenError:
+      "Couldn't read aloud. Check that your device has an English text-to-speech voice installed (Settings > Language > Text-to-speech).",
     askLabel: 'Your question about this text',
     askPlaceholder: 'What does it mean when it says...',
     asking: 'Asking...',

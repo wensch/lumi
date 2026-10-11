@@ -15,7 +15,7 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 ## Bloco C — Expansão (Fase 4)
 6. ✅ **Planos de leitura** (6 planos de 6 a 30 dias, montados com os devocionais aprovados; migration 00019) — séries sobre um tema, com progresso, um dia por dia.
 7. ✅ **Desafios** (6 pessoais + 3 de círculo, migration 00020) — metas curtas de 7 ou 30 dias, sozinho ou no círculo, com progresso somado e sem ranking.
-8. **Áudio** — leitura em áudio do devocional.
+8. ✅ **Áudio** — botão "ouvir" nos passos de leitura do devocional (versículo e textos), com a voz do próprio aparelho (`expo-speech`): sem internet, sem custo e sem conta; para ao trocar de passo, sair da tela ou ir ao segundo plano.
 9. **Eventos** — datas especiais (Páscoa, Natal, Advento) com conteúdo e itens do Lumi.
 
 ## Bloco D — Qualidade

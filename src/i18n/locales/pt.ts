@@ -222,6 +222,10 @@ export const pt = {
     reflectPlaceholder: 'O que ficou com você hoje...',
     close: 'Fechar',
     askAboutText: 'Tirar uma dúvida sobre esse texto',
+    listen: 'Ouvir este texto',
+    stopListening: 'Parar a leitura',
+    listenError:
+      'Não foi possível ler em voz alta. Confira se o aparelho tem uma voz em português instalada (Ajustes > Idioma > Texto para voz).',
     askLabel: 'Sua dúvida sobre esse texto',
     askPlaceholder: 'O que isso quer dizer quando fala...',
     asking: 'Perguntando...',

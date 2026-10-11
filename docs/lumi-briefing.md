@@ -262,6 +262,12 @@ Um plano ativo por vez (os outros ficam em pausa com o progresso guardado) e um 
 do calendário: o devocional da tela Hoje passa a ser o próximo dia do plano. Terminar um plano libera
 a conquista "Plano concluído". Planos não criam texto novo: reorganizam o conteúdo editorial aprovado.
 
+**Áudio (Fase 4):** cada passo de leitura do devocional (versículo e textos) tem um botão "ouvir". A
+leitura usa a voz de texto-para-fala do aparelho (pt-BR ou en-US conforme o idioma do app), um pouco
+mais devagar que o normal, só uma leitura por vez e sem baixar nada. Não há gravação nem voz gerada
+por IA: o texto lido é sempre o conteúdo editorial aprovado. Se o aparelho não tiver voz no idioma, o
+app avisa como instalar. Narração profissional (arquivos de áudio) fica como evolução futura.
+
 **Desafios (Fase 4):** metas curtas com prazo (7 ou 30 dias), pessoais (até 3 ao mesmo tempo) ou do
 círculo (1 por vez). Medem constância, reflexões, torcidas e orações. No círculo a meta é somada
 (meta por pessoa × membros) e a tela mostra só o total, sem nomes, sem ranking e sem comparação. Se o

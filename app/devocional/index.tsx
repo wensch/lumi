@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -17,6 +25,7 @@ import {
   useScrollFocusedInput,
 } from '@/components';
 import { ACHIEVEMENT_ICONS, isKnownAchievement } from '@/features/achievements';
+import { useReadAloud } from '@/features/audio';
 import { cancelTodaysReminders } from '@/features/notifications';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
 import { useVersePassage, verseVersionId } from '@/features/bible';
@@ -148,6 +157,13 @@ export default function DevocionalScreen() {
     error: askError,
   } = useAskAboutDevotional(session?.id ?? null);
 
+  const {
+    speaking,
+    failed: listenFailed,
+    toggle: toggleListen,
+    stop: stopListening,
+  } = useReadAloud();
+
   const steps = useMemo(() => (content ? buildSteps(content) : []), [content]);
   const currentStep = steps[stepIndex];
   const isLastStep = stepIndex === steps.length - 1;
@@ -163,10 +179,29 @@ export default function DevocionalScreen() {
     isVerseStep ? (content?.passage_reference ?? null) : null,
   );
 
+  // O que a voz lê no passo atual: o versículo (com a referência) ou o texto do passo.
+  const readText =
+    currentStep?.kind === 'verse'
+      ? versePassage
+        ? `${versePassage.reference}. ${versePassage.content}`
+        : null
+      : currentStep?.kind === 'text'
+        ? currentStep.text
+        : null;
+
+  useEffect(() => {
+    if (listenFailed) Alert.alert(t('devotional.listenError'));
+  }, [listenFailed, t]);
+
   // Fecha a tela; se foi aberta direto (sem histórico), cai na aba Hoje em vez de não fazer nada.
-  const leave = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
+  const leave = () => {
+    stopListening();
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)');
+  };
 
   const handleComplete = async () => {
+    stopListening();
     const outcome = await complete(reflection.trim() || undefined);
     if (outcome) {
       const unlockedCodes = outcome.unlocked_achievement_codes ?? [];
@@ -197,12 +232,14 @@ export default function DevocionalScreen() {
       return;
     }
     closeAsk();
+    stopListening();
     stepScrollRef.current?.scrollTo({ y: 0, animated: false });
     setStepIndex((i) => i + 1);
   };
 
   const goBack = () => {
     closeAsk();
+    stopListening();
     stepScrollRef.current?.scrollTo({ y: 0, animated: false });
     setStepIndex((i) => Math.max(0, i - 1));
   };
@@ -470,19 +507,41 @@ export default function DevocionalScreen() {
             ) : null}
 
             <View style={styles.stepBottomRow}>
-              {canAsk && !showAsk ? (
-                <Pressable
-                  onPress={() => setShowAsk(true)}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('devotional.askAboutText')}
-                  hitSlop={8}
-                  style={styles.askIconButton}
-                >
-                  <Ionicons name="chatbubble-ellipses-outline" size={26} color={theme.colors.ink} />
-                </Pressable>
-              ) : (
-                <View />
-              )}
+              <View style={styles.stepActions}>
+                {readText ? (
+                  <Pressable
+                    onPress={() => toggleListen(readText)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t(
+                      speaking ? 'devotional.stopListening' : 'devotional.listen',
+                    )}
+                    accessibilityState={{ selected: speaking }}
+                    hitSlop={8}
+                    style={[styles.askIconButton, speaking && styles.iconButtonActive]}
+                  >
+                    <Ionicons
+                      name={speaking ? 'stop' : 'volume-high-outline'}
+                      size={26}
+                      color={theme.colors.ink}
+                    />
+                  </Pressable>
+                ) : null}
+                {canAsk && !showAsk ? (
+                  <Pressable
+                    onPress={() => setShowAsk(true)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('devotional.askAboutText')}
+                    hitSlop={8}
+                    style={styles.askIconButton}
+                  >
+                    <Ionicons
+                      name="chatbubble-ellipses-outline"
+                      size={26}
+                      color={theme.colors.ink}
+                    />
+                  </Pressable>
+                ) : null}
+              </View>
               <LumiMascot
                 mood={currentStep.kind === 'reflect' ? 'thoughtful' : 'waiting'}
                 size={110}
@@ -698,6 +757,13 @@ const getStyles = (theme: Theme) =>
       alignItems: 'flex-end',
       justifyContent: 'space-between',
       marginTop: 'auto',
+    },
+    stepActions: {
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    iconButtonActive: {
+      backgroundColor: theme.colors.yellow,
     },
     askIconButton: {
       width: 52,
