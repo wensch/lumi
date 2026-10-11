@@ -3,9 +3,10 @@ import type { Database } from '@/lib/supabase';
 type Content = Database['public']['Tables']['content']['Row'];
 
 function dayOfYear(date: Date): number {
-  const start = new Date(date.getFullYear(), 0, 0);
-  const diffMs = date.getTime() - start.getTime();
-  return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  // Em UTC para o horário de verão não encurtar/alongar o dia (e trocar o devocional à 0h-1h).
+  const today = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  const dayZero = Date.UTC(date.getFullYear(), 0, 0);
+  return Math.round((today - dayZero) / (1000 * 60 * 60 * 24));
 }
 
 /**

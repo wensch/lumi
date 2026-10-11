@@ -1,3 +1,12 @@
+-- ATENÇÃO: patch OBSOLETO. A função complete_devotional_session foi redefinida nas migrations
+-- 00019, 00020 e 00022; rodar este arquivo hoje voltaria para a versão da 00016 e perderia planos,
+-- conquistas e desafios. Se ela já foi redefinida, o bloco abaixo impede de continuar.
+do $$ begin
+  if exists (select 1 from public.achievements where code = 'challenge_done') then
+    raise exception 'Patch obsoleto: sobrescreveria complete_devotional_session (00022). Não rode.';
+  end if;
+end $$;
+
 -- Lumi — Folga (migration 00016), parte 2 de 2: recria complete_devotional_session com os campos novos.
 -- A parte 1 (colunas freezes e last_freeze_date em streaks) já foi aplicada pelo conector.
 -- Rode no SQL Editor do Supabase: o conector cancela SQL com DROP.

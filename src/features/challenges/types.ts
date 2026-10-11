@@ -26,6 +26,8 @@ export type CircleChallengeActive = {
   target: number;
   progress: number;
   ends_at: string;
+  /** Só quem começou o desafio ou o criador do círculo pode pará-lo. */
+  can_stop: boolean;
 };
 
 export type CircleChallengeOption = {
@@ -47,6 +49,9 @@ export type CircleChallengeState = {
 /** Dias que faltam até `endsAt` (0 = termina hoje, nunca negativo). */
 export function daysLeft(endsAt: string | null, now: Date = new Date()): number {
   if (!endsAt) return 0;
-  const diff = new Date(endsAt).getTime() - now.getTime();
-  return Math.max(0, Math.ceil(diff / (24 * 60 * 60 * 1000)));
+  // Em dias de calendário (local): termina hoje = 0, amanhã = 1.
+  const end = new Date(endsAt);
+  const endDay = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.max(0, Math.round((endDay - today) / (24 * 60 * 60 * 1000)));
 }

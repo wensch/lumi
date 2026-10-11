@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { useBibleSearch, type BibleSearchResult } from '@youversion/platform-react-hooks';
 import type { BibleBook } from '@youversion/platform-core';
 import { Card, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
@@ -52,18 +53,21 @@ export default function BibliaScreen() {
   const backToChapters = (bookId: string) => setView({ kind: 'chapters', bookId });
 
   // Botão voltar do Android: sobe um nível dentro da Bíblia em vez de sair do app.
-  useEffect(() => {
-    if (view.kind === 'list') return;
-    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (view.kind === 'reader' && view.from === 'chapters') {
-        setView({ kind: 'chapters', bookId: view.bookId });
-      } else {
-        setView({ kind: 'list' });
-      }
-      return true;
-    });
-    return () => subscription.remove();
-  }, [view]);
+  // Só enquanto a aba está em foco: as abas continuam montadas e o voltar das outras não é daqui.
+  useFocusEffect(
+    useCallback(() => {
+      if (view.kind === 'list') return;
+      const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+        if (view.kind === 'reader' && view.from === 'chapters') {
+          setView({ kind: 'chapters', bookId: view.bookId });
+        } else {
+          setView({ kind: 'list' });
+        }
+        return true;
+      });
+      return () => subscription.remove();
+    }, [view]),
+  );
 
   const searchActive = search.query.trim().length > 0;
 
@@ -148,18 +152,12 @@ export default function BibliaScreen() {
   );
 }
 
-/**
- * Mensagem de erro da Bíblia + linha técnica com o motivo real. A linha
- * técnica é temporária: serve para diagnosticar falhas da API da YouVersion
- * em aparelhos reais, onde não há console.
- */
+/** Mensagem de erro da Bíblia. O motivo técnico (e a dica da chave) só aparecem em desenvolvimento. */
 function BibleError({ error }: { error: unknown }) {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const detail = error instanceof Error ? error.message : String(error);
-  // Diagnóstico temporário do 401 (chave recusada): mostra só o tamanho e o final da chave
-  // embutida no app, para comparar com a do painel da YouVersion.
   const appKey = process.env.EXPO_PUBLIC_YOUVERSION_APP_KEY ?? '';
   const keyHint = appKey
     ? `${t('bible.keyInApp')}: ${appKey.length} ${t('bible.characters')}, …${appKey.slice(-4)}`
@@ -167,12 +165,16 @@ function BibleError({ error }: { error: unknown }) {
   return (
     <View style={styles.errorBox}>
       <Text style={styles.helperText}>{t('bible.errorLoading')}</Text>
-      <Text style={styles.errorDetail} selectable>
-        {detail}
-      </Text>
-      <Text style={styles.errorDetail} selectable>
-        {keyHint}
-      </Text>
+      {__DEV__ ? (
+        <>
+          <Text style={styles.errorDetail} selectable>
+            {detail}
+          </Text>
+          <Text style={styles.errorDetail} selectable>
+            {keyHint}
+          </Text>
+        </>
+      ) : null}
     </View>
   );
 }

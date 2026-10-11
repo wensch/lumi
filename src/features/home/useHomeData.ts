@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import type { LumiMood } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
@@ -60,8 +61,13 @@ export function useHomeData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const fetchHomeData = useCallback(async (userId: string) => {
-    setLoading(true);
+  // Dia (local) em que os dados foram buscados: ao voltar do segundo plano num dia novo, recarrega.
+  const fetchedDayRef = useRef(toLocalDateKey(new Date()));
+
+  const fetchHomeData = useCallback(async (userId: string, silent = false) => {
+    // Recarga ao voltar do segundo plano é silenciosa: sem piscar o esqueleto da tela.
+    if (!silent) setLoading(true);
+    fetchedDayRef.current = toLocalDateKey(new Date());
 
     const emptyWeek = buildEmptyWeek();
     // Início da semana à meia-noite LOCAL (como instante UTC) — antes usava "T00:00:00" sem fuso.
@@ -131,6 +137,17 @@ export function useHomeData() {
     // session muda de referência a cada onAuthStateChange (TOKEN_REFRESHED
     // incluso) — usar userId em vez de session evita refetch/loading:true
     // espúrio nesses casos.
+  }, [userId, fetchHomeData]);
+
+  // App aberto na virada do dia (ex.: concluiu 23h50 e volta às 8h): atualiza semana, sequência e "hoje".
+  useEffect(() => {
+    if (!userId) return;
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active' && toLocalDateKey(new Date()) !== fetchedDayRef.current) {
+        fetchHomeData(userId, true);
+      }
+    });
+    return () => subscription.remove();
   }, [userId, fetchHomeData]);
 
   const refetch = useCallback(async () => {

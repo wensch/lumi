@@ -364,10 +364,13 @@ export const pt = {
     circleProgress: '{{done}} de {{total}} juntos',
     circleStart: 'Começar com o círculo',
     circleStop: 'Parar desafio',
+    circleStopTitle: 'Parar o desafio do círculo?',
+    circleStopBody: 'O desafio termina para todo o círculo e o progresso é perdido.',
     errors: {
       too_many_active:
         'Você já tem 3 desafios em andamento. Termine ou desista de um antes de começar outro.',
       already_active: 'Este círculo já tem um desafio em andamento.',
+      forbidden: 'Só quem começou o desafio ou quem criou o círculo pode pará-lo.',
       not_member: 'Você não faz parte deste círculo.',
       not_found: 'Este desafio não está mais disponível.',
       unknown: 'Algo deu errado. Tente de novo em instantes.',

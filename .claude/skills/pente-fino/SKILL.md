@@ -87,7 +87,7 @@ achado você mesmo** antes de corrigir (agentes erram).
 ### 4. Testar o app inteiro
 
 - **Banco (Postgres 16 local)**: `pg_ctlcluster 16 main start`; carregue as migrations em ordem num banco
-  de teste (`lumitest`, com stub de `auth`) e rode os cenários de `/tmp/lumitest/t*.sql` se existirem; se
+  de teste (`lumitest`, com stub de `auth`) e rode os cenários de `supabase/tests/` (veja o README da pasta); se
   não existirem, escreva cenários novos para as funções que mudaram (casos felizes, sem permissão, não
   membro, repetição, limites). Use mais de um usuário para testar o que um não pode ver do outro.
   Limpe os dados entre cenários para não poluir os testes seguintes.

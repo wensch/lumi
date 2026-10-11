@@ -3,13 +3,14 @@ import type { Challenge, CircleChallengeState } from './types';
 
 /** Códigos de erro das funções do banco (migration 00020); o app os traduz. */
 export type ChallengeErrorCode =
-  'too_many_active' | 'already_active' | 'not_member' | 'not_found' | 'unknown';
+  'too_many_active' | 'already_active' | 'not_member' | 'not_found' | 'forbidden' | 'unknown';
 
 const KNOWN: ChallengeErrorCode[] = [
   'too_many_active',
   'already_active',
   'not_member',
   'not_found',
+  'forbidden',
 ];
 
 function errorCode(error: { message?: string } | null | undefined): ChallengeErrorCode {

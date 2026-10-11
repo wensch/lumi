@@ -30,8 +30,8 @@ function isMilestone(streak: number) {
 }
 
 /** Fala do Lumi na conclusão: varia pelo contexto e, nos dias comuns, pelo dia do mês (sem sorteio a cada render). */
-function lumiCompletionKey(streak: number, unlocked: number, isFirst: boolean) {
-  if (isMilestone(streak)) return 'devotional.lumiSays.milestone';
+function lumiCompletionKey(milestone: boolean, unlocked: number, isFirst: boolean) {
+  if (milestone) return 'devotional.lumiSays.milestone';
   if (isFirst) return 'devotional.lumiSays.first';
   if (unlocked > 0) return 'devotional.lumiSays.achievement';
   return `devotional.lumiSays.normal${(new Date().getDate() % 3) + 1}`;
@@ -39,6 +39,8 @@ function lumiCompletionKey(streak: number, unlocked: number, isFirst: boolean) {
 
 /** XP por conquista desbloqueada (espelha complete_devotional_session). */
 const ACHIEVEMENT_XP = 20;
+// O banco recusa reflexões acima disso (complete_devotional_session).
+const REFLECTION_MAX_LENGTH = 5000;
 
 type Content = Database['public']['Tables']['content']['Row'];
 type Result = {
@@ -47,6 +49,8 @@ type Result = {
   unlockedCodes: string[];
   freezeUsed: boolean;
   freezeEarned: boolean;
+  /** Só a primeira conclusão do dia rende XP e festa de marco. */
+  firstToday: boolean;
 };
 
 type DevotionalStep = {
@@ -115,7 +119,9 @@ export default function DevocionalScreen() {
     plan,
   } = useDevotional();
   const [stepIndex, setStepIndex] = useState(0);
-  const [reflection, setReflection] = useState('');
+  // Rascunho digitado; enquanto nulo, mostra a reflexão já salva na sessão de hoje (se houver).
+  const [reflectionDraft, setReflectionDraft] = useState<string | null>(null);
+  const reflection = reflectionDraft ?? session?.reflection_text ?? '';
   const [result, setResult] = useState<Result | null>(null);
   // XP "sobe" de 0 até o valor na tela de conclusão.
   const xpShown = useCountUp(result?.xp ?? 0);
@@ -124,7 +130,7 @@ export default function DevocionalScreen() {
   useEffect(() => {
     if (!result) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    if (result.unlockedCodes.length > 0 || isMilestone(result.streak)) {
+    if (result.unlockedCodes.length > 0 || (result.firstToday && isMilestone(result.streak))) {
       const timer = setTimeout(() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
       }, 450);
@@ -168,6 +174,8 @@ export default function DevocionalScreen() {
         streak: outcome.current_streak,
         // Cada conquista desbloqueada rende +20 XP além dos 10 do momento do dia.
         xp: outcome.xp_awarded + ACHIEVEMENT_XP * unlockedCodes.length,
+        // Reabrir o devocional de hoje e concluir de novo não vale XP: sem repetir a festa de marco.
+        firstToday: outcome.xp_awarded > 0,
         unlockedCodes,
         freezeUsed: outcome.freeze_used ?? false,
         freezeEarned: outcome.freeze_earned ?? false,
@@ -189,11 +197,13 @@ export default function DevocionalScreen() {
       return;
     }
     closeAsk();
+    stepScrollRef.current?.scrollTo({ y: 0, animated: false });
     setStepIndex((i) => i + 1);
   };
 
   const goBack = () => {
     closeAsk();
+    stepScrollRef.current?.scrollTo({ y: 0, animated: false });
     setStepIndex((i) => Math.max(0, i - 1));
   };
 
@@ -226,13 +236,13 @@ export default function DevocionalScreen() {
     // "momento concluído" — sem soar como se a quebra nunca tivesse
     // acontecido, nem como cobrança por ter sumido (briefing §7.2, §8.3).
     const showReturnWelcome = isReturningFromBreak && result.streak === 1;
-    const milestone = isMilestone(result.streak);
+    const milestone = result.firstToday && isMilestone(result.streak);
     const journey = getJourney(result.streak, result.streak);
     const bigCelebration = milestone || result.unlockedCodes.length > 0;
-    const wonOutfits = outfitsForMilestone(result.streak);
+    const wonOutfits = result.firstToday ? outfitsForMilestone(result.streak) : [];
     const lumiLine = t(
       lumiCompletionKey(
-        result.streak,
+        milestone,
         result.unlockedCodes.length,
         result.unlockedCodes.includes('first_moment'),
       ),
@@ -422,8 +432,9 @@ export default function DevocionalScreen() {
                   label={t('devotional.reflectLabel')}
                   placeholder={t('devotional.reflectPlaceholder')}
                   value={reflection}
-                  onChangeText={setReflection}
+                  onChangeText={setReflectionDraft}
                   multiline
+                  maxLength={REFLECTION_MAX_LENGTH}
                   style={styles.reflectionInput}
                 />
               </>

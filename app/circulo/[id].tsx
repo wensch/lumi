@@ -380,11 +380,20 @@ export default function CirculoScreen() {
                           count: daysLeft(challengeState.active.ends_at),
                         })}
                   </Text>
-                  <Button
-                    label={t('challenges.circleStop')}
-                    variant="tertiary"
-                    onPress={() => void runChallenge(() => challengesApi.stopCircle(detail.id))}
-                  />
+                  {challengeState.active.can_stop ? (
+                    <Button
+                      label={t('challenges.circleStop')}
+                      variant="tertiary"
+                      onPress={() =>
+                        confirm(
+                          t('challenges.circleStopTitle'),
+                          t('challenges.circleStopBody'),
+                          t('challenges.circleStop'),
+                          () => void runChallenge(() => challengesApi.stopCircle(detail.id)),
+                        )
+                      }
+                    />
+                  ) : null}
                 </>
               ) : (
                 <>

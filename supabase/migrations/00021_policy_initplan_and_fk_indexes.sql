@@ -2,7 +2,7 @@
 --
 --   1. As políticas de RLS chamavam auth.uid() direto: o Postgres reavalia a função a cada linha.
 --      Com (select auth.uid()) ela é avaliada uma vez por consulta (alerta auth_rls_initplan).
---      Usa ALTER POLICY (mesma regra, só a forma de escrever), então não há DROP.
+--      Usa ALTER POLICY (mesma regra, só a forma de escrever), então não precisa recriar nada.
 --   2. Índices para chaves estrangeiras sem índice: acelera apagar usuário/círculo/pedido (cascata)
 --      e os filtros das funções (alerta unindexed_foreign_keys).
 
@@ -60,7 +60,7 @@ alter policy xp_events_select_own on public.xp_events
 -- ---------------------------------------------------------------------------
 create index if not exists circle_challenges_challenge_idx on public.circle_challenges (challenge_id);
 create index if not exists circle_challenges_started_by_idx on public.circle_challenges (started_by);
-create index if not exists circle_cheers_from_user_idx on public.circle_cheers (from_user);
+create index if not exists circle_cheers_from_user_idx on public.circle_cheers (from_user, day);
 create index if not exists circle_cheers_to_user_idx on public.circle_cheers (to_user);
 create index if not exists circle_events_circle_idx on public.circle_events (circle_id);
 create index if not exists circle_events_request_idx on public.circle_events (request_id);
@@ -69,9 +69,15 @@ create index if not exists circles_owner_idx on public.circles (owner_id);
 create index if not exists content_bible_source_idx on public.content (bible_source_id);
 create index if not exists devotional_sessions_content_idx on public.devotional_sessions (content_id);
 create index if not exists prayer_entries_session_idx on public.prayer_entries (devotional_session_id);
-create index if not exists prayer_prayers_user_idx on public.prayer_prayers (user_id);
-create index if not exists prayer_requests_author_idx on public.prayer_requests (author_id);
+create index if not exists prayer_prayers_user_idx on public.prayer_prayers (user_id, created_at);
+create index if not exists prayer_requests_author_idx on public.prayer_requests (author_id, created_at desc);
 create index if not exists reading_plan_days_content_idx on public.reading_plan_days (content_id);
 create index if not exists user_achievements_achievement_idx on public.user_achievements (achievement_id);
 create index if not exists user_challenges_challenge_idx on public.user_challenges (challenge_id);
 create index if not exists user_reading_plans_plan_idx on public.user_reading_plans (plan_id);
+
+-- Contagens feitas a cada conclusão de momento (conquistas e desafios) por dia concluído.
+create index if not exists devotional_sessions_completed_idx
+  on public.devotional_sessions (user_id, completed_at) where completed_at is not null;
+create index if not exists circle_challenges_circle_idx
+  on public.circle_challenges (circle_id, started_at desc);

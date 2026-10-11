@@ -99,7 +99,8 @@ export function useDevotional() {
       .gte('started_at', startOfToday);
     // Dia de plano: reaproveita só a sessão de hoje DESTE devocional; uma sessão aberta antes com outro
     // texto não vale (senão o plano nunca avançaria).
-    if (plan) sessionQuery = sessionQuery.eq('content_id', content.id);
+    // Também ignora sessão já concluída: o servidor só avança o plano na primeira conclusão da sessão.
+    if (plan) sessionQuery = sessionQuery.eq('content_id', content.id).is('completed_at', null);
     const { data: existingSession } = await sessionQuery
       .order('started_at', { ascending: false })
       .limit(1)

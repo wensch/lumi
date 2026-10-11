@@ -360,10 +360,13 @@ export const en: TranslationSchema = {
     circleProgress: '{{done}} of {{total}} together',
     circleStart: 'Start with the circle',
     circleStop: 'Stop challenge',
+    circleStopTitle: 'Stop the circle challenge?',
+    circleStopBody: 'The challenge ends for the whole circle and the progress is lost.',
     errors: {
       too_many_active:
         'You already have 3 challenges in progress. Finish or give up one before starting another.',
       already_active: 'This circle already has a challenge in progress.',
+      forbidden: 'Only the person who started the challenge or the circle creator can stop it.',
       not_member: 'You are not a member of this circle.',
       not_found: 'This challenge is no longer available.',
       unknown: 'Something went wrong. Try again in a moment.',

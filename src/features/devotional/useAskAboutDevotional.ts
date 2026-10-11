@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { getCurrentLanguage, translate } from '@/i18n';
@@ -13,12 +13,15 @@ export function useAskAboutDevotional(devotionalSessionId: string | null) {
   const [asking, setAsking] = useState(false);
   const [answer, setAnswer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Cada pergunta tem um número; se a pessoa fecha/troca de passo antes da resposta, ela é descartada.
+  const requestRef = useRef(0);
 
   const ask = useCallback(
     async (question: string) => {
       const trimmed = question.trim();
       if (!trimmed || !devotionalSessionId) return;
 
+      const requestId = ++requestRef.current;
       setAsking(true);
       setError(null);
       setAnswer(null);
@@ -35,6 +38,7 @@ export function useAskAboutDevotional(devotionalSessionId: string | null) {
         },
       });
 
+      if (requestId !== requestRef.current) return;
       setAsking(false);
 
       if (fnError || !data?.answer) {
@@ -44,6 +48,7 @@ export function useAskAboutDevotional(devotionalSessionId: string | null) {
         if (!body && fnError instanceof FunctionsHttpError) {
           body = await fnError.context.json().catch(() => undefined);
         }
+        if (requestId !== requestRef.current) return;
         // Os códigos têm texto traduzido no app; a mensagem crua do servidor é só português.
         const byCode: Record<string, string> = {
           daily_limit: translate('errors.askDailyLimit'),
@@ -59,6 +64,8 @@ export function useAskAboutDevotional(devotionalSessionId: string | null) {
   );
 
   const reset = useCallback(() => {
+    requestRef.current += 1;
+    setAsking(false);
     setAnswer(null);
     setError(null);
   }, []);
