@@ -4,6 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Screen, ScreenHeader, Section } from '@/components';
 import { useAuth } from '@/features/auth';
+import { VoicePicker } from '@/features/audio';
 import { useNotificationPreferences } from '@/features/settings';
 import { useAppUpdate } from '@/features/updates';
 import { hasNotificationPermission, requestNotificationPermission } from '@/features/notifications';
@@ -178,6 +179,10 @@ export default function ConfiguracoesScreen() {
             onPress={() => Linking.openSettings().catch(() => {})}
           />
         ) : null}
+      </Section>
+
+      <Section label={t('settings.voice')}>
+        <VoicePicker />
       </Section>
 
       <Section label={t('settings.appearance')}>

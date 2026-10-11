@@ -222,6 +222,11 @@ export const pt = {
     reflectPlaceholder: 'O que ficou com você hoje...',
     close: 'Fechar',
     askAboutText: 'Tirar uma dúvida sobre esse texto',
+    leaveTitle: 'Sair do devocional?',
+    leaveBody:
+      'Você ainda não concluiu o momento de hoje. Se sair agora, ao voltar você começa do início e o que escreveu na reflexão não fica guardado.',
+    leaveStay: 'Continuar',
+    leaveConfirm: 'Sair',
     listen: 'Ouvir este texto',
     stopListening: 'Parar a leitura',
     listenError:
@@ -531,6 +536,15 @@ export const pt = {
     defaultDevotionalName: 'Devocional',
   },
   settings: {
+    voice: 'Voz da leitura',
+    voiceHint:
+      'Escolha a voz que lê o devocional em voz alta. Toque para ouvir uma amostra. As vozes "de rede" costumam ser as mais naturais.',
+    voiceAuto: 'Automática (a mais natural)',
+    voiceSample: 'Olá! Eu sou o Lumi e vou ler o seu devocional com calma.',
+    voiceNetwork: 'Precisa de internet',
+    voiceOnDevice: 'Funciona sem internet',
+    voiceNone:
+      'Este aparelho não listou vozes. Instale uma voz em português em Ajustes > Idioma > Texto para voz.',
     saveError: 'Não foi possível salvar agora. Confira a conexão e tente de novo.',
     loadError:
       'Não foi possível carregar as suas preferências. O que aparece abaixo pode não ser o que você escolheu.',

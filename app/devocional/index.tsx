@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
+  BackHandler,
   KeyboardAvoidingView,
   Pressable,
   ScrollView,
@@ -199,6 +200,31 @@ export default function DevocionalScreen() {
     if (router.canGoBack()) router.back();
     else router.replace('/(tabs)');
   };
+
+  // Sair no meio: pergunta antes, porque o progresso do passo e a reflexão digitada se perdem. No primeiro
+  // passo, sem nada escrito, não há o que perder e fecha direto.
+  const hasProgress = stepIndex > 0 || reflection.trim().length > 0;
+  const confirmLeave = () => {
+    if (!hasProgress) {
+      leave();
+      return;
+    }
+    Alert.alert(t('devotional.leaveTitle'), t('devotional.leaveBody'), [
+      { text: t('devotional.leaveStay'), style: 'cancel' },
+      { text: t('devotional.leaveConfirm'), style: 'destructive', onPress: leave },
+    ]);
+  };
+
+  // O botão voltar do Android passa pela mesma pergunta (só enquanto o devocional está em andamento).
+  const inProgress = !result && !!content;
+  useEffect(() => {
+    if (!inProgress) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      confirmLeave();
+      return true;
+    });
+    return () => subscription.remove();
+  });
 
   const handleComplete = async () => {
     stopListening();
@@ -405,7 +431,7 @@ export default function DevocionalScreen() {
       <KeyboardAvoidingView behavior="padding" style={styles.devBody}>
         <View style={styles.devHeader}>
           <Pressable
-            onPress={leave}
+            onPress={confirmLeave}
             accessibilityRole="button"
             accessibilityLabel={t('devotional.close')}
             hitSlop={8}

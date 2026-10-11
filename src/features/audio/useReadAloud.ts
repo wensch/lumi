@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import * as Speech from 'expo-speech';
 import { getCurrentLanguage } from '@/i18n';
+import { resolveVoice } from './voices';
 
 /** Códigos de idioma (BCP 47) das vozes do sistema para cada idioma do app. */
 const SPEECH_LANGUAGE = { pt: 'pt-BR', en: 'en-US' } as const;
@@ -39,8 +40,10 @@ export function splitForSpeech(text: string, maxLength: number): string[] {
 }
 
 /**
- * Lê um texto em voz alta com a voz do próprio aparelho (sem internet e sem custo). Só um texto por
- * vez; para ao desmontar a tela e quando o app vai para o segundo plano.
+ * Lê um texto em voz alta com a voz do próprio aparelho. Usa a voz escolhida em Configurações ou, no
+ * automático, a mais natural instalada (as vozes "de rede" do Google são neurais). Se essa voz falhar
+ * (ex.: voz de rede sem internet), tenta de novo com a voz padrão do sistema. Só um texto por vez; para
+ * ao desmontar a tela e quando o app vai para o segundo plano.
  */
 export function useReadAloud() {
   const [speaking, setSpeaking] = useState(false);
@@ -54,7 +57,7 @@ export function useReadAloud() {
     Speech.stop().catch(() => {});
   }, []);
 
-  const speak = useCallback((text: string) => {
+  const speak = useCallback(async (text: string) => {
     const chunks = splitForSpeech(text, Speech.maxSpeechInputLength);
     if (chunks.length === 0) return;
 
@@ -64,33 +67,50 @@ export function useReadAloud() {
     // Interrompe qualquer leitura anterior antes de enfileirar a nova.
     Speech.stop().catch(() => {});
 
-    const language = SPEECH_LANGUAGE[getCurrentLanguage()];
-    chunks.forEach((chunk, index) => {
-      const isLast = index === chunks.length - 1;
-      Speech.speak(chunk, {
-        language,
-        rate: SPEECH_RATE,
-        onDone: () => {
-          if (isLast && sessionRef.current === id) setSpeaking(false);
-        },
-        onStopped: () => {
-          if (sessionRef.current === id) setSpeaking(false);
-        },
-        onError: () => {
-          if (sessionRef.current !== id) return;
-          sessionRef.current += 1;
-          setSpeaking(false);
-          setFailed(true);
-          Speech.stop().catch(() => {});
-        },
+    const appLanguage = getCurrentLanguage();
+    const language = SPEECH_LANGUAGE[appLanguage];
+    const voice = await resolveVoice(appLanguage);
+    if (sessionRef.current !== id) return; // parou ou trocou enquanto escolhia a voz
+
+    let fellBack = false;
+    const run = (withVoice: string | undefined) => {
+      chunks.forEach((chunk, index) => {
+        const isLast = index === chunks.length - 1;
+        Speech.speak(chunk, {
+          language,
+          voice: withVoice,
+          rate: SPEECH_RATE,
+          onDone: () => {
+            if (isLast && sessionRef.current === id) setSpeaking(false);
+          },
+          onStopped: () => {
+            if (sessionRef.current === id) setSpeaking(false);
+          },
+          onError: () => {
+            if (sessionRef.current !== id) return;
+            Speech.stop().catch(() => {});
+            if (withVoice) {
+              // A voz escolhida não funcionou (rede, voz removida): tenta a padrão do sistema, uma vez.
+              if (!fellBack) {
+                fellBack = true;
+                run(undefined);
+              }
+              return;
+            }
+            sessionRef.current += 1;
+            setSpeaking(false);
+            setFailed(true);
+          },
+        });
       });
-    });
+    };
+    run(voice);
   }, []);
 
   const toggle = useCallback(
     (text: string) => {
       if (speaking) stop();
-      else speak(text);
+      else void speak(text);
     },
     [speaking, speak, stop],
   );

@@ -219,6 +219,11 @@ export const en: TranslationSchema = {
     reflectPlaceholder: 'What stuck with you today...',
     close: 'Close',
     askAboutText: 'Ask a question about this text',
+    leaveTitle: 'Leave the devotional?',
+    leaveBody:
+      "You haven't finished today's moment yet. If you leave now, you'll start over when you come back and your reflection won't be saved.",
+    leaveStay: 'Keep going',
+    leaveConfirm: 'Leave',
     listen: 'Listen to this text',
     stopListening: 'Stop reading',
     listenError:
@@ -527,6 +532,15 @@ export const en: TranslationSchema = {
     defaultDevotionalName: 'Devotional',
   },
   settings: {
+    voice: 'Reading voice',
+    voiceHint:
+      'Choose the voice that reads the devotional aloud. Tap to hear a sample. "Network" voices are usually the most natural.',
+    voiceAuto: 'Automatic (the most natural)',
+    voiceSample: "Hi! I'm Lumi and I'll read your devotional slowly and calmly.",
+    voiceNetwork: 'Needs internet',
+    voiceOnDevice: 'Works offline',
+    voiceNone:
+      'This device did not list any voices. Install an English voice in Settings > Language > Text-to-speech.',
     saveError: "Couldn't save right now. Check your connection and try again.",
     loadError: "Couldn't load your preferences. What's shown below may not be what you chose.",
     notificationsBlocked:
