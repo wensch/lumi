@@ -262,6 +262,15 @@ Um plano ativo por vez (os outros ficam em pausa com o progresso guardado) e um 
 do calendário: o devocional da tela Hoje passa a ser o próximo dia do plano. Terminar um plano libera
 a conquista "Plano concluído". Planos não criam texto novo: reorganizam o conteúdo editorial aprovado.
 
+**Eventos (Fase 4):** Advento, Natal e Páscoa são planos de leitura especiais (mesma estrutura dos
+planos: um dia por dia, sem culpa se atrasar) que só aparecem na época, com um convite na tela Hoje
+até uma semana antes (três dias, no Natal). O Advento tem 24 dias (esperança, paz, alegria e amor); o
+Natal, 7; a Páscoa, 8 (do Domingo de Ramos ao Domingo de Páscoa). Cada evento tem devocionais próprios,
+que nunca entram no sorteio do dia, uma conquista ao terminar e itens do Lumi (coroa do Advento, gorro
+e estrela de Natal, lírio e amanhecer de Páscoa) que, como os outros, nunca se perdem. O texto segue os
+mesmos critérios do restante (sem culpa, nada falando em nome de Deus, "uma leitura possível"). Texto
+para revisão: `docs/devocionais-eventos.md`.
+
 **Áudio (Fase 4):** cada passo de leitura do devocional (versículo e textos) tem um botão "ouvir". A
 leitura usa a voz de texto-para-fala do aparelho (pt-BR ou en-US conforme o idioma do app), um pouco
 mais devagar que o normal, só uma leitura por vez e sem baixar nada. Não há gravação nem voz gerada

@@ -21,6 +21,9 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   plan_completed: '🧭',
   challenge_done: '🎯',
   challenge_circle: '🌟',
+  event_advento: '🕯️',
+  event_natal: '🎄',
+  event_pascoa: '🌅',
 };
 
 export function isKnownAchievement(code: string): boolean {

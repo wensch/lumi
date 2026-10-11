@@ -79,7 +79,9 @@ export function useDevotional() {
             days: activePlan.days,
           }
         : null;
-    const content = planContent ?? selectDailyContent(allContent ?? []);
+    // Devocionais de evento (Advento, Natal, Páscoa) só chegam pelo plano do evento, nunca no sorteio do dia.
+    const content =
+      planContent ?? selectDailyContent((allContent ?? []).filter((item) => !item.seasonal));
 
     if (!content) {
       setState({ ...EMPTY_STATE, isReturningFromBreak });

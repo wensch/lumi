@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00023
+## Migrations 00004 a 00024
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -130,4 +130,10 @@ bloqueia o momento do dia; "momentos" contam dias distintos) e limita 10 sessõe
 A `00023_circle_bans.sql` faz a pessoa removida pelo criador não voltar com o mesmo código de convite
 (`circle_bans`; sair sozinho não veta). A função de remover ficou como `remove_circle_member_core`
 (fechada ao cliente), chamada pela pública.
+A `00024_seasonal_events.sql` cria os eventos do calendário cristão (Advento, Natal, Páscoa): tabela
+`seasonal_events` (datas por ano), `reading_plans.event_slug`, `content.seasonal` (fora do sorteio do
+dia), `active_events()` e as conquistas de evento. Depois dela, rode `supabase/seed-events.sql` (39
+devocionais, 3 planos e as datas de 2026 a 2035; revisão em `docs/devocionais-eventos.md`). Para
+testar fora da época, as janelas de 2026 podem ser abertas à mão; `patches/restore-event-windows.sql`
+volta às datas reais.
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.

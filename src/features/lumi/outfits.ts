@@ -1,5 +1,8 @@
 import type { JourneyMilestone } from './journey';
 
+/** Eventos do calendário cristão que liberam itens (conquista do plano do evento). */
+export type OutfitEvent = 'advento' | 'natal' | 'pascoa';
+
 export type OutfitId =
   | 'scarf'
   | 'bow'
@@ -12,7 +15,12 @@ export type OutfitId =
   | 'cape'
   | 'wings'
   | 'glow'
-  | 'rainbow';
+  | 'rainbow'
+  | 'wreath'
+  | 'xmashat'
+  | 'xmasstar'
+  | 'lily'
+  | 'dawn';
 
 /** Um item de cada categoria pode ser usado ao mesmo tempo. */
 export type OutfitSlot = 'neck' | 'face' | 'head' | 'back' | 'aura';
@@ -28,7 +36,10 @@ export type Outfit = {
   slot: OutfitSlot;
   motion?: OutfitMotion;
   /** Marco de sequência que libera o item (nunca se perde: vale pela maior sequência já alcançada). */
-  milestone: JourneyMilestone;
+  milestone?: JourneyMilestone;
+  /** Itens de evento: liberados pela conquista de terminar o plano do evento (nunca se perdem). */
+  achievement?: string;
+  event?: OutfitEvent;
   icon: string;
   /** Desenhado ATRÁS do corpo (capa, brilho). */
   back?: string;
@@ -183,6 +194,92 @@ export const OUTFITS: Outfit[] = [
     icon: '⭐',
     front: `<path d="${fivePointStar(100, 15, 15, 6.5)}" fill="#FFD35A" stroke-width="3"></path>`,
   },
+  {
+    id: 'wreath',
+    slot: 'head',
+    achievement: 'event_advento',
+    event: 'advento',
+    icon: '🕯️',
+    front:
+      '<path d="M60 54Q100 22 140 54" stroke="#3E9B57" stroke-width="11"></path>' +
+      '<g fill="#2F7D45" stroke-width="2"><ellipse cx="66" cy="50" rx="7" ry="3.5" transform="rotate(-50 66 50)"></ellipse><ellipse cx="82" cy="40" rx="7" ry="3.5" transform="rotate(-30 82 40)"></ellipse><ellipse cx="118" cy="40" rx="7" ry="3.5" transform="rotate(30 118 40)"></ellipse><ellipse cx="134" cy="50" rx="7" ry="3.5" transform="rotate(50 134 50)"></ellipse></g>' +
+      '<g fill="#E8604C" stroke-width="2"><circle cx="100" cy="35" r="3.5"></circle><circle cx="95" cy="38" r="3"></circle><circle cx="105" cy="38" r="3"></circle></g>' +
+      [
+        [71.2, 46.3, '#7C5CFF'],
+        [90.4, 38.9, '#7C5CFF'],
+        [109.6, 38.9, '#FF8FB3'],
+        [128.8, 46.3, '#7C5CFF'],
+      ]
+        .map(
+          ([x, y, color]) =>
+            `<rect x="${Number(x) - 3.5}" y="${Number(y) - 20}" width="7" height="17" rx="2" fill="${color}" stroke-width="2.2"></rect>` +
+            `<path d="M${x} ${Number(y) - 31}Q${Number(x) + 5} ${Number(y) - 25} ${x} ${Number(y) - 21}Q${Number(x) - 5} ${Number(y) - 25} ${x} ${Number(y) - 31}Z" fill="#FFD35A" stroke-width="1.8"></path>`,
+        )
+        .join(''),
+  },
+  {
+    id: 'xmashat',
+    slot: 'head',
+    achievement: 'event_natal',
+    event: 'natal',
+    icon: '🎅',
+    front:
+      '<path d="M68 56Q70 18 106 18Q134 20 152 46L140 58Z" fill="#D9382F"></path>' +
+      '<rect x="62" y="50" width="86" height="15" rx="7.5" fill="#FFFDF6"></rect>' +
+      '<circle cx="154" cy="48" r="8" fill="#FFFDF6"></circle>' +
+      '<path d="M84 30Q96 26 108 28" stroke="#FFFFFF" stroke-width="3" stroke-opacity=".45"></path>',
+  },
+  {
+    id: 'xmasstar',
+    slot: 'aura',
+    motion: 'float',
+    achievement: 'event_natal',
+    event: 'natal',
+    icon: '🌟',
+    back:
+      '<path d="M150 30L118 78L132 84Z" fill="#FFE08A" fill-opacity=".55" stroke="none"></path>' +
+      '<path d="M150 30L96 52L100 66Z" fill="#FFE08A" fill-opacity=".4" stroke="none"></path>',
+    front:
+      '<path d="M150 8Q152 28 172 30Q152 32 150 52Q148 32 128 30Q148 28 150 8Z" fill="#FFD35A" stroke-width="2.5"></path>' +
+      star(26, 30, 7) +
+      star(30, 128, 6) +
+      star(176, 120, 7),
+  },
+  {
+    id: 'lily',
+    slot: 'neck',
+    achievement: 'event_pascoa',
+    event: 'pascoa',
+    icon: '🌷',
+    front:
+      '<g fill="#4CC46A" stroke-width="2.2"><ellipse cx="104" cy="152" rx="4" ry="11" transform="rotate(35 104 152)"></ellipse><ellipse cx="126" cy="152" rx="4" ry="11" transform="rotate(-35 126 152)"></ellipse></g>' +
+      '<g transform="translate(115 134)" stroke-width="2.2" fill="#FFFFFF">' +
+      [0, 72, 144, 216, 288]
+        .map(
+          (angle) =>
+            `<ellipse cx="0" cy="-9" rx="5.5" ry="10" transform="rotate(${angle})"></ellipse>`,
+        )
+        .join('') +
+      '<circle cx="0" cy="0" r="3.5" fill="#FFD35A"></circle></g>',
+  },
+  {
+    id: 'dawn',
+    slot: 'aura',
+    motion: 'pulse',
+    achievement: 'event_pascoa',
+    event: 'pascoa',
+    icon: '🌅',
+    back:
+      '<circle cx="100" cy="150" r="74" fill="#FFD35A" fill-opacity=".45" stroke="none"></circle>' +
+      '<g stroke="#FFB84D" stroke-width="5" stroke-opacity=".7">' +
+      [200, 220, 240, 260, 280, 300, 320, 340]
+        .map((deg) => {
+          const rad = (deg * Math.PI) / 180;
+          return `<path d="M${(100 + 82 * Math.cos(rad)).toFixed(1)} ${(150 + 82 * Math.sin(rad)).toFixed(1)}L${(100 + 98 * Math.cos(rad)).toFixed(1)} ${(150 + 98 * Math.sin(rad)).toFixed(1)}"></path>`;
+        })
+        .join('') +
+      '</g>',
+  },
 ];
 
 export function outfitById(id: string): Outfit | undefined {
@@ -192,6 +289,24 @@ export function outfitById(id: string): Outfit | undefined {
 /** Itens liberados exatamente neste marco (a tela de conclusão comemora cada um). */
 export function outfitsForMilestone(milestone: number): Outfit[] {
   return OUTFITS.filter((outfit) => outfit.milestone === milestone);
+}
+
+/** Itens de evento liberados por estas conquistas (a tela de conclusão comemora cada um). */
+export function outfitsForAchievements(codes: readonly string[]): Outfit[] {
+  return OUTFITS.filter((outfit) => outfit.achievement && codes.includes(outfit.achievement));
+}
+
+/**
+ * O item está liberado? Itens comuns vêm dos marcos de sequência; itens de evento, da conquista do plano
+ * do evento. Nenhum se perde quando a sequência quebra.
+ */
+export function isOutfitUnlocked(
+  outfit: Outfit,
+  reachedMilestones: readonly number[],
+  achievementCodes: ReadonlySet<string>,
+): boolean {
+  if (outfit.milestone !== undefined && reachedMilestones.includes(outfit.milestone)) return true;
+  return outfit.achievement !== undefined && achievementCodes.has(outfit.achievement);
 }
 
 /** Ordem em que as categorias são desenhadas: de trás para a frente. */

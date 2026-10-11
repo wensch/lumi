@@ -88,6 +88,8 @@ export interface Database {
           application_text: string | null;
           challenge_text: string | null;
           prayer_text: string | null;
+          /** Devocional de evento (Advento, Natal, Páscoa): fora do sorteio do dia. */
+          seasonal: boolean;
           published_at: string | null;
           created_at: string;
         };
@@ -306,6 +308,10 @@ export interface Database {
       deactivate_device_token: {
         Args: { p_token: string };
         Returns: undefined;
+      };
+      active_events: {
+        Args: Record<string, never>;
+        Returns: unknown;
       };
       list_reading_plans: {
         Args: Record<string, never>;

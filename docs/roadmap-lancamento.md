@@ -16,7 +16,7 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 6. ✅ **Planos de leitura** (6 planos de 6 a 30 dias, montados com os devocionais aprovados; migration 00019) — séries sobre um tema, com progresso, um dia por dia.
 7. ✅ **Desafios** (6 pessoais + 3 de círculo, migration 00020) — metas curtas de 7 ou 30 dias, sozinho ou no círculo, com progresso somado e sem ranking.
 8. ✅ **Áudio** — botão "ouvir" nos passos de leitura do devocional (versículo e textos), com a voz do próprio aparelho (`expo-speech`): sem internet, sem custo e sem conta; para ao trocar de passo, sair da tela ou ir ao segundo plano.
-9. **Eventos** — datas especiais (Páscoa, Natal, Advento) com conteúdo e itens do Lumi.
+9. ✅ **Eventos** — Advento (24 dias), Natal (7) e Páscoa (8): planos especiais que só aparecem na época (datas 2026–2035), 39 devocionais próprios (fora do sorteio do dia), conquista de cada evento e 5 itens novos do Lumi (coroa do Advento, gorro e estrela de Natal, lírio e amanhecer de Páscoa). ⚠️ As janelas de 2026 estão abertas de propósito para teste: antes de publicar, rode `supabase/patches/restore-event-windows.sql`.
 
 ## Bloco D — Qualidade
 10. **Inglês completo** — telas e devocionais.
@@ -28,4 +28,4 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 14. Nome definitivo e ícone final.
 15. Política de privacidade, termos e **apagar conta e dados** (exigido pelas lojas).
 16. Assinatura de release (Play Store / App Store), fichas das lojas, capturas de tela.
-17. **Apagar os dados de teste** do Supabase e publicar.
+17. **Apagar os dados de teste** do Supabase e publicar. Antes: rodar `supabase/patches/restore-event-windows.sql` (volta as datas reais dos eventos de 2026).

@@ -66,6 +66,7 @@ function PlanCard({ plan, theme }: { plan: PlanSummary; theme: Theme }) {
           <View style={styles.cardTitleBox}>
             <Text style={theme.typography.bodyStrong}>{plan.title}</Text>
             <Text style={[theme.typography.caption, styles.muted]}>
+              {plan.event_slug ? `${t('events.tag')} · ` : ''}
               {t('plans.daysCount', { count: plan.days })}
               {statusLabel ? ` · ${statusLabel}` : ''}
             </Text>

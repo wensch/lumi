@@ -6,7 +6,26 @@ export type PlanSummary = {
   title: string;
   description: string;
   icon: string | null;
+  /** Plano de evento (advento, natal, pascoa); nulo nos planos comuns. */
+  event_slug: string | null;
   days: number;
+  status: PlanStatus;
+  last_day_done: number;
+};
+
+export type EventSlug = 'advento' | 'natal' | 'pascoa';
+
+/** Um evento do calendário cristão em andamento ('now') ou chegando ('soon'). */
+export type ActiveEvent = {
+  slug: EventSlug;
+  plan_id: string;
+  title: string;
+  description: string;
+  icon: string | null;
+  days: number;
+  state: 'now' | 'soon';
+  starts_on: string;
+  ends_on: string;
   status: PlanStatus;
   last_day_done: number;
 };

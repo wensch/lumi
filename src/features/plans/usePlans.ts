@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useAuth } from '@/features/auth';
 import { plansApi } from './api';
-import type { ActivePlan, PlanDetail, PlanSummary } from './types';
+import type { ActiveEvent, ActivePlan, PlanDetail, PlanSummary } from './types';
 
 /** Lista de planos com o progresso de cada um; recarrega ao voltar para a tela. */
 export function usePlans() {
@@ -85,4 +85,34 @@ export function useActivePlan() {
   );
 
   return { active, refetch: load };
+}
+
+/**
+ * Eventos do calendário cristão em andamento ou chegando (Advento, Natal, Páscoa), com o progresso da
+ * pessoa. Sem rede, mantém o que já tinha.
+ */
+export function useActiveEvents() {
+  const { session } = useAuth();
+  const userId = session?.user.id ?? null;
+  const [events, setEvents] = useState<ActiveEvent[]>([]);
+
+  const load = useCallback(async () => {
+    const result = await plansApi.events();
+    if (result.error === null) setEvents(result.data);
+  }, []);
+
+  useEffect(() => {
+    if (!userId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset síncrono ao deslogar, sem sistema externo envolvido
+      setEvents([]);
+    }
+  }, [userId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) load();
+    }, [userId, load]),
+  );
+
+  return { events, refetch: load };
 }

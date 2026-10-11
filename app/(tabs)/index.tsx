@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Card, FadeIn, Screen, Skeleton, StreakBadge, XPBadge } from '@/components';
-import { useActivePlan } from '@/features/plans';
+import { daysUntil, useActiveEvents, useActivePlan } from '@/features/plans';
 import { lumiGreeting, useHomeData, type WeekDay } from '@/features/home';
 import { LumiMascot } from '@/features/lumi';
 import { ShareStreakButton } from '@/features/share';
@@ -29,6 +29,7 @@ export default function HojeScreen() {
   } = useHomeData();
 
   const { active: activePlan } = useActivePlan();
+  const { events } = useActiveEvents();
 
   if (loading) {
     return (
@@ -53,6 +54,12 @@ export default function HojeScreen() {
       </Screen>
     );
   }
+
+  // Evento do calendário (Advento, Natal, Páscoa): convida só quem ainda não começou (ou pausou). Quem
+  // está fazendo o plano do evento já o vê no cartão do plano ativo; quem concluiu não é incomodado.
+  const eventCard =
+    events.find((item) => item.status === 'none' || item.status === 'paused') ?? null;
+  const eventStartsIn = eventCard?.state === 'soon' ? daysUntil(eventCard.starts_on) : 0;
 
   const greeting = lumiGreeting(daysSinceLastCompleted, t);
   const completedToday = daysSinceLastCompleted === 0;
@@ -143,6 +150,36 @@ export default function HojeScreen() {
           <Button label={t('home.startDevotional')} onPress={() => router.push('/devocional')} />
         </>
       )}
+
+      {eventCard ? (
+        <FadeIn>
+          <Pressable
+            onPress={() => router.push(`/planos/${eventCard.plan_id}`)}
+            accessibilityRole="button"
+            accessibilityLabel={eventCard.title}
+          >
+            <Card style={styles.eventCard}>
+              <Text style={styles.eventKicker}>
+                {eventCard.state === 'soon' ? t('events.kickerSoon') : t('events.kickerNow')} ·{' '}
+                {t(`events.${eventCard.slug}`)}
+              </Text>
+              <Text style={theme.typography.bodyStrong}>
+                {eventCard.icon ?? '✨'} {eventCard.title}
+              </Text>
+              <Text style={[theme.typography.caption, styles.messageSubtitle]}>
+                {eventCard.state === 'soon'
+                  ? eventStartsIn <= 1
+                    ? t('events.startsTomorrow')
+                    : t('events.startsIn', { count: eventStartsIn })
+                  : eventCard.status === 'paused'
+                    ? t('events.resumeCard')
+                    : eventCard.description}
+              </Text>
+              <Text style={styles.eventLink}>{t('events.view')} →</Text>
+            </Card>
+          </Pressable>
+        </FadeIn>
+      ) : null}
 
       {activePlan ? (
         <Pressable
@@ -287,6 +324,21 @@ const getStyles = (theme: Theme) =>
     },
     planCard: {
       gap: 2,
+    },
+    eventCard: {
+      gap: 4,
+      backgroundColor: theme.colors.yellow,
+    },
+    eventKicker: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+    },
+    eventLink: {
+      ...theme.typography.bodyStrong,
+      color: theme.colors.ink,
+      marginTop: 2,
     },
     devotionalKicker: {
       ...theme.typography.bodyStrong,

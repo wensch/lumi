@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
+import { useAchievementCodes } from '@/features/achievements';
 import { lumiGreeting, useHomeData } from '@/features/home';
 import {
   getJourney,
+  isOutfitUnlocked,
   JOURNEY_MILESTONES,
   LumiMascot,
   OUTFIT_SLOTS,
@@ -21,6 +23,7 @@ export default function LumiScreen() {
   const { currentStreak, longestStreak, daysSinceLastCompleted, loading, error, refetch } =
     useHomeData();
   const { outfitIds, toggleOutfit, clearOutfits } = useLumiOutfit();
+  const achievementCodes = useAchievementCodes();
 
   if (loading) {
     return (
@@ -104,7 +107,7 @@ export default function LumiScreen() {
           <Text style={styles.slotTitle}>{t(`lumi.slots.${slot}`)}</Text>
           <View style={styles.wardrobeGrid}>
             {OUTFITS.filter((outfit) => outfit.slot === slot).map((outfit) => {
-              const unlocked = journey.reached.includes(outfit.milestone);
+              const unlocked = isOutfitUnlocked(outfit, journey.reached, achievementCodes);
               return (
                 <WardrobeTile
                   key={outfit.id}
@@ -112,7 +115,9 @@ export default function LumiScreen() {
                   label={
                     unlocked
                       ? t(`lumi.outfits.${outfit.id}`)
-                      : t('lumi.outfitLocked', { days: outfit.milestone })
+                      : outfit.event
+                        ? t('lumi.outfitLockedEvent', { event: t(`events.${outfit.event}`) })
+                        : t('lumi.outfitLocked', { days: outfit.milestone })
                   }
                   selected={outfitIds.includes(outfit.id)}
                   unlocked={unlocked}

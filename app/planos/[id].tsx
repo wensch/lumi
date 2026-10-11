@@ -28,7 +28,9 @@ export default function PlanoScreen() {
     const result = await action();
     setWorking(false);
     if (result.error !== null) {
-      Alert.alert(t('plans.errorLoad'));
+      Alert.alert(
+        result.error.includes('not_available') ? t('events.notAvailable') : t('plans.errorLoad'),
+      );
       return false;
     }
     await refetch();

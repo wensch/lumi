@@ -30,7 +30,13 @@ import { useReadAloud } from '@/features/audio';
 import { cancelTodaysReminders } from '@/features/notifications';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
 import { useVersePassage, verseVersionId } from '@/features/bible';
-import { getJourney, JOURNEY_MILESTONES, LumiMascot, outfitsForMilestone } from '@/features/lumi';
+import {
+  getJourney,
+  JOURNEY_MILESTONES,
+  LumiMascot,
+  outfitsForAchievements,
+  outfitsForMilestone,
+} from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import type { Database } from '@/lib/supabase';
@@ -302,7 +308,12 @@ export default function DevocionalScreen() {
     const milestone = result.firstToday && isMilestone(result.streak);
     const journey = getJourney(result.streak, result.streak);
     const bigCelebration = milestone || result.unlockedCodes.length > 0;
-    const wonOutfits = result.firstToday ? outfitsForMilestone(result.streak) : [];
+    // Itens ganhos agora: os do marco de sequência (só na 1ª conclusão do dia) e os de evento, liberados
+    // pela conquista que acabou de sair (terminar o plano do Advento, do Natal ou da Páscoa).
+    const wonOutfits = [
+      ...(result.firstToday ? outfitsForMilestone(result.streak) : []),
+      ...outfitsForAchievements(result.unlockedCodes),
+    ];
     const lumiLine = t(
       lumiCompletionKey(
         milestone,
