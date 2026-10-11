@@ -126,14 +126,16 @@ Deno.serve(async (req) => {
 
   const context = `Título do devocional: ${content.title}\nPassagem bíblica de referência: ${content.passage_reference ?? 'não informada'}\nTexto devocional: ${content.body}`;
 
-  // Limite diário por usuário, ANTES de gastar uma chamada ao modelo. Se a função ainda não existe no
-  // banco (migration 00014 não aplicada), segue sem limite em vez de quebrar o recurso.
+  // Limite diário por usuário, ANTES de gastar uma chamada ao modelo. Se não der para conferir o limite,
+  // a pergunta NÃO segue: sem o teto, qualquer falha do banco abriria gasto ilimitado com o modelo.
   const { data: quota, error: quotaError } = await supabase.rpc('consume_ai_quota', {
     p_limit: DAILY_QUESTION_LIMIT,
   });
   if (quotaError) {
-    console.warn('consume_ai_quota indisponível; seguindo sem limite diário.');
-  } else if (quota?.[0] && quota[0].allowed === false) {
+    console.warn('consume_ai_quota falhou; pergunta recusada por segurança.');
+    return jsonResponse({ error: 'Não foi possível responder agora.' }, 503);
+  }
+  if (quota?.[0] && quota[0].allowed === false) {
     return jsonResponse(
       { error: 'Você usou todas as perguntas de hoje. Amanhã tem mais.', code: 'daily_limit' },
       429,

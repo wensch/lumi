@@ -483,7 +483,8 @@ export const pt = {
     leaveConfirmBody: 'Seus pedidos de oração neste círculo serão apagados.',
     remove: 'Remover do círculo',
     removeConfirmTitle: 'Remover {{name}}?',
-    removeConfirmBody: 'Os pedidos de oração dessa pessoa neste círculo também serão apagados.',
+    removeConfirmBody:
+      'Os pedidos de oração dessa pessoa neste círculo também serão apagados, e ela não poderá voltar com o código de convite.',
     report: 'Denunciar',
     reportConfirmTitle: 'Denunciar este conteúdo?',
     reportConfirmBody: 'Vamos analisar. Quem fez a publicação não é avisado de quem denunciou.',
@@ -526,6 +527,9 @@ export const pt = {
     defaultDevotionalName: 'Devocional',
   },
   settings: {
+    saveError: 'Não foi possível salvar agora. Confira a conexão e tente de novo.',
+    loadError:
+      'Não foi possível carregar as suas preferências. O que aparece abaixo pode não ser o que você escolheu.',
     notificationsBlocked:
       'As notificações estão bloqueadas no sistema, então o lembrete não vai aparecer.',
     openSystemSettings: 'Abrir ajustes do sistema',

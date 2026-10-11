@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00022
+## Migrations 00004 a 00023
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -127,4 +127,7 @@ estrangeiras). A 00022 fecha falhas: o cliente deixa de inserir/apagar `profiles
 derrubava os círculos dos outros), tira privilégios sobrantes, faz o prazo dos desafios valer, limita
 quem para o desafio do círculo, endurece `complete_devotional_session` (uma falha nos desafios não
 bloqueia o momento do dia; "momentos" contam dias distintos) e limita 10 sessões abertas por dia.
+A `00023_circle_bans.sql` faz a pessoa removida pelo criador não voltar com o mesmo código de convite
+(`circle_bans`; sair sozinho não veta). A função de remover ficou como `remove_circle_member_core`
+(fechada ao cliente), chamada pela pública.
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.

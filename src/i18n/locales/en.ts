@@ -479,7 +479,8 @@ export const en: TranslationSchema = {
     leaveConfirmBody: 'Your prayer requests in this circle will be deleted.',
     remove: 'Remove from circle',
     removeConfirmTitle: 'Remove {{name}}?',
-    removeConfirmBody: "This person's prayer requests in this circle will also be deleted.",
+    removeConfirmBody:
+      "This person's prayer requests in this circle will also be deleted, and they won't be able to rejoin with the invite code.",
     report: 'Report',
     reportConfirmTitle: 'Report this content?',
     reportConfirmBody: 'We will review it. The person who posted is not told who reported.',
@@ -522,6 +523,8 @@ export const en: TranslationSchema = {
     defaultDevotionalName: 'Devotional',
   },
   settings: {
+    saveError: "Couldn't save right now. Check your connection and try again.",
+    loadError: "Couldn't load your preferences. What's shown below may not be what you chose.",
     notificationsBlocked:
       "Notifications are blocked in system settings, so the reminder won't show up.",
     openSystemSettings: 'Open system settings',

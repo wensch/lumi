@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Screen, ScreenHeader, Section } from '@/components';
@@ -36,6 +36,8 @@ export default function ConfiguracoesScreen() {
     returnEnabled,
     circlesEnabled,
     loading,
+    loadFailed,
+    refetch,
     updatePreferredTime,
     setRemindersEnabled,
     setReturnEnabled,
@@ -51,13 +53,18 @@ export default function ConfiguracoesScreen() {
       .catch(() => {});
   }, [remindersEnabled]);
 
+  // Quando o servidor não guarda (sem rede), a tela não muda sozinha: avisa em vez de fingir que salvou.
+  const reportIfFailed = async (saving: Promise<boolean>) => {
+    if (!(await saving)) Alert.alert(t('settings.saveError'));
+  };
+
   const handleToggleReminders = async (enabled: boolean) => {
     if (enabled) {
       const granted = await requestNotificationPermission();
       setPermissionBlocked(!granted);
       if (!granted) return;
     }
-    await setRemindersEnabled(enabled);
+    await reportIfFailed(setRemindersEnabled(enabled));
   };
 
   const handleToggleCircles = async (enabled: boolean) => {
@@ -66,7 +73,7 @@ export default function ConfiguracoesScreen() {
       setPermissionBlocked(!granted);
       if (!granted) return;
     }
-    await setCirclesEnabled(enabled);
+    await reportIfFailed(setCirclesEnabled(enabled));
   };
 
   const handleTimeChange = async (selectedDate: Date | undefined) => {
@@ -76,7 +83,7 @@ export default function ConfiguracoesScreen() {
     const time = `${String(selectedDate.getHours()).padStart(2, '0')}:${String(
       selectedDate.getMinutes(),
     ).padStart(2, '0')}:00`;
-    await updatePreferredTime(time);
+    await reportIfFailed(updatePreferredTime(time));
   };
 
   return (
@@ -84,6 +91,12 @@ export default function ConfiguracoesScreen() {
       <ScreenHeader title={t('settings.title')} onBackPress={goBackOrHome} />
 
       <Section label={t('settings.reminders')}>
+        {loadFailed ? (
+          <>
+            <Text style={styles.helperText}>{t('settings.loadError')}</Text>
+            <Button variant="ghost" label={t('common.retry')} onPress={refetch} />
+          </>
+        ) : null}
         <View style={styles.row}>
           <Text style={theme.typography.bodyStrong}>{t('settings.dailyReminder')}</Text>
           <Switch
@@ -133,7 +146,7 @@ export default function ConfiguracoesScreen() {
               </Text>
               <Switch
                 value={returnEnabled}
-                onValueChange={setReturnEnabled}
+                onValueChange={(enabled) => void reportIfFailed(setReturnEnabled(enabled))}
                 disabled={loading}
                 accessibilityLabel={t('settings.returnNotes')}
                 trackColor={{ true: theme.colors.green, false: theme.colors.bg }}
