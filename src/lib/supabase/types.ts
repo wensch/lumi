@@ -327,6 +327,30 @@ export interface Database {
         Args: { p_plan_id: string };
         Returns: undefined;
       };
+      list_challenges: {
+        Args: Record<string, never>;
+        Returns: unknown;
+      };
+      start_challenge: {
+        Args: { p_challenge_id: string };
+        Returns: undefined;
+      };
+      abandon_challenge: {
+        Args: { p_challenge_id: string };
+        Returns: undefined;
+      };
+      circle_challenge_state: {
+        Args: { p_circle_id: string };
+        Returns: unknown;
+      };
+      start_circle_challenge: {
+        Args: { p_circle_id: string; p_challenge_id: string };
+        Returns: undefined;
+      };
+      stop_circle_challenge: {
+        Args: { p_circle_id: string };
+        Returns: undefined;
+      };
       consume_ai_quota: {
         Args: {
           p_limit?: number;

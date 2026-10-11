@@ -19,6 +19,8 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   streak_100_days: '👑',
   moments_100: '🕊️',
   plan_completed: '🧭',
+  challenge_done: '🎯',
+  challenge_circle: '🌟',
 };
 
 export function isKnownAchievement(code: string): boolean {

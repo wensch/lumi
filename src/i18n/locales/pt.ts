@@ -149,6 +149,8 @@ export const pt = {
     streak_100_days: '100 dias seguidos',
     moments_100: '100 momentos',
     plan_completed: 'Plano concluído',
+    challenge_done: 'Desafio cumprido',
+    challenge_circle: 'Juntos até o fim',
   },
   achievementHints: {
     first_moment: 'Complete seu primeiro momento com o Lumi.',
@@ -166,6 +168,8 @@ export const pt = {
     streak_100_days: 'Faça o momento 100 dias seguidos.',
     moments_100: 'Complete 100 momentos no total.',
     plan_completed: 'Termine um plano de leitura.',
+    challenge_done: 'Cumpra um desafio.',
+    challenge_circle: 'Cumpra um desafio junto com o seu círculo.',
   },
   achievementTap: {
     unlocked: 'Conquistada!',
@@ -329,6 +333,44 @@ export const pt = {
       d100: { title: '100 dias', reward: 'Brilho dourado e coroa' },
       d200: { title: '200 dias', reward: 'Arco-íris para o Lumi' },
       d365: { title: '1 ano', reward: 'Estrela — um ano de constância' },
+    },
+  },
+  challenges: {
+    title: 'Desafios',
+    intro:
+      'Metas curtas para dar um empurrãozinho na constância. Sem pressa e sem culpa: se o tempo acabar, é só tentar de novo.',
+    errorLoad: 'Não foi possível carregar os desafios agora.',
+    activeTitle: 'Em andamento',
+    availableTitle: 'Para começar',
+    inDays: 'em {{count}} dias',
+    doneTimes: 'cumprido {{count}}x',
+    progress: '{{done}} de {{total}}',
+    endsToday: 'termina hoje',
+    endsTomorrow: 'termina amanhã',
+    endsInDays: 'faltam {{count}} dias',
+    lastCompleted: 'Cumprido! 🎉 Dá para repetir quando quiser.',
+    lastExpired: 'O tempo acabou da última vez. Que tal tentar de novo?',
+    start: 'Começar',
+    abandon: 'Desistir',
+    abandonTitle: 'Desistir do desafio?',
+    abandonBody:
+      'Seu progresso neste desafio será perdido. Você pode começar de novo quando quiser.',
+    circleTitle: 'Desafio do círculo',
+    circleIntro:
+      'Uma meta para o círculo todo cumprir junto. O progresso é somado, sem comparar ninguém.',
+    circleLastCompleted: 'O círculo cumpriu o último desafio! 🎉 Que tal escolher outro?',
+    circleLastExpired: 'O tempo do último desafio acabou. Escolham outro e tentem de novo.',
+    circleOptionGoal: 'Meta do círculo: {{total}} em {{days}} dias',
+    circleProgress: '{{done}} de {{total}} juntos',
+    circleStart: 'Começar com o círculo',
+    circleStop: 'Parar desafio',
+    errors: {
+      too_many_active:
+        'Você já tem 3 desafios em andamento. Termine ou desista de um antes de começar outro.',
+      already_active: 'Este círculo já tem um desafio em andamento.',
+      not_member: 'Você não faz parte deste círculo.',
+      not_found: 'Este desafio não está mais disponível.',
+      unknown: 'Algo deu errado. Tente de novo em instantes.',
     },
   },
   plans: {

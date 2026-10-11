@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00019
+## Migrations 00004 a 00020
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -113,3 +113,10 @@ A `00019_reading_plans.sql` cria os planos de leitura (`reading_plans`, `reading
 "Plano concluído" e recria `complete_devotional_session` (agora avança o plano e avalia as conquistas a
 cada conclusão). Depois dela, rode `supabase/seed-reading-plans.sql` (6 planos montados só com
 devocionais já aprovados). Sem `DROP` nem `DELETE`: o conector do Supabase aplica sozinho.
+
+A `00020_challenges.sql` cria os desafios (`challenges`, `user_challenges`, `circle_challenges`), as
+funções `list_challenges`, `start_challenge`, `abandon_challenge`, `circle_challenge_state`,
+`start_circle_challenge` e `stop_circle_challenge`, as conquistas "Desafio cumprido" e "Juntos até o
+fim" e recria `complete_devotional_session` (atualiza o progresso dos desafios a cada conclusão).
+Depois dela, rode `supabase/seed-challenges.sql` (6 desafios pessoais e 3 de círculo). Sem `DROP` nem
+`DELETE`.

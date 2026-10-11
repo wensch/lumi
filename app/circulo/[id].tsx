@@ -5,6 +5,12 @@ import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
 import {
+  challengesApi,
+  daysLeft,
+  useCircleChallenge,
+  type ChallengeErrorCode,
+} from '@/features/challenges';
+import {
   circlesApi,
   InviteShare,
   PRAYER_REQUEST_MAX_LENGTH,
@@ -21,6 +27,7 @@ export default function CirculoScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { detail, prayers, loading, error, refetch } = useCircle(id);
+  const { state: challengeState, refetch: refetchChallenge } = useCircleChallenge(id);
   const [copied, setCopied] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [requestText, setRequestText] = useState('');
@@ -45,6 +52,16 @@ export default function CirculoScreen() {
     await Clipboard.setStringAsync(detail.invite_code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  /** Começa ou para o desafio do círculo; erro vira aviso traduzido. */
+  const runChallenge = async (action: () => Promise<{ error: ChallengeErrorCode | null }>) => {
+    const result = await action();
+    if (result.error !== null) {
+      Alert.alert(t(`challenges.errors.${result.error}`));
+      return;
+    }
+    await refetchChallenge();
   };
 
   const cheer = async (member: CircleMember) => {
@@ -325,6 +342,84 @@ export default function CirculoScreen() {
             </Card>
           </FadeIn>
 
+          <FadeIn delay={150}>
+            <Card style={styles.sectionCard}>
+              <Text style={styles.sectionTitle}>{t('challenges.circleTitle')}</Text>
+              {challengeState?.active ? (
+                <>
+                  <Text style={theme.typography.bodyStrong}>
+                    {challengeState.active.icon ?? '🎯'} {challengeState.active.title}
+                  </Text>
+                  <Text style={[theme.typography.caption, styles.mutedText]}>
+                    {challengeState.active.description}
+                  </Text>
+                  <View style={styles.challengeTrack}>
+                    <View
+                      style={[
+                        styles.challengeFill,
+                        {
+                          width: `${Math.round(
+                            Math.min(
+                              challengeState.active.progress / challengeState.active.target,
+                              1,
+                            ) * 100,
+                          )}%`,
+                        },
+                      ]}
+                    />
+                  </View>
+                  <Text style={[theme.typography.caption, styles.mutedText]}>
+                    {t('challenges.circleProgress', {
+                      done: challengeState.active.progress,
+                      total: challengeState.active.target,
+                    })}{' '}
+                    ·{' '}
+                    {daysLeft(challengeState.active.ends_at) === 0
+                      ? t('challenges.endsToday')
+                      : t('challenges.endsInDays', {
+                          count: daysLeft(challengeState.active.ends_at),
+                        })}
+                  </Text>
+                  <Button
+                    label={t('challenges.circleStop')}
+                    variant="tertiary"
+                    onPress={() => void runChallenge(() => challengesApi.stopCircle(detail.id))}
+                  />
+                </>
+              ) : (
+                <>
+                  <Text style={[theme.typography.caption, styles.mutedText]}>
+                    {challengeState?.last_status === 'completed'
+                      ? t('challenges.circleLastCompleted')
+                      : challengeState?.last_status === 'expired'
+                        ? t('challenges.circleLastExpired')
+                        : t('challenges.circleIntro')}
+                  </Text>
+                  {(challengeState?.available ?? []).map((option) => (
+                    <View key={option.id} style={styles.challengeOption}>
+                      <Text style={theme.typography.bodyStrong}>
+                        {option.icon ?? '🎯'} {option.title}
+                      </Text>
+                      <Text style={[theme.typography.caption, styles.mutedText]}>
+                        {t('challenges.circleOptionGoal', {
+                          total: option.target,
+                          days: option.window_days,
+                        })}
+                      </Text>
+                      <Button
+                        label={t('challenges.circleStart')}
+                        variant="secondary"
+                        onPress={() =>
+                          void runChallenge(() => challengesApi.startCircle(detail.id, option.id))
+                        }
+                      />
+                    </View>
+                  ))}
+                </>
+              )}
+            </Card>
+          </FadeIn>
+
           <FadeIn delay={180}>
             <Card style={styles.sectionCard}>
               <Text style={styles.sectionTitle}>{t('circles.inviteTitle')}</Text>
@@ -368,6 +463,25 @@ const getStyles = (theme: Theme) =>
     },
     sectionCard: {
       gap: theme.spacing.sm,
+    },
+    challengeTrack: {
+      height: 16,
+      borderRadius: 8,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      backgroundColor: theme.colors.white,
+      overflow: 'hidden',
+    },
+    challengeFill: {
+      height: '100%',
+      backgroundColor: theme.colors.green,
+    },
+    challengeOption: {
+      gap: theme.spacing.xs,
+      paddingTop: theme.spacing.sm,
+      borderTopWidth: 1.5,
+      borderTopColor: theme.colors.muted,
+      borderStyle: 'dashed',
     },
     sectionTitle: {
       ...theme.typography.heading,

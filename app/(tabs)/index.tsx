@@ -169,6 +169,11 @@ export default function HojeScreen() {
           onPress={() => router.push('/planos')}
         />
       )}
+      <Button
+        label={t('challenges.title')}
+        variant="tertiary"
+        onPress={() => router.push('/desafios')}
+      />
 
       {longestStreak > currentStreak ? (
         <Text style={styles.recordHint}>

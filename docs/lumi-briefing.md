@@ -262,6 +262,11 @@ Um plano ativo por vez (os outros ficam em pausa com o progresso guardado) e um 
 do calendário: o devocional da tela Hoje passa a ser o próximo dia do plano. Terminar um plano libera
 a conquista "Plano concluído". Planos não criam texto novo: reorganizam o conteúdo editorial aprovado.
 
+**Desafios (Fase 4):** metas curtas com prazo (7 ou 30 dias), pessoais (até 3 ao mesmo tempo) ou do
+círculo (1 por vez). Medem constância, reflexões, torcidas e orações. No círculo a meta é somada
+(meta por pessoa × membros) e a tela mostra só o total, sem nomes, sem ranking e sem comparação. Se o
+prazo acaba, o tom é de recomeço, nunca de fracasso.
+
 ## 13. UX e navegação
 
 | Área | Função |
