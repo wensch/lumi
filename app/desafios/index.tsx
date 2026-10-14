@@ -4,10 +4,12 @@ import * as Haptics from 'expo-haptics';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
 import {
   challengesApi,
+  CustomChallengeForm,
   daysLeft,
   useChallenges,
   type Challenge,
   type ChallengeErrorCode,
+  type NewChallenge,
 } from '@/features/challenges';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -19,6 +21,7 @@ export default function DesafiosScreen() {
   const { t } = useTranslation();
   const { challenges, loading, error, refetch } = useChallenges();
   const [working, setWorking] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const active = challenges.filter((challenge) => challenge.state === 'active');
   const available = challenges.filter((challenge) => challenge.state === 'available');
@@ -33,6 +36,29 @@ export default function DesafiosScreen() {
     }
     Haptics.selectionAsync().catch(() => {});
     await refetch();
+  };
+
+  const create = async (input: NewChallenge) => {
+    setWorking(true);
+    const result = await challengesApi.createCustom(input, null);
+    setWorking(false);
+    if (result.error !== null) {
+      Alert.alert(t(`challenges.errors.${result.error}`));
+      return;
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    setCreating(false);
+    await refetch();
+  };
+
+  const confirmRemove = (challenge: Challenge) => {
+    Alert.alert(t('challenges.removeCustomTitle'), t('challenges.removeCustomBody'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('challenges.removeCustom'),
+        onPress: () => void run(() => challengesApi.archiveCustom(challenge.id)),
+      },
+    ]);
   };
 
   const confirmAbandon = (challenge: Challenge) => {
@@ -83,6 +109,22 @@ export default function DesafiosScreen() {
             </>
           ) : null}
 
+          {creating ? (
+            <Card>
+              <CustomChallengeForm
+                working={working}
+                onSubmit={(input) => void create(input)}
+                onCancel={() => setCreating(false)}
+              />
+            </Card>
+          ) : (
+            <Button
+              label={t('challenges.createOwn')}
+              variant="secondary"
+              onPress={() => setCreating(true)}
+            />
+          )}
+
           <Text style={styles.sectionTitle}>{t('challenges.availableTitle')}</Text>
           {available.map((challenge, index) => (
             <FadeIn key={challenge.id} delay={Math.min(index, 6) * 50} rise={8}>
@@ -92,6 +134,7 @@ export default function DesafiosScreen() {
                 actionLabel={t('challenges.start')}
                 actionVariant="secondary"
                 onAction={() => void run(() => challengesApi.start(challenge.id))}
+                onRemove={challenge.custom ? () => confirmRemove(challenge) : undefined}
                 disabled={working}
               />
             </FadeIn>
@@ -108,6 +151,7 @@ function ChallengeCard({
   actionLabel,
   actionVariant,
   onAction,
+  onRemove,
   disabled,
 }: {
   challenge: Challenge;
@@ -115,6 +159,7 @@ function ChallengeCard({
   actionLabel: string;
   actionVariant: 'secondary' | 'tertiary';
   onAction: () => void;
+  onRemove?: () => void;
   disabled: boolean;
 }) {
   const styles = getStyles(theme);
@@ -130,6 +175,7 @@ function ChallengeCard({
         <View style={styles.cardTitleBox}>
           <Text style={theme.typography.bodyStrong}>{challenge.title}</Text>
           <Text style={[theme.typography.caption, styles.muted]}>
+            {challenge.custom ? `${t('challenges.customTag')} · ` : ''}
             {t('challenges.inDays', { count: challenge.window_days })}
             {challenge.completed_count > 0
               ? ` · ${t('challenges.doneTimes', { count: challenge.completed_count })}`
@@ -160,6 +206,9 @@ function ChallengeCard({
       ) : null}
 
       <Button label={actionLabel} variant={actionVariant} onPress={onAction} disabled={disabled} />
+      {onRemove ? (
+        <Button label={t('challenges.removeCustom')} variant="tertiary" onPress={onRemove} />
+      ) : null}
     </Card>
   );
 }

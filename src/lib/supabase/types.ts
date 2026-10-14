@@ -357,6 +357,23 @@ export interface Database {
         Args: { p_circle_id: string };
         Returns: undefined;
       };
+      create_custom_challenge: {
+        Args: {
+          p_scope: string;
+          p_circle_id: string | null;
+          p_title: string;
+          p_description: string;
+          p_icon: string | null;
+          p_metric: string;
+          p_target: number;
+          p_window_days: number;
+        };
+        Returns: string;
+      };
+      archive_custom_challenge: {
+        Args: { p_challenge_id: string };
+        Returns: undefined;
+      };
       consume_ai_quota: {
         Args: {
           p_limit?: number;

@@ -6,9 +6,11 @@ import * as Haptics from 'expo-haptics';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
 import {
   challengesApi,
+  CustomChallengeForm,
   daysLeft,
   useCircleChallenge,
   type ChallengeErrorCode,
+  type NewChallenge,
 } from '@/features/challenges';
 import {
   circlesApi,
@@ -29,6 +31,8 @@ export default function CirculoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { detail, prayers, loading, error, refetch } = useCircle(id);
   const { state: challengeState, refetch: refetchChallenge } = useCircleChallenge(id);
+  const [creatingChallenge, setCreatingChallenge] = useState(false);
+  const [challengeWorking, setChallengeWorking] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [requestText, setRequestText] = useState('');
@@ -62,6 +66,20 @@ export default function CirculoScreen() {
       Alert.alert(t(`challenges.errors.${result.error}`));
       return;
     }
+    await refetchChallenge();
+  };
+
+  const createChallenge = async (input: NewChallenge) => {
+    if (!detail) return;
+    setChallengeWorking(true);
+    const result = await challengesApi.createCustom(input, detail.id);
+    setChallengeWorking(false);
+    if (result.error !== null) {
+      Alert.alert(t(`challenges.errors.${result.error}`));
+      return;
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    setCreatingChallenge(false);
     await refetchChallenge();
   };
 
@@ -405,11 +423,30 @@ export default function CirculoScreen() {
                         ? t('challenges.circleLastExpired')
                         : t('challenges.circleIntro')}
                   </Text>
+                  {creatingChallenge ? (
+                    <CustomChallengeForm
+                      members={challengeState?.members ?? 1}
+                      working={challengeWorking}
+                      onSubmit={(input) => void createChallenge(input)}
+                      onCancel={() => setCreatingChallenge(false)}
+                    />
+                  ) : (
+                    <Button
+                      label={t('challenges.circleCreateOwn')}
+                      variant="secondary"
+                      onPress={() => setCreatingChallenge(true)}
+                    />
+                  )}
                   {(challengeState?.available ?? []).map((option) => (
                     <View key={option.id} style={styles.challengeOption}>
                       <Text style={theme.typography.bodyStrong}>
                         {option.icon ?? '🎯'} {option.title}
                       </Text>
+                      {option.custom ? (
+                        <Text style={[theme.typography.caption, styles.mutedText]}>
+                          {t('challenges.customTag')}
+                        </Text>
+                      ) : null}
                       <Text style={[theme.typography.caption, styles.mutedText]}>
                         {t('challenges.circleOptionGoal', {
                           total: option.target,
@@ -423,6 +460,26 @@ export default function CirculoScreen() {
                           void runChallenge(() => challengesApi.startCircle(detail.id, option.id))
                         }
                       />
+                      {option.can_archive ? (
+                        <Button
+                          label={t('challenges.removeCustom')}
+                          variant="tertiary"
+                          onPress={() =>
+                            Alert.alert(
+                              t('challenges.removeCustomTitle'),
+                              t('challenges.removeCustomBody'),
+                              [
+                                { text: t('common.cancel'), style: 'cancel' },
+                                {
+                                  text: t('challenges.removeCustom'),
+                                  onPress: () =>
+                                    void runChallenge(() => challengesApi.archiveCustom(option.id)),
+                                },
+                              ],
+                            )
+                          }
+                        />
+                      ) : null}
                     </View>
                   ))}
                 </>

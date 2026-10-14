@@ -20,7 +20,10 @@ export type OutfitId =
   | 'xmashat'
   | 'xmasstar'
   | 'lily'
-  | 'dawn';
+  | 'dawn'
+  | 'sprout'
+  | 'bell'
+  | 'backpack';
 
 /** Um item de cada categoria pode ser usado ao mesmo tempo. */
 export type OutfitSlot = 'neck' | 'face' | 'head' | 'back' | 'aura';
@@ -65,6 +68,40 @@ const star = (x: number, y: number, r = 8) =>
  * Um item de cada vez; evolução representa constância, não espiritualidade (briefing §8.7).
  */
 export const OUTFITS: Outfit[] = [
+  {
+    id: 'sprout',
+    slot: 'head',
+    achievement: 'first_moment',
+    icon: '🌱',
+    front:
+      '<path d="M100 52Q100 42 100 32" stroke-width="3.5"></path>' +
+      '<path d="M100 38Q86 36 80 22Q96 22 100 38Z" fill="#6BD68A" stroke-width="3"></path>' +
+      '<path d="M100 33Q114 31 120 17Q104 16 100 33Z" fill="#4CC46A" stroke-width="3"></path>',
+  },
+  {
+    id: 'bell',
+    slot: 'neck',
+    milestone: 3,
+    icon: '🔔',
+    front:
+      '<path d="M62 122Q100 138 138 122L139 131Q100 147 61 131Z" fill="#E8604C"></path>' +
+      '<circle cx="100" cy="146" r="10" fill="#FFD35A" stroke-width="3"></circle>' +
+      '<path d="M91 147h18" stroke-width="2.5"></path>' +
+      '<circle cx="100" cy="153" r="2.5" fill="#3A2A22" stroke="none"></circle>',
+  },
+  {
+    id: 'backpack',
+    slot: 'back',
+    milestone: 5,
+    icon: '🎒',
+    back:
+      '<rect x="126" y="104" width="46" height="58" rx="16" fill="#7BAE4F"></rect>' +
+      '<rect x="136" y="134" width="26" height="20" rx="7" fill="#5E8D38"></rect>' +
+      '<path d="M142 104v-6q0-6 8-6t8 6v6" stroke-width="3"></path>',
+    front:
+      '<path d="M122 112Q96 124 70 118" stroke="#5E8D38" stroke-width="5"></path>' +
+      '<path d="M126 124Q104 134 84 130" stroke="#5E8D38" stroke-width="5"></path>',
+  },
   {
     id: 'scarf',
     slot: 'neck',

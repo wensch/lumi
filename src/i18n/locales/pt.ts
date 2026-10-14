@@ -316,6 +316,7 @@ export const pt = {
     outfitNone: 'Sem item',
     outfitLocked: 'Com {{days}} dias',
     outfitLockedEvent: 'Complete: {{event}}',
+    outfitLockedFirst: 'Complete o 1º devocional',
     outfits: {
       scarf: 'Cachecol',
       bow: 'Gravata-borboleta',
@@ -334,6 +335,9 @@ export const pt = {
       xmasstar: 'Estrela de Natal',
       lily: 'Lírio de Páscoa',
       dawn: 'Amanhecer',
+      sprout: 'Broto',
+      bell: 'Sininho',
+      backpack: 'Mochila',
     },
     slots: {
       head: 'Cabeça',
@@ -346,6 +350,8 @@ export const pt = {
     keepsForever: 'O que você desbloqueia fica com você, mesmo se a sequência quebrar.',
     itemsSoon: 'Os itens do Lumi aparecem aqui assim que forem liberados.',
     milestones: {
+      d3: { title: '3 dias', reward: 'Sininho para o Lumi' },
+      d5: { title: '5 dias', reward: 'Mochila de caminhada' },
       d7: { title: '7 dias', reward: 'Cachecol para o Lumi' },
       d14: { title: '14 dias', reward: 'Óculos e gravata-borboleta' },
       d21: { title: '21 dias', reward: 'Gorro para o Lumi' },
@@ -387,7 +393,41 @@ export const pt = {
     circleStop: 'Parar desafio',
     circleStopTitle: 'Parar o desafio do círculo?',
     circleStopBody: 'O desafio termina para todo o círculo e o progresso é perdido.',
+    createOwn: 'Criar meu desafio',
+    circleCreateOwn: 'Criar desafio do círculo',
+    customTag: 'Criado por você',
+    removeCustom: 'Remover da lista',
+    removeCustomTitle: 'Remover este desafio da lista?',
+    removeCustomBody:
+      'Ele some da lista para criar de novo depois. Quem já fez continua com o histórico.',
+    form: {
+      name: 'Nome do desafio',
+      namePlaceholder: 'Ex.: Uma oração por dia',
+      icon: 'Ícone',
+      metric: 'O que contar',
+      metrics: {
+        moments_days: 'Dias de devocional',
+        reflections: 'Reflexões escritas',
+        prayers: 'Orações pelos pedidos',
+        cheers: 'Torcidas',
+      },
+      window: 'Em quanto tempo',
+      target: 'Meta',
+      targetCircle: 'Meta de cada pessoa',
+      less: 'Diminuir',
+      more: 'Aumentar',
+      circleTotal: 'Meta do círculo: {{total}} ({{people}} pessoas).',
+      create: 'Criar e começar',
+      summary: {
+        moments_days: 'Fazer o devocional em {{count}} dias diferentes, em até {{days}} dias.',
+        reflections: 'Escrever {{count}} reflexões em até {{days}} dias.',
+        prayers: 'Marcar {{count}} orações pelos pedidos do círculo em até {{days}} dias.',
+        cheers: 'Torcer pelo círculo {{count}} vezes em até {{days}} dias.',
+      },
+    },
     errors: {
+      invalid_input: 'Confira o nome e a meta do desafio e tente de novo.',
+      too_many_created: 'Você criou muitos desafios hoje. Tente de novo amanhã.',
       too_many_active:
         'Você já tem 3 desafios em andamento. Termine ou desista de um antes de começar outro.',
       already_active: 'Este círculo já tem um desafio em andamento.',
@@ -562,12 +602,15 @@ export const pt = {
   },
   settings: {
     voice: 'Voz da leitura',
-    voiceHint:
-      'Escolha a voz que lê o devocional em voz alta. Toque para ouvir uma amostra. As vozes "de rede" costumam ser as mais naturais.',
+    voiceHint: 'Toque numa voz para escolher e ouvir uma amostra. O botão ▶ só toca a amostra.',
     voiceAuto: 'Automática (a mais natural)',
     voiceSample: 'Olá! Eu sou o Lumi e vou ler o seu devocional com calma.',
-    voiceNetwork: 'Precisa de internet',
-    voiceOnDevice: 'Funciona sem internet',
+    voiceName: 'Voz {{number}}',
+    voicePlay: 'Ouvir amostra',
+    voiceGroupNatural: 'Vozes mais naturais',
+    voiceGroupNaturalHint: 'Precisam de internet.',
+    voiceGroupDevice: 'Vozes do aparelho',
+    voiceGroupDeviceHint: 'Funcionam sem internet, soam mais robóticas.',
     voiceNone:
       'Este aparelho não listou vozes. Instale uma voz em português em Ajustes > Idioma > Texto para voz.',
     saveError: 'Não foi possível salvar agora. Confira a conexão e tente de novo.',

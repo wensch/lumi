@@ -117,7 +117,9 @@ export default function LumiScreen() {
                       ? t(`lumi.outfits.${outfit.id}`)
                       : outfit.event
                         ? t('lumi.outfitLockedEvent', { event: t(`events.${outfit.event}`) })
-                        : t('lumi.outfitLocked', { days: outfit.milestone })
+                        : outfit.achievement
+                          ? t('lumi.outfitLockedFirst')
+                          : t('lumi.outfitLocked', { days: outfit.milestone })
                   }
                   selected={outfitIds.includes(outfit.id)}
                   unlocked={unlocked}

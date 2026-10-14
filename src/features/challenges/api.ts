@@ -1,9 +1,16 @@
 import { supabase } from '@/lib/supabase';
-import type { Challenge, CircleChallengeState } from './types';
+import type { Challenge, CircleChallengeState, NewChallenge } from './types';
 
 /** Códigos de erro das funções do banco (migration 00020); o app os traduz. */
 export type ChallengeErrorCode =
-  'too_many_active' | 'already_active' | 'not_member' | 'not_found' | 'forbidden' | 'unknown';
+  | 'too_many_active'
+  | 'already_active'
+  | 'not_member'
+  | 'not_found'
+  | 'forbidden'
+  | 'invalid_input'
+  | 'too_many_created'
+  | 'unknown';
 
 const KNOWN: ChallengeErrorCode[] = [
   'too_many_active',
@@ -11,6 +18,8 @@ const KNOWN: ChallengeErrorCode[] = [
   'not_member',
   'not_found',
   'forbidden',
+  'invalid_input',
+  'too_many_created',
 ];
 
 function errorCode(error: { message?: string } | null | undefined): ChallengeErrorCode {
@@ -49,6 +58,22 @@ export const challengesApi = {
         p_challenge_id: challengeId,
       }),
     ),
+  /** Cria um desafio próprio e já começa (pessoal, ou do círculo quando `circleId` vem). */
+  createCustom: (input: NewChallenge, circleId: string | null) =>
+    call<string>(() =>
+      supabase.rpc('create_custom_challenge', {
+        p_scope: circleId ? 'circle' : 'personal',
+        p_circle_id: circleId,
+        p_title: input.title,
+        p_description: input.description,
+        p_icon: input.icon,
+        p_metric: input.metric,
+        p_target: input.target,
+        p_window_days: input.windowDays,
+      }),
+    ),
+  archiveCustom: (challengeId: string) =>
+    call<null>(() => supabase.rpc('archive_custom_challenge', { p_challenge_id: challengeId })),
   stopCircle: (circleId: string) =>
     call<null>(() => supabase.rpc('stop_circle_challenge', { p_circle_id: circleId })),
 };
