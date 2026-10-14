@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Button, TextField } from '@/components';
+import { Button, Stepper, TextField } from '@/components';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import {
@@ -93,25 +93,14 @@ export function CustomChallengeForm({ members, working, onSubmit, onCancel }: Pr
       <Text style={styles.label}>
         {isCircle ? t('challenges.form.targetCircle') : t('challenges.form.target')}
       </Text>
-      <View style={styles.stepper}>
-        <Pressable
-          onPress={() => setTarget(Math.max(1, safeTarget - 1))}
-          accessibilityRole="button"
-          accessibilityLabel={t('challenges.form.less')}
-          style={styles.stepButton}
-        >
-          <Text style={styles.stepText}>−</Text>
-        </Pressable>
-        <Text style={styles.stepValue}>{safeTarget}</Text>
-        <Pressable
-          onPress={() => setTarget(Math.min(maxTarget, safeTarget + 1))}
-          accessibilityRole="button"
-          accessibilityLabel={t('challenges.form.more')}
-          style={styles.stepButton}
-        >
-          <Text style={styles.stepText}>+</Text>
-        </Pressable>
-      </View>
+      <Stepper
+        value={safeTarget}
+        min={1}
+        max={maxTarget}
+        onChange={setTarget}
+        decreaseLabel={t('challenges.form.less')}
+        increaseLabel={t('challenges.form.more')}
+      />
 
       <Text style={[theme.typography.caption, styles.muted]}>
         {summary}
@@ -198,28 +187,5 @@ const getStyles = (theme: Theme) =>
     },
     chipText: {
       ...theme.typography.bodyStrong,
-    },
-    stepper: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: theme.spacing.md,
-    },
-    stepButton: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 2.5,
-      borderColor: theme.colors.ink,
-      backgroundColor: theme.colors.white,
-    },
-    stepText: {
-      ...theme.typography.heading,
-    },
-    stepValue: {
-      ...theme.typography.heading,
-      minWidth: 40,
-      textAlign: 'center',
     },
   });

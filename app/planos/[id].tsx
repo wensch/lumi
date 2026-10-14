@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
 import {
@@ -131,10 +131,22 @@ export default function PlanoScreen() {
           <View style={styles.dayList}>
             {plan.items.map((item, index) => (
               <FadeIn key={item.day} delay={Math.min(index, 8) * 40} rise={6}>
-                <DayRow item={item} language={language} theme={theme} />
+                <DayRow item={item} language={language} theme={theme} revealAll={!!plan.custom} />
               </FadeIn>
             ))}
           </View>
+
+          {plan.external_url ? (
+            <Button
+              label={t('plans.openYouVersion')}
+              variant="secondary"
+              onPress={() =>
+                Linking.openURL(plan.external_url as string).catch(() =>
+                  Alert.alert(t('plans.errorLoad')),
+                )
+              }
+            />
+          ) : null}
 
           {plan.status === 'active' ? (
             <Button
@@ -144,16 +156,54 @@ export default function PlanoScreen() {
               disabled={working}
             />
           ) : null}
+
+          {plan.custom ? (
+            <Button
+              label={t('plans.remove')}
+              variant="tertiary"
+              onPress={() =>
+                Alert.alert(t('plans.removeTitle'), t('plans.removeBody'), [
+                  { text: t('common.cancel'), style: 'cancel' },
+                  {
+                    text: t('plans.remove'),
+                    style: 'destructive',
+                    onPress: async () => {
+                      setWorking(true);
+                      const result = await plansApi.archiveCustom(plan.id);
+                      setWorking(false);
+                      if (result.error !== null) {
+                        Alert.alert(t('plans.errorLoad'));
+                        return;
+                      }
+                      goBackOrHome();
+                    },
+                  },
+                ])
+              }
+              disabled={working}
+            />
+          ) : null}
         </>
       )}
     </Screen>
   );
 }
 
-function DayRow({ item, language, theme }: { item: PlanDay; language: 'pt' | 'en'; theme: Theme }) {
+function DayRow({
+  item,
+  language,
+  theme,
+  revealAll,
+}: {
+  item: PlanDay;
+  language: 'pt' | 'en';
+  theme: Theme;
+  /** Plano próprio: os dias de frente já aparecem (a pessoa montou o plano, não é surpresa). */
+  revealAll: boolean;
+}) {
   const styles = getStyles(theme);
   const { t } = useTranslation();
-  const locked = item.state === 'locked';
+  const locked = item.state === 'locked' && !revealAll;
   return (
     <Card
       padding="compact"

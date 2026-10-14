@@ -18,6 +18,8 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 8. ✅ **Áudio** — botão "ouvir" nos passos de leitura do devocional (versículo e textos), com a voz do próprio aparelho (`expo-speech`): sem internet, sem custo e sem conta; para ao trocar de passo, sair da tela ou ir ao segundo plano.
 9. ✅ **Eventos** — Advento (24 dias), Natal (7) e Páscoa (8): planos especiais que só aparecem na época (datas 2026–2035), 39 devocionais próprios (fora do sorteio do dia), conquista de cada evento e 5 itens novos do Lumi (coroa do Advento, gorro e estrela de Natal, lírio e amanhecer de Páscoa). ⚠️ As janelas de 2026 estão abertas de propósito para teste: antes de publicar, rode `supabase/patches/restore-event-windows.sql`.
 
+9.1 ✅ **Feedback do teste (14/10)** — seletor de voz mais limpo (nomes simples, dois grupos, botão de amostra); itens do Lumi nos primeiros dias (broto no 1º devocional, sininho em 3 dias, mochila em 5); **desafios criados pela pessoa** (pessoais e do círculo; migration 00025); **planos criados pela pessoa** (um livro da Bíblia, um capítulo por dia, ou acompanhamento de um plano do YouVersion; migration 00026). A API da YouVersion não oferece o conteúdo dos planos, por isso não dá para importá-los.
+
 ## Bloco D — Qualidade
 10. **Inglês completo** — telas e devocionais.
 11. **Métricas** — ativação, D1/D7/D30, conclusão (briefing §16), sem dados de oração.

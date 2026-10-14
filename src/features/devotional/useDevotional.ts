@@ -47,7 +47,8 @@ export function useDevotional() {
 
     const [{ data: allContent, error: contentError }, { data: streak }, planResult] =
       await Promise.all([
-        supabase.from('content').select('*').not('published_at', 'is', null),
+        // Sem filtro: o banco já devolve só o publicado e os dias dos planos criados pela própria pessoa.
+        supabase.from('content').select('*'),
         supabase.from('streaks').select('last_completed_date').eq('user_id', userId).single(),
         // Sem plano (ou sem rede para consultá-lo) cai no devocional do dia comum.
         supabase.rpc('active_reading_plan'),
@@ -79,9 +80,12 @@ export function useDevotional() {
             days: activePlan.days,
           }
         : null;
-    // Devocionais de evento (Advento, Natal, Páscoa) só chegam pelo plano do evento, nunca no sorteio do dia.
+    // Devocionais de evento (Advento, Natal, Páscoa) e dias de planos próprios só chegam pelo plano, nunca no sorteio do dia.
     const content =
-      planContent ?? selectDailyContent((allContent ?? []).filter((item) => !item.seasonal));
+      planContent ??
+      selectDailyContent(
+        (allContent ?? []).filter((item) => item.published_at && !item.seasonal && !item.owner_id),
+      );
 
     if (!content) {
       setState({ ...EMPTY_STATE, isReturningFromBreak });

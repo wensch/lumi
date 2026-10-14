@@ -70,6 +70,13 @@ const BOOKS: Record<string, [pt: string, en: string]> = {
   REV: ['Apocalipse', 'Revelation'],
 };
 
+/** Nome do livro (código USFM) no idioma; se não conhecer o código, devolve o próprio código. */
+export function bookName(code: string, language: LanguageCode): string {
+  const book = BOOKS[code];
+  if (!book) return code;
+  return language === 'en' ? book[1] : book[0];
+}
+
 /** "PSA.23.1-3" -> "Salmos 23:1-3". Se não reconhecer o formato, devolve o texto como veio. */
 export function formatPassageReference(reference: string | null, language: LanguageCode): string {
   if (!reference) return '';

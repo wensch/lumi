@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00024
+## Migrations 00004 a 00026
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -136,4 +136,12 @@ dia), `active_events()` e as conquistas de evento. Depois dela, rode `supabase/s
 devocionais, 3 planos e as datas de 2026 a 2035; revisão em `docs/devocionais-eventos.md`). Para
 testar fora da época, as janelas de 2026 podem ser abertas à mão; `patches/restore-event-windows.sql`
 volta às datas reais.
+A `00025_custom_challenges.sql` deixa a pessoa criar o próprio desafio (pessoal ou do círculo):
+`challenges.owner_id/circle_id/created_by/archived_at`, `create_custom_challenge` (valida nome, meta e
+prazo, limita 10 por dia e já começa) e `archive_custom_challenge`; as listas passam a mostrar os
+desafios próprios junto dos exemplos. A `00026_custom_plans.sql` faz o mesmo com planos de leitura:
+`create_custom_plan` (cada dia vira uma linha privada em `content` com `owner_id`, lida só pelo dono;
+link só da YouVersion), `archive_custom_plan`, e as funções de planos passam a esconder os planos dos
+outros e os arquivados. A API pública da YouVersion não traz o conteúdo dos planos deles; por isso o
+"plano do YouVersion" só acompanha os dias dentro do Lumi.
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.

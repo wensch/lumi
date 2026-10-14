@@ -85,7 +85,10 @@ type DevotionalStep = {
 
 function buildSteps(content: Content): DevotionalStep[] {
   return [
-    { key: 'verse', labelKey: 'devotional.stepVerse', bgKey: 'green', kind: 'verse' },
+    // Dia de plano acompanhado de fora (YouVersion) não tem passagem: pula o passo do versículo.
+    ...(content.passage_reference
+      ? [{ key: 'verse', labelKey: 'devotional.stepVerse', bgKey: 'green', kind: 'verse' }]
+      : []),
     {
       key: 'text',
       labelKey: 'devotional.stepText',

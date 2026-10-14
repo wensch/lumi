@@ -8,6 +8,8 @@ export type PlanSummary = {
   icon: string | null;
   /** Plano de evento (advento, natal, pascoa); nulo nos planos comuns. */
   event_slug: string | null;
+  /** Criado pela própria pessoa (só ela vê). */
+  custom?: boolean;
   days: number;
   status: PlanStatus;
   last_day_done: number;
@@ -44,6 +46,9 @@ export type PlanDetail = {
   title: string;
   description: string;
   icon: string | null;
+  custom?: boolean;
+  /** Link do plano na YouVersion (planos próprios de acompanhamento). */
+  external_url?: string | null;
   days: number;
   status: PlanStatus;
   last_day_done: number;
@@ -62,4 +67,20 @@ export type ActivePlan = {
   next_day: number;
   content_id: string;
   done_today: boolean;
+};
+
+/** Um dia de um plano próprio: o texto vem da passagem (USFM) ou do próprio texto do dia. */
+export type NewPlanDay = {
+  title: string;
+  /** Código USFM da YouVersion, ex.: "JHN.3"; nulo nos dias de plano acompanhado de fora. */
+  passage_reference: string | null;
+  body: string;
+};
+
+export type NewPlan = {
+  title: string;
+  description: string;
+  icon: string;
+  externalUrl: string | null;
+  days: NewPlanDay[];
 };

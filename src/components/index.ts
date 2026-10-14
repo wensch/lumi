@@ -12,3 +12,4 @@ export * from './Skeleton';
 export * from './StreakBadge';
 export * from './TextField';
 export * from './XPBadge';
+export * from './Stepper';

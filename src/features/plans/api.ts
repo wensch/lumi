@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { ActiveEvent, ActivePlan, PlanDetail, PlanSummary } from './types';
+import type { ActiveEvent, ActivePlan, NewPlan, PlanDetail, PlanSummary } from './types';
 
 async function call<T>(
   run: () => PromiseLike<{ data: unknown; error: { message?: string } | null }>,
@@ -21,6 +21,20 @@ export const plansApi = {
   active: () => call<ActivePlan | null>(() => supabase.rpc('active_reading_plan')),
   start: (planId: string) =>
     call<null>(() => supabase.rpc('start_reading_plan', { p_plan_id: planId })),
+  /** Cria um plano próprio e já começa. Devolve o id do plano. */
+  createCustom: (plan: NewPlan) =>
+    call<string>(() =>
+      supabase.rpc('create_custom_plan', {
+        p_title: plan.title,
+        p_description: plan.description,
+        p_icon: plan.icon,
+        p_external_url: plan.externalUrl,
+        p_days: plan.days,
+        p_start: true,
+      }),
+    ),
+  archiveCustom: (planId: string) =>
+    call<null>(() => supabase.rpc('archive_custom_plan', { p_plan_id: planId })),
   pause: (planId: string) =>
     call<null>(() => supabase.rpc('pause_reading_plan', { p_plan_id: planId })),
 };

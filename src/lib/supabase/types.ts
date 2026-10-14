@@ -90,6 +90,8 @@ export interface Database {
           prayer_text: string | null;
           /** Devocional de evento (Advento, Natal, Páscoa): fora do sorteio do dia. */
           seasonal: boolean;
+          /** Dia de plano criado pela própria pessoa: privado, fora do devocional do dia. */
+          owner_id: string | null;
           published_at: string | null;
           created_at: string;
         };
@@ -326,6 +328,21 @@ export interface Database {
         Returns: unknown;
       };
       start_reading_plan: {
+        Args: { p_plan_id: string };
+        Returns: undefined;
+      };
+      create_custom_plan: {
+        Args: {
+          p_title: string;
+          p_description: string;
+          p_icon: string | null;
+          p_external_url: string | null;
+          p_days: unknown;
+          p_start?: boolean;
+        };
+        Returns: string;
+      };
+      archive_custom_plan: {
         Args: { p_plan_id: string };
         Returns: undefined;
       };

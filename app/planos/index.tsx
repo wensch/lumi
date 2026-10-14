@@ -16,6 +16,11 @@ export default function PlanosScreen() {
     <Screen>
       <ScreenHeader title={t('plans.title')} onBackPress={goBackOrHome} />
       <Text style={[theme.typography.caption, styles.muted]}>{t('plans.intro')}</Text>
+      <Button
+        label={t('plans.createOwn')}
+        variant="secondary"
+        onPress={() => router.push('/planos/novo')}
+      />
 
       {loading ? (
         <>
@@ -67,6 +72,7 @@ function PlanCard({ plan, theme }: { plan: PlanSummary; theme: Theme }) {
             <Text style={theme.typography.bodyStrong}>{plan.title}</Text>
             <Text style={[theme.typography.caption, styles.muted]}>
               {plan.event_slug ? `${t('events.tag')} · ` : ''}
+              {plan.custom ? `${t('plans.customTag')} · ` : ''}
               {t('plans.daysCount', { count: plan.days })}
               {statusLabel ? ` · ${statusLabel}` : ''}
             </Text>
