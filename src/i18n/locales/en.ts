@@ -16,7 +16,7 @@ export const en: TranslationSchema = {
   tabs: {
     today: 'Today',
     bible: 'Bible',
-    lumi: 'Lumi',
+    journey: 'Journey',
     circles: 'Circles',
     profile: 'Profile',
   },
@@ -92,6 +92,7 @@ export const en: TranslationSchema = {
     finish: 'Finish',
   },
   home: {
+    weekDone: 'done',
     startDevotional: 'Start my devotional',
     anotherDevotional: "Read today's devotional again",
     veryLate: 'Almost midnight. You like living dangerously, huh? 🐑',
@@ -299,7 +300,23 @@ export const en: TranslationSchema = {
     trendingSearches: 'Trending topics',
     suggestions: 'Suggestions',
   },
+  journey: {
+    intro: 'Your path with the Word: a reading plan to follow and challenges to give you a nudge.',
+    planTitle: 'Reading plan',
+    planInvite: 'A sequence of devotionals on a theme, one a day. Pick one or create your own.',
+    choosePlan: 'Choose a plan',
+    seeAllPlans: 'See all plans',
+    createPlan: 'Create my plan',
+    seePlan: 'See the plan',
+    challengesTitle: 'Challenges',
+    challengesInvite: 'Short goals to nudge your consistency, on your own or with your circle.',
+    seeChallenges: 'See challenges',
+    createChallenge: 'Create my challenge',
+    errorLoad: "Couldn't load right now.",
+    openLumi: 'Open Lumi and the wardrobe',
+  },
   lumi: {
+    title: 'Lumi',
     mascotLabel: 'Lumi, the mascot',
     journeyTitle: "Lumi's journey",
     nextMilestone: 'Next milestone',
@@ -488,6 +505,7 @@ export const en: TranslationSchema = {
     title: 'Reading plans',
     intro:
       'A series of devotionals on one theme, one per day. You can pause and come back any time without losing what you did.',
+    errorAction: "Couldn't do that right now. Try again in a moment.",
     errorLoad: "Couldn't load the plans right now.",
     empty: 'Plans are being prepared. Check back soon.',
     daysCount: '{{count}} days',

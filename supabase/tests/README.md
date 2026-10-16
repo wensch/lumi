@@ -13,7 +13,7 @@ done
 for s in seed-content seed-content-batch-2 seed-content-batch-3 seed-content-structure-fill seed-reading-plans seed-challenges; do
   su postgres -c "psql -q -d lumitest -f supabase/$s.sql"
 done
-su postgres -c "psql -q -d lumitest -f supabase/tests/t22.sql"   # e t16..t20, t22..t26
+su postgres -c "psql -q -d lumitest -f supabase/tests/t22.sql"   # e t16..t20, t22..t27
 ```
 
 Cada arquivo imprime o que espera (`esperado: ...`) ao lado do resultado. Erros `permission denied`

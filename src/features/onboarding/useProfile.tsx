@@ -20,6 +20,11 @@ type ProfileContextValue = {
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
+  /**
+   * Marca o onboarding como feito na cópia local, logo depois de o servidor confirmar. Sem isso, uma
+   * falha de rede na releitura do perfil devolveria a pessoa ao início do onboarding.
+   */
+  markOnboardingCompleted: () => void;
 };
 
 const ProfileContext = createContext<ProfileContextValue | undefined>(undefined);
@@ -79,14 +84,23 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     await fetchProfile(userId);
   }, [userId, fetchProfile]);
 
+  const markOnboardingCompleted = useCallback(() => {
+    setProfile((current) =>
+      current && !current.onboarding_completed_at
+        ? { ...current, onboarding_completed_at: new Date().toISOString() }
+        : current,
+    );
+  }, []);
+
   const value = useMemo<ProfileContextValue>(
     () => ({
       profile,
       loading: userId !== null && loadedFor !== userId,
       error,
       refetch,
+      markOnboardingCompleted,
     }),
-    [profile, userId, loadedFor, error, refetch],
+    [profile, userId, loadedFor, error, refetch, markOnboardingCompleted],
   );
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;

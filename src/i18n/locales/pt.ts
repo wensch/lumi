@@ -20,7 +20,7 @@ export const pt = {
   tabs: {
     today: 'Hoje',
     bible: 'Bíblia',
-    lumi: 'Lumi',
+    journey: 'Jornada',
     circles: 'Círculos',
     profile: 'Perfil',
   },
@@ -95,6 +95,7 @@ export const pt = {
     finish: 'Concluir',
   },
   home: {
+    weekDone: 'concluído',
     startDevotional: 'Começar meu devocional',
     anotherDevotional: 'Reler o devocional de hoje',
     veryLate: 'Quase meia-noite. Você gosta de viver perigosamente, né? 🐑',
@@ -302,7 +303,25 @@ export const pt = {
     trendingSearches: 'Temas em alta',
     suggestions: 'Sugestões',
   },
+  journey: {
+    intro:
+      'Seu caminho com a Palavra: um plano de leitura para seguir e desafios para dar um empurrãozinho.',
+    planTitle: 'Plano de leitura',
+    planInvite: 'Uma sequência de devocionais sobre um tema, um por dia. Escolha um ou crie o seu.',
+    choosePlan: 'Escolher um plano',
+    seeAllPlans: 'Ver todos os planos',
+    createPlan: 'Criar meu plano',
+    seePlan: 'Ver o plano',
+    challengesTitle: 'Desafios',
+    challengesInvite:
+      'Metas curtas para dar um empurrãozinho na constância, sozinho ou com o seu círculo.',
+    seeChallenges: 'Ver desafios',
+    createChallenge: 'Criar meu desafio',
+    errorLoad: 'Não foi possível carregar agora.',
+    openLumi: 'Abrir o Lumi e o guarda-roupa',
+  },
   lumi: {
+    title: 'Lumi',
     mascotLabel: 'Lumi, o mascote',
     journeyTitle: 'A jornada do Lumi',
     nextMilestone: 'Próximo marco',
@@ -493,6 +512,7 @@ export const pt = {
     title: 'Planos de leitura',
     intro:
       'Uma sequência de devocionais sobre um tema, um por dia. Dá para pausar e voltar quando quiser, sem perder o que já fez.',
+    errorAction: 'Não foi possível fazer isso agora. Tente de novo em instantes.',
     errorLoad: 'Não foi possível carregar os planos agora.',
     empty: 'Os planos estão sendo preparados. Volte em breve.',
     daysCount: '{{count}} dias',

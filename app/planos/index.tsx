@@ -63,7 +63,9 @@ function PlanCard({ plan, theme }: { plan: PlanSummary; theme: Theme }) {
     <Pressable
       onPress={() => router.push(`/planos/${plan.id}`)}
       accessibilityRole="button"
-      accessibilityLabel={plan.title}
+      accessibilityLabel={[plan.title, t('plans.daysCount', { count: plan.days }), statusLabel]
+        .filter(Boolean)
+        .join(', ')}
     >
       <Card style={[styles.card, plan.status === 'active' && styles.cardActive]}>
         <View style={styles.cardHeader}>

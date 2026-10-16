@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useAuth } from '@/features/auth';
 import { circlesApi } from './api';
+import { useRequestOrder } from '@/lib/useRequestOrder';
 import type { CircleSummary } from './types';
 
 /** Meus círculos. Recarrega toda vez que a aba volta ao foco (entrar/sair mudam a lista). */
@@ -11,9 +12,12 @@ export function useCircles() {
   const [circles, setCircles] = useState<CircleSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const order = useRequestOrder();
 
   const load = useCallback(async () => {
+    const ticket = order.next();
     const result = await circlesApi.list();
+    if (!order.isLatest(ticket)) return;
     if (result.error) {
       setError(true);
     } else {
@@ -21,7 +25,7 @@ export function useCircles() {
       setCircles(result.data);
     }
     setLoading(false);
-  }, []);
+  }, [order]);
 
   useEffect(() => {
     if (!userId) {
@@ -39,5 +43,5 @@ export function useCircles() {
     }, [userId, load]),
   );
 
-  return { circles, loading, error, refetch: load };
+  return { circles, loading, error: error && circles.length === 0, refetch: load };
 }

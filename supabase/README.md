@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00026
+## Migrations 00004 a 00027
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -144,4 +144,8 @@ desafios próprios junto dos exemplos. A `00026_custom_plans.sql` faz o mesmo co
 link só da YouVersion), `archive_custom_plan`, e as funções de planos passam a esconder os planos dos
 outros e os arquivados. A API pública da YouVersion não traz o conteúdo dos planos deles; por isso o
 "plano do YouVersion" só acompanha os dias dentro do Lumi.
+A `00027_pente_fino_planos_desafios.sql` (pente fino de 16/10) endurece os desafios e planos próprios
+(títulos invisíveis, tetos, toques simultâneos, desafio arquivado), corrige `reading_plan_detail` para
+planos de evento de edições passadas e faz sair/remover do círculo registrar antes o desafio que já bateu
+a meta (`leave_circle` virou uma função fina que chama `leave_circle_core`).
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.

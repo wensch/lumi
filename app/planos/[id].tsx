@@ -29,7 +29,7 @@ export default function PlanoScreen() {
     setWorking(false);
     if (result.error !== null) {
       Alert.alert(
-        result.error.includes('not_available') ? t('events.notAvailable') : t('plans.errorLoad'),
+        result.error.includes('not_available') ? t('events.notAvailable') : t('plans.errorAction'),
       );
       return false;
     }
@@ -129,11 +129,22 @@ export default function PlanoScreen() {
           )}
 
           <View style={styles.dayList}>
-            {plan.items.map((item, index) => (
-              <FadeIn key={item.day} delay={Math.min(index, 8) * 40} rise={6}>
-                <DayRow item={item} language={language} theme={theme} revealAll={!!plan.custom} />
-              </FadeIn>
-            ))}
+            {plan.items.map((item, index) =>
+              // Só os primeiros dias animam (um plano próprio pode ter 366).
+              index < 12 ? (
+                <FadeIn key={item.day} delay={Math.min(index, 8) * 40} rise={6}>
+                  <DayRow item={item} language={language} theme={theme} revealAll={!!plan.custom} />
+                </FadeIn>
+              ) : (
+                <DayRow
+                  key={item.day}
+                  item={item}
+                  language={language}
+                  theme={theme}
+                  revealAll={!!plan.custom}
+                />
+              ),
+            )}
           </View>
 
           {plan.external_url ? (
@@ -172,7 +183,7 @@ export default function PlanoScreen() {
                       const result = await plansApi.archiveCustom(plan.id);
                       setWorking(false);
                       if (result.error !== null) {
-                        Alert.alert(t('plans.errorLoad'));
+                        Alert.alert(t('plans.errorAction'));
                         return;
                       }
                       goBackOrHome();

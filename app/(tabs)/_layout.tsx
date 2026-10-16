@@ -12,7 +12,7 @@ function TabsNavigator() {
     <Tabs tabBar={(props) => <FloatingTabBar {...props} />} screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="index" options={{ title: t('tabs.today') }} />
       <Tabs.Screen name="biblia" options={{ title: t('tabs.bible') }} />
-      <Tabs.Screen name="lumi" options={{ title: t('tabs.lumi') }} />
+      <Tabs.Screen name="jornada" options={{ title: t('tabs.journey') }} />
       <Tabs.Screen
         name="circulos"
         options={{ title: t('tabs.circles'), tabBarBadge: unread > 0 ? unread : undefined }}

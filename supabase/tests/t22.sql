@@ -8,6 +8,7 @@ insert into auth.users (id) values (:A),(:B),(:C) on conflict do nothing;
 insert into public.profiles (id, timezone) select id, 'America/Sao_Paulo' from auth.users where id in (:A,:B,:C) on conflict (id) do update set timezone = 'America/Sao_Paulo';
 insert into public.streaks (user_id) select id from auth.users where id in (:A,:B,:C) on conflict do nothing;
 truncate public.user_challenges, public.circle_challenges, public.circle_events, public.circle_cheers, public.prayer_prayers, public.prayer_requests, public.circle_members, public.circles, public.devotional_sessions cascade;
+\ir ../seed-challenges.sql
 
 \echo '== 1. perfil: cliente não apaga nem recria profiles (esperado: 2x permission denied)'
 set role authenticated; select set_config('request.jwt.claim.sub','cccc0000-0000-0000-0000-000000000003',false);

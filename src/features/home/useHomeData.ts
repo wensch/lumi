@@ -92,7 +92,7 @@ export function useHomeData() {
 
     // Falha de rede: mantém o último dado conhecido em vez de mostrar "0 dias · 0 XP"
     // para quem tem uma sequência de verdade.
-    if (streakResult.error) {
+    if (streakResult.error || xpResult.error || weekSessionsResult.error) {
       setError(true);
       setLoading(false);
       return;

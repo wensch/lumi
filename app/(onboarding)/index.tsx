@@ -26,7 +26,7 @@ export default function OnboardingScreen() {
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const { session } = useAuth();
-  const { refetch } = useProfile();
+  const { refetch, markOnboardingCompleted } = useProfile();
 
   const ageRanges = (Object.keys(AGE_RANGE_KEYS) as AgeRange[]).map((value) => ({
     value,
@@ -108,6 +108,8 @@ export default function OnboardingScreen() {
         // segue sem lembrete; dá para ligar depois em Configurações
       }
 
+      // O servidor já confirmou: não depende da releitura (que pode falhar sem rede) para seguir.
+      markOnboardingCompleted();
       await refetch();
       router.replace('/(tabs)');
     } catch {

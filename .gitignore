@@ -50,3 +50,7 @@ supabase/.temp/
 
 # pacotes Python baixados por engano (ferramentas de teste do banco)
 *.whl
+
+# Chaves e credenciais que nunca entram no repositório
+*.keystore
+*service-account*.json

@@ -25,6 +25,8 @@ type CircleEventRow = {
 type ServiceAccount = { project_id: string; client_email: string; private_key: string };
 
 const CLAIM_WINDOW_MINUTES = 10;
+/** Sem resposta do Google nesse tempo, desiste daquele envio (a função não trava o lote todo). */
+const FETCH_TIMEOUT_MS = 8000;
 const CHANNEL_ID = 'circulos';
 
 const TEXT: Record<
@@ -105,6 +107,7 @@ async function getAccessToken(account: ServiceAccount): Promise<string> {
   const response = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     body: new URLSearchParams({
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
       assertion,
@@ -125,21 +128,28 @@ async function sendPush(
   body: string,
   circleId: string,
 ): Promise<'ok' | 'invalid_token' | 'error'> {
-  const response = await fetch(
-    `https://fcm.googleapis.com/v1/projects/${account.project_id}/messages:send`,
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: {
-          token,
-          notification: { title, body },
-          data: { circleId },
-          android: { priority: 'NORMAL', notification: { channel_id: CHANNEL_ID } },
-        },
-      }),
-    },
-  );
+  let response: Response;
+  try {
+    response = await fetch(
+      `https://fcm.googleapis.com/v1/projects/${account.project_id}/messages:send`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        body: JSON.stringify({
+          message: {
+            token,
+            notification: { title, body },
+            data: { circleId },
+            android: { priority: 'NORMAL', notification: { channel_id: CHANNEL_ID } },
+          },
+        }),
+      },
+    );
+  } catch {
+    // Tempo esgotado ou falha de rede: este aviso fica só dentro do app, e os demais seguem.
+    return 'error';
+  }
   if (response.ok) return 'ok';
   // 404 (UNREGISTERED) ou 400 que cita o token: aparelho desinstalou o app / token expirou.
   // Qualquer outro 400 seria erro nosso na mensagem, e aí o token não deve ser desativado.

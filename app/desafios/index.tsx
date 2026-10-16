@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
 import {
@@ -21,15 +22,22 @@ export default function DesafiosScreen() {
   const { t } = useTranslation();
   const { challenges, loading, error, refetch } = useChallenges();
   const [working, setWorking] = useState(false);
-  const [creating, setCreating] = useState(false);
+  // Vindo da aba Jornada (Criar meu desafio), o formulário já abre.
+  const { novo } = useLocalSearchParams<{ novo?: string }>();
+  // Trava síncrona contra toque duplo (o estado `working` só vale no próximo render).
+  const busyRef = useRef(false);
+  const [creating, setCreating] = useState(novo === '1');
 
   const active = challenges.filter((challenge) => challenge.state === 'active');
   const available = challenges.filter((challenge) => challenge.state === 'available');
 
   const run = async (action: () => Promise<{ error: ChallengeErrorCode | null }>) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setWorking(true);
     const result = await action();
     setWorking(false);
+    busyRef.current = false;
     if (result.error !== null) {
       Alert.alert(t(`challenges.errors.${result.error}`));
       return;
@@ -39,9 +47,12 @@ export default function DesafiosScreen() {
   };
 
   const create = async (input: NewChallenge) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setWorking(true);
     const result = await challengesApi.createCustom(input, null);
     setWorking(false);
+    busyRef.current = false;
     if (result.error !== null) {
       Alert.alert(t(`challenges.errors.${result.error}`));
       return;
@@ -207,7 +218,12 @@ function ChallengeCard({
 
       <Button label={actionLabel} variant={actionVariant} onPress={onAction} disabled={disabled} />
       {onRemove ? (
-        <Button label={t('challenges.removeCustom')} variant="tertiary" onPress={onRemove} />
+        <Button
+          label={t('challenges.removeCustom')}
+          variant="tertiary"
+          onPress={onRemove}
+          disabled={disabled}
+        />
       ) : null}
     </Card>
   );

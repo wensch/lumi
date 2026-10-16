@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Animated, Easing } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { useReduceMotion } from '@/lib/useReduceMotion';
@@ -111,14 +111,14 @@ export function LumiMascot({ mood = 'normal', size = 160 }: LumiMascotProps) {
   const { t } = useTranslation();
   const { outfitIds } = useLumiOutfit();
   const motionStyle = useMascotMotion(motionFor(outfitIds));
+  // O SVG montado só muda com o humor ou com os itens vestidos (a tela do devocional re-renderiza a cada tecla).
+  const xml = useMemo(
+    () => applyOutfits(lumiSvgWithFace(FACE_BY_VARIANT[mood]), outfitIds),
+    [mood, outfitIds],
+  );
   return (
     <Animated.View style={motionStyle}>
-      <SvgXml
-        xml={applyOutfits(lumiSvgWithFace(FACE_BY_VARIANT[mood]), outfitIds)}
-        width={size}
-        height={size}
-        accessibilityLabel={t('lumi.mascotLabel')}
-      />
+      <SvgXml xml={xml} width={size} height={size} accessibilityLabel={t('lumi.mascotLabel')} />
     </Animated.View>
   );
 }

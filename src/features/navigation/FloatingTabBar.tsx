@@ -7,7 +7,7 @@ import { useTheme, type Theme } from '@/theme';
 const ICON_BY_ROUTE: Record<string, keyof typeof Ionicons.glyphMap> = {
   index: 'sunny',
   biblia: 'book',
-  lumi: 'paw',
+  jornada: 'compass',
   circulos: 'people',
   perfil: 'person-circle',
 };

@@ -155,10 +155,10 @@ function RootNavigation() {
   const segments = useSegments();
 
   useNotificationScheduler();
-  usePushSetup();
   useTimezoneSync();
 
   const ready = !authLoading && !(session && profileLoading);
+  usePushSetup(ready);
 
   useEffect(() => {
     if (!ready) return;

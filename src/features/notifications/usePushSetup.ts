@@ -13,7 +13,11 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
  * Mantém o push dos círculos em dia: registra o aparelho (se a pessoa quer os avisos e a permissão
  * já foi dada), guarda o idioma e abre o círculo quando ela toca no aviso. Roda no layout raiz.
  */
-export function usePushSetup() {
+/**
+ * `navigationReady`: o navegador já está na tela (o app só monta as rotas depois de ler a sessão e o perfil).
+ * Um toque numa notificação com o app fechado só pode navegar a partir daí; antes seria descartado.
+ */
+export function usePushSetup(navigationReady: boolean) {
   const { session } = useAuth();
   const userId = session?.user.id ?? null;
   const { language } = useTranslation();
@@ -50,10 +54,11 @@ export function usePushSetup() {
   // Cada toque abre o círculo uma vez só: sair e entrar de novo na conta não repete a navegação.
   const handledResponse = useRef<string | null>(null);
   useEffect(() => {
-    if (!userId || !responseId || handledResponse.current === responseId) return;
+    if (!navigationReady || !userId || !responseId || handledResponse.current === responseId)
+      return;
     // O id vem do payload da notificação e vai para a rota: só aceita um UUID.
     if (typeof circleId !== 'string' || !UUID_PATTERN.test(circleId)) return;
     handledResponse.current = responseId;
     router.push(`/circulo/${circleId}`);
-  }, [userId, responseId, circleId]);
+  }, [navigationReady, userId, responseId, circleId]);
 }

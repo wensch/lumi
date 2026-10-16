@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { calculateDaysSince } from '@/lib/dates';
 import { useAuth } from '@/features/auth';
 import {
   scheduleDailyReminder,
@@ -28,6 +29,16 @@ async function savePreference(userId: string, patch: Record<string, unknown>): P
     .update({ ...patch, updated_at: new Date().toISOString() })
     .eq('user_id', userId);
   return !error;
+}
+
+/** Já concluiu o momento de hoje? Quem concluiu não recebe os lembretes de hoje (igual ao agendador do app). */
+async function hasCompletedToday(userId: string): Promise<boolean> {
+  const { data } = await supabase
+    .from('streaks')
+    .select('last_completed_date')
+    .eq('user_id', userId)
+    .maybeSingle();
+  return calculateDaysSince(data?.last_completed_date ?? null) === 0;
 }
 
 export function useNotificationPreferences() {
@@ -80,7 +91,10 @@ export function useNotificationPreferences() {
       setPreferences((prev) => ({ ...prev, preferredTime: time }));
 
       if (preferences.remindersEnabled) {
-        await scheduleDailyReminder(time, { returnNotes: preferences.returnEnabled });
+        await scheduleDailyReminder(time, {
+          returnNotes: preferences.returnEnabled,
+          skipToday: await hasCompletedToday(userId),
+        });
       }
       return true;
     },
@@ -97,6 +111,7 @@ export function useNotificationPreferences() {
       if (enabled && preferences.preferredTime) {
         await scheduleDailyReminder(preferences.preferredTime, {
           returnNotes: preferences.returnEnabled,
+          skipToday: await hasCompletedToday(userId),
         });
       } else {
         await cancelDailyReminder();
@@ -114,7 +129,10 @@ export function useNotificationPreferences() {
       setPreferences((prev) => ({ ...prev, returnEnabled: enabled }));
 
       if (preferences.remindersEnabled && preferences.preferredTime) {
-        await scheduleDailyReminder(preferences.preferredTime, { returnNotes: enabled });
+        await scheduleDailyReminder(preferences.preferredTime, {
+          returnNotes: enabled,
+          skipToday: await hasCompletedToday(userId),
+        });
       }
       return true;
     },

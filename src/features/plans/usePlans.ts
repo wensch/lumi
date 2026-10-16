@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useAuth } from '@/features/auth';
 import { plansApi } from './api';
+import { useRequestOrder } from '@/lib/useRequestOrder';
 import type { ActiveEvent, ActivePlan, PlanDetail, PlanSummary } from './types';
 
 /** Lista de planos com o progresso de cada um; recarrega ao voltar para a tela. */
@@ -11,9 +12,12 @@ export function usePlans() {
   const [plans, setPlans] = useState<PlanSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const order = useRequestOrder();
 
   const load = useCallback(async () => {
+    const ticket = order.next();
     const result = await plansApi.list();
+    if (!order.isLatest(ticket)) return;
     if (result.error !== null) {
       setError(true);
     } else {
@@ -21,7 +25,7 @@ export function usePlans() {
       setPlans(result.data);
     }
     setLoading(false);
-  }, []);
+  }, [order]);
 
   useFocusEffect(
     useCallback(() => {
@@ -29,7 +33,7 @@ export function usePlans() {
     }, [userId, load]),
   );
 
-  return { plans, loading, error, refetch: load };
+  return { plans, loading, error: error && plans.length === 0, refetch: load };
 }
 
 /** Um plano com os dias; recarrega ao voltar (concluir um dia muda o estado). */
@@ -37,10 +41,13 @@ export function usePlan(planId: string | undefined) {
   const [plan, setPlan] = useState<PlanDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const order = useRequestOrder();
 
   const load = useCallback(async () => {
     if (!planId) return;
+    const ticket = order.next();
     const result = await plansApi.detail(planId);
+    if (!order.isLatest(ticket)) return;
     if (result.error !== null) {
       setError(true);
     } else {
@@ -48,7 +55,7 @@ export function usePlan(planId: string | undefined) {
       setPlan(result.data);
     }
     setLoading(false);
-  }, [planId]);
+  }, [planId, order]);
 
   useFocusEffect(
     useCallback(() => {
@@ -56,7 +63,7 @@ export function usePlan(planId: string | undefined) {
     }, [load]),
   );
 
-  return { plan, loading, error, refetch: load };
+  return { plan, loading, error: error && !plan, refetch: load };
 }
 
 /** O plano ativo (para o cartão da tela Hoje). Nulo se não há plano ativo. */

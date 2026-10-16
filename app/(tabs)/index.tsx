@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Button, Card, FadeIn, Screen, Skeleton, StreakBadge, XPBadge } from '@/components';
 import { daysUntil, useActiveEvents, useActivePlan } from '@/features/plans';
 import { lumiGreeting, useHomeData, type WeekDay } from '@/features/home';
@@ -84,6 +85,17 @@ export default function HojeScreen() {
       <View style={styles.header}>
         <StreakBadge days={currentStreak} />
         <XPBadge xp={totalXp} />
+        <Pressable
+          onPress={() => router.push('/lumi')}
+          accessibilityRole="button"
+          accessibilityLabel={t('journey.openLumi')}
+          style={styles.lumiChip}
+        >
+          <Ionicons name="paw" size={18} color={theme.colors.ink} />
+          <Text style={styles.lumiChipText} maxFontSizeMultiplier={1.3}>
+            {t('lumi.title')}
+          </Text>
+        </Pressable>
       </View>
 
       <View style={styles.weekRow}>
@@ -104,10 +116,16 @@ export default function HojeScreen() {
       ) : null}
 
       <FadeIn delay={60} rise={18}>
-        <View style={styles.mascotArea}>
-          <View style={styles.mascotBackdrop} />
-          <LumiMascot mood={isVeryLate ? 'sleepy' : greeting.mood} size={290} />
-        </View>
+        <Pressable
+          onPress={() => router.push('/lumi')}
+          accessibilityRole="button"
+          accessibilityLabel={t('journey.openLumi')}
+        >
+          <View style={styles.mascotArea}>
+            <View style={styles.mascotBackdrop} />
+            <LumiMascot mood={isVeryLate ? 'sleepy' : greeting.mood} size={290} />
+          </View>
+        </Pressable>
       </FadeIn>
 
       {completedToday ? (
@@ -199,18 +217,7 @@ export default function HojeScreen() {
             </Text>
           </Card>
         </Pressable>
-      ) : (
-        <Button
-          label={t('plans.browse')}
-          variant="tertiary"
-          onPress={() => router.push('/planos')}
-        />
-      )}
-      <Button
-        label={t('challenges.title')}
-        variant="tertiary"
-        onPress={() => router.push('/desafios')}
-      />
+      ) : null}
 
       {longestStreak > currentStreak ? (
         <Text style={styles.recordHint}>
@@ -225,9 +232,12 @@ export default function HojeScreen() {
 
 function WeekDayCircle({ day, letter, theme }: { day: WeekDay; letter: string; theme: Theme }) {
   const styles = getStyles(theme);
+  const { t } = useTranslation();
   return (
     <View style={styles.weekDay}>
       <View
+        accessible
+        accessibilityLabel={`${letter} ${Number(day.date.slice(8, 10))}${day.completed ? `, ${t('home.weekDone')}` : ''}`}
         style={[
           styles.weekDayCircle,
           day.completed && styles.weekDayCircleCompleted,
@@ -249,8 +259,25 @@ const getStyles = (theme: Theme) =>
   StyleSheet.create({
     header: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       justifyContent: 'space-between',
       alignItems: 'center',
+      gap: theme.spacing.xs,
+    },
+    lumiChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.xs,
+      backgroundColor: theme.colors.pink,
+      borderWidth: 2.5,
+      borderColor: theme.colors.ink,
+      borderRadius: theme.radius.pill,
+      minHeight: 40,
+      paddingHorizontal: 12,
+      ...theme.shadow.chip,
+    },
+    lumiChipText: {
+      ...theme.typography.bodyStrong,
     },
     freezeHint: {
       ...theme.typography.caption,

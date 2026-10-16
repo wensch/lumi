@@ -47,8 +47,8 @@ export function useDevotional() {
 
     const [{ data: allContent, error: contentError }, { data: streak }, planResult] =
       await Promise.all([
-        // Sem filtro: o banco já devolve só o publicado e os dias dos planos criados pela própria pessoa.
-        supabase.from('content').select('*'),
+        // O sorteio do dia usa só o catálogo público: os dias de planos próprios (owner_id) vêm por id, abaixo.
+        supabase.from('content').select('*').is('owner_id', null).not('published_at', 'is', null),
         supabase.from('streaks').select('last_completed_date').eq('user_id', userId).single(),
         // Sem plano (ou sem rede para consultá-lo) cai no devocional do dia comum.
         supabase.rpc('active_reading_plan'),
@@ -66,11 +66,17 @@ export function useDevotional() {
       return;
     }
 
+    // Conteúdo por id: do catálogo já baixado ou, para dia de plano próprio (privado), direto do banco.
+    const contentById = async (id: string): Promise<Content | null> => {
+      const known = (allContent ?? []).find((item) => item.id === id);
+      if (known) return known;
+      const { data } = await supabase.from('content').select('*').eq('id', id).maybeSingle();
+      return data ?? null;
+    };
+
     // Com plano ativo e o dia de hoje ainda não feito, o devocional é o próximo dia do plano.
     const planContent =
-      activePlan && !activePlan.done_today
-        ? ((allContent ?? []).find((item) => item.id === activePlan.content_id) ?? null)
-        : null;
+      activePlan && !activePlan.done_today ? await contentById(activePlan.content_id) : null;
     const plan =
       activePlan && planContent
         ? {
@@ -82,10 +88,7 @@ export function useDevotional() {
         : null;
     // Devocionais de evento (Advento, Natal, Páscoa) e dias de planos próprios só chegam pelo plano, nunca no sorteio do dia.
     const content =
-      planContent ??
-      selectDailyContent(
-        (allContent ?? []).filter((item) => item.published_at && !item.seasonal && !item.owner_id),
-      );
+      planContent ?? selectDailyContent((allContent ?? []).filter((item) => !item.seasonal));
 
     if (!content) {
       setState({ ...EMPTY_STATE, isReturningFromBreak });
@@ -116,7 +119,8 @@ export function useDevotional() {
       // O texto exibido segue a sessão (e não o cálculo do dia): se o catálogo mudou no meio
       // do dia, a pergunta à IA e o histórico continuam apontando para o mesmo conteúdo.
       const sessionContent =
-        (allContent ?? []).find((item) => item.id === existingSession.content_id) ?? content;
+        (existingSession.content_id ? await contentById(existingSession.content_id) : null) ??
+        content;
       setState({ content: sessionContent, session: existingSession, isReturningFromBreak, plan });
       setLoading(false);
       return;

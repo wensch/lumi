@@ -76,8 +76,10 @@ export default function AuthScreen() {
 
     // Evita repetir a ponte pro Supabase toda vez que o hook re-renderiza
     // com o mesmo usuário já autenticado.
-    if (bridgedYvUserId.current === yvUserInfo.id) return;
-    bridgedYvUserId.current = yvUserInfo.id ?? yvUserInfo.email;
+    // Mesma chave nos dois lados (o id da YouVersion é opcional: sem ele vale o e-mail).
+    const bridgeKey = yvUserInfo.id ?? yvUserInfo.email ?? null;
+    if (bridgedYvUserId.current === bridgeKey) return;
+    bridgedYvUserId.current = bridgeKey;
 
     (async () => {
       const { error: authError } = await signInWithMagicLink(yvUserInfo.email as string);

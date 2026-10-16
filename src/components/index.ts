@@ -13,3 +13,4 @@ export * from './StreakBadge';
 export * from './TextField';
 export * from './XPBadge';
 export * from './Stepper';
+export * from './ProgressBar';

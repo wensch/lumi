@@ -17,7 +17,7 @@ Bíblia, com o mascote Lumi (cordeiro). Contexto completo do produto em
 
 - **Frontend:** React Native + Expo + TypeScript, navegação via
   [Expo Router](https://docs.expo.dev/router/introduction/) (file-based, 4
-  abas: Hoje / Bíblia / Lumi / Perfil).
+  abas: Hoje / Bíblia / Jornada / Círculos / Perfil; o Lumi e o guarda-roupa abrem pelo topo da Hoje).
 - **Backend:** Supabase (auth, Postgres, storage). Migrations em
   [supabase/migrations/](supabase/migrations/) — ver
   [supabase/README.md](supabase/README.md) para aplicar.

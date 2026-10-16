@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -18,6 +18,8 @@ import { goBackOrHome } from '@/lib/navigation';
 type Mode = 'book' | 'youversion';
 
 const YOUVERSION_PLANS_URL = 'https://www.bible.com/reading-plans';
+/** Livros com capítulos suficientes para um plano de um capítulo por dia (mínimo do servidor). */
+const PLANNABLE_BOOKS = BIBLE_BOOKS.filter((book) => book.chapters >= MIN_PLAN_DAYS);
 const SUGGESTED_BOOKS = ['JHN', 'PSA', 'PRO', 'MRK', 'ACT', 'ROM', 'GEN', 'MAT', 'LUK', 'PHP'];
 const EXTERNAL_DAY_CHOICES = [7, 14, 21, 30, 60, 90];
 const TITLE_MAX_LENGTH = 60;
@@ -29,8 +31,11 @@ function normalize(text: string): string {
 
 function searchBooks(query: string, language: LanguageCode) {
   const needle = normalize(query.trim());
-  if (!needle) return SUGGESTED_BOOKS.flatMap((code) => BIBLE_BOOKS.filter((b) => b.code === code));
-  return BIBLE_BOOKS.filter((book) => normalize(bookName(book.code, language)).includes(needle));
+  if (!needle)
+    return SUGGESTED_BOOKS.flatMap((code) => PLANNABLE_BOOKS.filter((b) => b.code === code));
+  return PLANNABLE_BOOKS.filter((book) =>
+    normalize(bookName(book.code, language)).includes(needle),
+  );
 }
 
 export default function NovoPlanoScreen() {
@@ -39,6 +44,8 @@ export default function NovoPlanoScreen() {
   const { t, language } = useTranslation();
   const [mode, setMode] = useState<Mode>('book');
   const [working, setWorking] = useState(false);
+  // Trava síncrona contra toque duplo (o estado `working` só vale no próximo render).
+  const busyRef = useRef(false);
 
   // Um livro, um capítulo por dia.
   const [query, setQuery] = useState('');
@@ -70,6 +77,19 @@ export default function NovoPlanoScreen() {
     setBookTitle(null);
   };
 
+  const confirmSwitch = (activeTitle: string) =>
+    new Promise<boolean>((resolve) => {
+      Alert.alert(
+        t('plans.switchTitle'),
+        `${activeTitle}\n${t('plans.switchBody')}`,
+        [
+          { text: t('common.cancel'), style: 'cancel', onPress: () => resolve(false) },
+          { text: t('plans.switchAction'), onPress: () => resolve(true) },
+        ],
+        { onDismiss: () => resolve(false) },
+      );
+    });
+
   const submit = async (plan: {
     title: string;
     description: string;
@@ -77,9 +97,23 @@ export default function NovoPlanoScreen() {
     externalUrl: string | null;
     days: NewPlanDay[];
   }) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setWorking(true);
+    // Criar já começa o plano e pausa o que estava em andamento: avisa antes, como ao trocar de plano.
+    const current = await plansApi.list();
+    const otherActive =
+      current.error === null ? current.data.find((p) => p.status === 'active') : null;
+    if (otherActive && !(await confirmSwitch(otherActive.title))) {
+      setWorking(false);
+      busyRef.current = false;
+      return;
+    }
     const result = await plansApi.createCustom(plan);
-    setWorking(false);
+    if (result.error !== null || typeof result.data !== 'string') {
+      setWorking(false);
+      busyRef.current = false;
+    }
     if (result.error !== null) {
       Alert.alert(
         result.error.includes('too_many')
@@ -90,7 +124,12 @@ export default function NovoPlanoScreen() {
       );
       return;
     }
+    if (typeof result.data !== 'string') {
+      Alert.alert(t('plans.create.errorGeneric'));
+      return;
+    }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    // Fica com o botão travado até a tela trocar (evita um segundo plano igual).
     router.replace(`/planos/${result.data}`);
   };
 

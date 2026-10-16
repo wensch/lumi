@@ -20,6 +20,8 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 
 9.1 ✅ **Feedback do teste (14/10)** — seletor de voz mais limpo (nomes simples, dois grupos, botão de amostra); itens do Lumi nos primeiros dias (broto no 1º devocional, sininho em 3 dias, mochila em 5); **desafios criados pela pessoa** (pessoais e do círculo; migration 00025); **planos criados pela pessoa** (um livro da Bíblia, um capítulo por dia, ou acompanhamento de um plano do YouVersion; migration 00026). A API da YouVersion não oferece o conteúdo dos planos, por isso não dá para importá-los.
 
+9.2 ✅ **Navegação (16/10)** — a aba Lumi virou **Jornada** (plano de leitura em andamento + desafios, com atalhos para criar os seus); o Lumi e o guarda-roupa abrem pelo botão/mascote no topo da Hoje. **Pente fino 16/10** — ver o relatório no chat; migration 00027.
+
 ## Bloco D — Qualidade
 10. **Inglês completo** — telas e devocionais.
 11. **Métricas** — ativação, D1/D7/D30, conclusão (briefing §16), sem dados de oração.
@@ -30,4 +32,4 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 14. Nome definitivo e ícone final.
 15. Política de privacidade, termos e **apagar conta e dados** (exigido pelas lojas).
 16. Assinatura de release (Play Store / App Store), fichas das lojas, capturas de tela.
-17. **Apagar os dados de teste** do Supabase e publicar. Antes: rodar `supabase/patches/restore-event-windows.sql` (volta as datas reais dos eventos de 2026).
+17. **Apagar os dados de teste** do Supabase e publicar. Antes de publicar nas lojas: restringir `apk.yml`/`site.yml` à branch `main` (hoje qualquer `ccr-*` publica o `apk-latest`), migrar o login para PKCE e guardar a sessão no SecureStore, e restringir a chave de API do Firebase ao pacote `com.lumi.app`. Antes: rodar `supabase/patches/restore-event-windows.sql` (volta as datas reais dos eventos de 2026).

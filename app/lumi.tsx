@@ -15,6 +15,7 @@ import {
 } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
+import { goBackOrHome } from '@/lib/navigation';
 
 export default function LumiScreen() {
   const theme = useTheme();
@@ -28,7 +29,7 @@ export default function LumiScreen() {
   if (loading) {
     return (
       <Screen>
-        <ScreenHeader title={t('tabs.lumi')} />
+        <ScreenHeader title={t('lumi.title')} onBackPress={goBackOrHome} />
         <Skeleton height={330} radius={theme.radius.lg} />
         <Skeleton height={110} radius={theme.radius.lg} />
         {Array.from({ length: 5 }, (_, index) => (
@@ -42,7 +43,7 @@ export default function LumiScreen() {
   if (error) {
     return (
       <Screen>
-        <ScreenHeader title={t('tabs.lumi')} />
+        <ScreenHeader title={t('lumi.title')} onBackPress={goBackOrHome} />
         <Card style={styles.errorCard}>
           <Text style={[theme.typography.body, styles.centeredText]}>{t('errors.connection')}</Text>
           <Button label={t('common.retry')} variant="ghost" onPress={refetch} />
@@ -56,7 +57,7 @@ export default function LumiScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={t('tabs.lumi')} />
+      <ScreenHeader title={t('lumi.title')} onBackPress={goBackOrHome} />
 
       <FadeIn>
         <Card style={styles.mascotCard}>

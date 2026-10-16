@@ -5,6 +5,7 @@ insert into auth.users (id) values ('11111111-1111-1111-1111-111111111111'),('22
 insert into public.profiles (id, timezone) select id, 'America/Sao_Paulo' from auth.users on conflict (id) do nothing;
 insert into public.streaks (user_id) select id from auth.users on conflict do nothing;
 truncate public.user_challenges, public.circle_challenges, public.user_achievements, public.devotional_sessions, public.circle_cheers, public.prayer_prayers, public.prayer_requests, public.circle_members, public.circles cascade;
+\ir ../seed-challenges.sql
 set role authenticated; set request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
 \echo '== tabelas fechadas (x3) e funções internas fechadas (x2)'
 select * from public.challenges;

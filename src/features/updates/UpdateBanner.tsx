@@ -5,6 +5,9 @@ import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { useAppUpdate } from './useAppUpdate';
 
+// A aba Hoje desmonta ao abrir outras telas: a dispensa vale para a abertura do app, não da tela.
+let dismissedThisLaunch = false;
+
 /**
  * Aviso discreto no topo da Hoje quando há build novo na release. Some ao
  * dispensar (só nesta abertura do app) e não aparece em build de desenvolvimento.
@@ -14,7 +17,7 @@ export function UpdateBanner() {
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const { status, latest, openDownload } = useAppUpdate({ autoCheck: true });
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(dismissedThisLaunch);
 
   if (status !== 'available' || !latest || dismissed) return null;
 
@@ -35,7 +38,10 @@ export function UpdateBanner() {
           <Text style={styles.updateLabel}>{t('updates.update')}</Text>
         </Pressable>
         <Pressable
-          onPress={() => setDismissed(true)}
+          onPress={() => {
+            dismissedThisLaunch = true;
+            setDismissed(true);
+          }}
           accessibilityRole="button"
           accessibilityLabel={t('updates.dismiss')}
           hitSlop={10}

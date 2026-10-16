@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
@@ -31,6 +31,8 @@ export default function CirculoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { detail, prayers, loading, error, refetch } = useCircle(id);
   const { state: challengeState, refetch: refetchChallenge } = useCircleChallenge(id);
+  // Uma ação do círculo por vez (cheer, orar, desafio...).
+  const busyRef = useRef(false);
   const [creatingChallenge, setCreatingChallenge] = useState(false);
   const [challengeWorking, setChallengeWorking] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -43,13 +45,20 @@ export default function CirculoScreen() {
 
   /** Roda uma ação do banco e, se falhar, mostra a mensagem traduzida. */
   const run = async (action: () => Promise<{ error: string | null }>) => {
-    const result = await action();
-    if (result.error) {
-      Alert.alert(t(`circles.errors.${result.error}`));
-      return false;
+    // Trava síncrona: dois toques seguidos não disparam duas ações (nem dois avisos para o círculo).
+    if (busyRef.current) return false;
+    busyRef.current = true;
+    try {
+      const result = await action();
+      if (result.error) {
+        Alert.alert(t(`circles.errors.${result.error}`));
+        return false;
+      }
+      await refetch();
+      return true;
+    } finally {
+      busyRef.current = false;
     }
-    await refetch();
-    return true;
   };
 
   const copyCode = async () => {
@@ -61,19 +70,27 @@ export default function CirculoScreen() {
 
   /** Começa ou para o desafio do círculo; erro vira aviso traduzido. */
   const runChallenge = async (action: () => Promise<{ error: ChallengeErrorCode | null }>) => {
-    const result = await action();
-    if (result.error !== null) {
-      Alert.alert(t(`challenges.errors.${result.error}`));
-      return;
+    if (busyRef.current) return;
+    busyRef.current = true;
+    try {
+      const result = await action();
+      if (result.error !== null) {
+        Alert.alert(t(`challenges.errors.${result.error}`));
+        return;
+      }
+      await refetchChallenge();
+    } finally {
+      busyRef.current = false;
     }
-    await refetchChallenge();
   };
 
   const createChallenge = async (input: NewChallenge) => {
-    if (!detail) return;
+    if (!detail || busyRef.current) return;
+    busyRef.current = true;
     setChallengeWorking(true);
     const result = await challengesApi.createCustom(input, detail.id);
     setChallengeWorking(false);
+    busyRef.current = false;
     if (result.error !== null) {
       Alert.alert(t(`challenges.errors.${result.error}`));
       return;
@@ -395,9 +412,11 @@ export default function CirculoScreen() {
                     ·{' '}
                     {daysLeft(challengeState.active.ends_at) === 0
                       ? t('challenges.endsToday')
-                      : t('challenges.endsInDays', {
-                          count: daysLeft(challengeState.active.ends_at),
-                        })}
+                      : daysLeft(challengeState.active.ends_at) === 1
+                        ? t('challenges.endsTomorrow')
+                        : t('challenges.endsInDays', {
+                            count: daysLeft(challengeState.active.ends_at),
+                          })}
                   </Text>
                   {challengeState.active.can_stop ? (
                     <Button
@@ -588,7 +607,8 @@ const getStyles = (theme: Theme) =>
       borderWidth: 2,
       borderColor: theme.colors.ink,
       borderRadius: theme.radius.pill,
-      paddingVertical: 6,
+      minHeight: 44,
+      justifyContent: 'center',
       paddingHorizontal: 12,
       backgroundColor: theme.colors.bg,
     },

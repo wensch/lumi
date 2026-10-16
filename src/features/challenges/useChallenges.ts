@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useAuth } from '@/features/auth';
 import { challengesApi } from './api';
+import { useRequestOrder } from '@/lib/useRequestOrder';
 import type { Challenge, CircleChallengeState } from './types';
 
 /** Desafios pessoais com o progresso; recarrega ao voltar para a tela. */
@@ -11,9 +12,12 @@ export function useChallenges() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const order = useRequestOrder();
 
   const load = useCallback(async () => {
+    const ticket = order.next();
     const result = await challengesApi.list();
+    if (!order.isLatest(ticket)) return;
     if (result.error !== null) {
       setError(true);
     } else {
@@ -21,7 +25,7 @@ export function useChallenges() {
       setChallenges(result.data);
     }
     setLoading(false);
-  }, []);
+  }, [order]);
 
   useFocusEffect(
     useCallback(() => {
@@ -29,7 +33,7 @@ export function useChallenges() {
     }, [userId, load]),
   );
 
-  return { challenges, loading, error, refetch: load };
+  return { challenges, loading, error: error && challenges.length === 0, refetch: load };
 }
 
 /** O desafio coletivo de um círculo (meta somada, sem nomes). */
