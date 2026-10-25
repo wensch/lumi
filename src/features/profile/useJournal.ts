@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
+import { useTranslation } from '@/i18n';
+import { loadTranslations, type Translations } from '@/lib/contentTranslations';
 
 export type JournalEntry = {
   id: string;
@@ -8,6 +10,8 @@ export type JournalEntry = {
   title: string | null;
   passageReference: string | null;
   reflection: string | null;
+  /** Conteúdo do momento (para trocar o título pela tradução). */
+  contentId: string | null;
 };
 
 const PAGE_SIZE = 40;
@@ -16,6 +20,7 @@ type JournalRow = {
   id: string;
   completed_at: string | null;
   reflection_text: string | null;
+  content_id: string | null;
   content: unknown;
 };
 
@@ -30,7 +35,15 @@ function toEntry(row: JournalRow): JournalEntry {
     title: content?.title ?? null,
     passageReference: content?.passage_reference ?? null,
     reflection: row.reflection_text?.trim() ? row.reflection_text : null,
+    contentId: row.content_id,
   };
+}
+
+function translateTitles(entries: JournalEntry[], tr: Translations): JournalEntry[] {
+  return entries.map((entry) => {
+    const translated = entry.contentId ? tr.content.get(entry.contentId) : undefined;
+    return translated ? { ...entry, title: translated.title } : entry;
+  });
 }
 
 /**
@@ -51,26 +64,36 @@ export function useJournal() {
   const activeUserId = useRef<string | null>(null);
   const loadingMoreRef = useRef(false);
 
-  const fetchEntries = useCallback(async (id: string) => {
-    setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('devotional_sessions')
-      .select('id, completed_at, reflection_text, content:content_id (title, passage_reference)')
-      .eq('user_id', id)
-      .not('completed_at', 'is', null)
-      .order('completed_at', { ascending: false })
-      .limit(PAGE_SIZE);
+  const { language } = useTranslation();
 
-    if (activeUserId.current !== id) return;
-    if (fetchError) {
-      setError(true);
-    } else {
-      setError(false);
-      setEntries((data ?? []).map(toEntry));
-      setHasMore((data ?? []).length === PAGE_SIZE);
-    }
-    setLoading(false);
-  }, []);
+  const fetchEntries = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      const [{ data, error: fetchError }, tr] = await Promise.all([
+        supabase
+          .from('devotional_sessions')
+          .select(
+            'id, completed_at, reflection_text, content_id, content:content_id (title, passage_reference)',
+          )
+          .eq('user_id', id)
+          .not('completed_at', 'is', null)
+          .order('completed_at', { ascending: false })
+          .limit(PAGE_SIZE),
+        loadTranslations(language),
+      ]);
+
+      if (activeUserId.current !== id) return;
+      if (fetchError) {
+        setError(true);
+      } else {
+        setError(false);
+        setEntries(translateTitles((data ?? []).map(toEntry), tr));
+        setHasMore((data ?? []).length === PAGE_SIZE);
+      }
+      setLoading(false);
+    },
+    [language],
+  );
 
   useEffect(() => {
     activeUserId.current = userId;
@@ -95,14 +118,19 @@ export function useJournal() {
     if (!id || !last || !hasMore || loadingMoreRef.current) return true;
     loadingMoreRef.current = true;
     setLoadingMore(true);
-    const { data, error: moreError } = await supabase
-      .from('devotional_sessions')
-      .select('id, completed_at, reflection_text, content:content_id (title, passage_reference)')
-      .eq('user_id', id)
-      .not('completed_at', 'is', null)
-      .lt('completed_at', last.completedAt)
-      .order('completed_at', { ascending: false })
-      .limit(PAGE_SIZE);
+    const [{ data, error: moreError }, tr] = await Promise.all([
+      supabase
+        .from('devotional_sessions')
+        .select(
+          'id, completed_at, reflection_text, content_id, content:content_id (title, passage_reference)',
+        )
+        .eq('user_id', id)
+        .not('completed_at', 'is', null)
+        .lt('completed_at', last.completedAt)
+        .order('completed_at', { ascending: false })
+        .limit(PAGE_SIZE),
+      loadTranslations(language),
+    ]);
     loadingMoreRef.current = false;
     setLoadingMore(false);
     if (activeUserId.current !== id) return true;
@@ -110,11 +138,14 @@ export function useJournal() {
     const rows = data ?? [];
     setEntries((current) => {
       const known = new Set(current.map((entry) => entry.id));
-      return [...current, ...rows.map(toEntry).filter((entry) => !known.has(entry.id))];
+      return [
+        ...current,
+        ...translateTitles(rows.map(toEntry), tr).filter((entry) => !known.has(entry.id)),
+      ];
     });
     setHasMore(rows.length === PAGE_SIZE);
     return true;
-  }, [userId, entries, hasMore]);
+  }, [userId, entries, hasMore, language]);
 
   /** Apaga só o texto da reflexão. Devolve false se o servidor recusar. */
   const clearReflection = useCallback(async (sessionId: string) => {

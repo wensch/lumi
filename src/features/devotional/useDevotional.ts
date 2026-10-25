@@ -3,7 +3,8 @@ import { supabase } from '@/lib/supabase';
 import type { Database } from '@/lib/supabase';
 import { useAuth } from '@/features/auth';
 import { calculateDaysSince, startOfLocalDay } from '@/lib/dates';
-import { translate } from '@/i18n';
+import { translate, useTranslation } from '@/i18n';
+import { loadTranslations, localizeContent, localizeText } from '@/lib/contentTranslations';
 import type { ActivePlan } from '@/features/plans/types';
 import { selectDailyContent } from './selectDailyContent';
 import { trackEvent } from '@/features/metrics';
@@ -42,108 +43,120 @@ export function useDevotional() {
   // Trava síncrona contra toque duplo em "concluir": o `completing` (state) só vale no próximo render.
   const completingRef = useRef(false);
 
-  const start = useCallback(async (userId: string) => {
-    setLoading(true);
-    setError(null);
+  const { language } = useTranslation();
 
-    const [{ data: allContent, error: contentError }, { data: streak }, planResult] =
-      await Promise.all([
+  const start = useCallback(
+    async (userId: string) => {
+      setLoading(true);
+      setError(null);
+
+      const [
+        { data: allContent, error: contentError },
+        { data: streak },
+        planResult,
+        translations,
+      ] = await Promise.all([
         // O sorteio do dia usa só o catálogo público: os dias de planos próprios (owner_id) vêm por id, abaixo.
         supabase.from('content').select('*').is('owner_id', null).not('published_at', 'is', null),
         supabase.from('streaks').select('last_completed_date').eq('user_id', userId).single(),
         // Sem plano (ou sem rede para consultá-lo) cai no devocional do dia comum.
         supabase.rpc('active_reading_plan'),
+        // Em inglês, os textos traduzidos; em português (ou sem rede) fica o original.
+        loadTranslations(language),
       ]);
-    const activePlan = (planResult.error ? null : planResult.data) as ActivePlan | null;
+      const activePlan = (planResult.error ? null : planResult.data) as ActivePlan | null;
+      // O catálogo já vem no idioma da pessoa: sorteio, dia de plano e sessão usam a mesma versão.
+      const catalog = (allContent ?? []).map((item) => localizeContent(item, translations));
 
-    const isReturningFromBreak =
-      (calculateDaysSince(streak?.last_completed_date ?? null) ?? 0) >= 2;
+      const isReturningFromBreak =
+        (calculateDaysSince(streak?.last_completed_date ?? null) ?? 0) >= 2;
 
-    if (contentError) {
-      // Sem rede/servidor: não é "sem devocional hoje" — avisa e deixa tentar de novo.
-      setError(translate('errors.devotionalStart'));
-      setState(EMPTY_STATE);
+      if (contentError) {
+        // Sem rede/servidor: não é "sem devocional hoje" — avisa e deixa tentar de novo.
+        setError(translate('errors.devotionalStart'));
+        setState(EMPTY_STATE);
+        setLoading(false);
+        return;
+      }
+
+      // Conteúdo por id: do catálogo já baixado ou, para dia de plano próprio (privado), direto do banco.
+      const contentById = async (id: string): Promise<Content | null> => {
+        const known = catalog.find((item) => item.id === id);
+        if (known) return known;
+        const { data } = await supabase.from('content').select('*').eq('id', id).maybeSingle();
+        return data ? localizeContent(data, translations) : null;
+      };
+
+      // Com plano ativo e o dia de hoje ainda não feito, o devocional é o próximo dia do plano.
+      const planContent =
+        activePlan && !activePlan.done_today ? await contentById(activePlan.content_id) : null;
+      const plan =
+        activePlan && planContent
+          ? {
+              planId: activePlan.plan_id,
+              title: localizeText(activePlan, translations.plans, 'plan_id').title,
+              day: activePlan.next_day,
+              days: activePlan.days,
+            }
+          : null;
+      // Devocionais de evento (Advento, Natal, Páscoa) e dias de planos próprios só chegam pelo plano, nunca no sorteio do dia.
+      const content = planContent ?? selectDailyContent(catalog.filter((item) => !item.seasonal));
+
+      if (!content) {
+        setState({ ...EMPTY_STATE, isReturningFromBreak });
+        setLoading(false);
+        return;
+      }
+
+      // Filtra por usuário + data (não por content_id): se o conteúdo do dia
+      // mudar entre uma abertura e outra da tela, ainda reaproveita a sessão do dia
+      // em vez de criar outra. Vale também para sessão já concluída: reler o
+      // devocional de hoje não deve criar uma linha nova no histórico a cada vez.
+      const startOfToday = startOfLocalDay().toISOString();
+      let sessionQuery = supabase
+        .from('devotional_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('started_at', startOfToday);
+      // Dia de plano: reaproveita só a sessão de hoje DESTE devocional; uma sessão aberta antes com outro
+      // texto não vale (senão o plano nunca avançaria).
+      // Também ignora sessão já concluída: o servidor só avança o plano na primeira conclusão da sessão.
+      if (plan) sessionQuery = sessionQuery.eq('content_id', content.id).is('completed_at', null);
+      const { data: existingSession } = await sessionQuery
+        .order('started_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (existingSession) {
+        // O texto exibido segue a sessão (e não o cálculo do dia): se o catálogo mudou no meio
+        // do dia, a pergunta à IA e o histórico continuam apontando para o mesmo conteúdo.
+        const sessionContent =
+          (existingSession.content_id ? await contentById(existingSession.content_id) : null) ??
+          content;
+        setState({ content: sessionContent, session: existingSession, isReturningFromBreak, plan });
+        setLoading(false);
+        return;
+      }
+
+      const { data: newSession, error: insertError } = await supabase
+        .from('devotional_sessions')
+        .insert({ user_id: userId, content_id: content.id })
+        .select('*')
+        .single();
+
+      if (insertError || !newSession) {
+        setError(translate('errors.devotionalStart'));
+        setState({ content, session: null, isReturningFromBreak, plan });
+        setLoading(false);
+        return;
+      }
+      trackEvent('devotional_started');
+
+      setState({ content, session: newSession, isReturningFromBreak, plan });
       setLoading(false);
-      return;
-    }
-
-    // Conteúdo por id: do catálogo já baixado ou, para dia de plano próprio (privado), direto do banco.
-    const contentById = async (id: string): Promise<Content | null> => {
-      const known = (allContent ?? []).find((item) => item.id === id);
-      if (known) return known;
-      const { data } = await supabase.from('content').select('*').eq('id', id).maybeSingle();
-      return data ?? null;
-    };
-
-    // Com plano ativo e o dia de hoje ainda não feito, o devocional é o próximo dia do plano.
-    const planContent =
-      activePlan && !activePlan.done_today ? await contentById(activePlan.content_id) : null;
-    const plan =
-      activePlan && planContent
-        ? {
-            planId: activePlan.plan_id,
-            title: activePlan.title,
-            day: activePlan.next_day,
-            days: activePlan.days,
-          }
-        : null;
-    // Devocionais de evento (Advento, Natal, Páscoa) e dias de planos próprios só chegam pelo plano, nunca no sorteio do dia.
-    const content =
-      planContent ?? selectDailyContent((allContent ?? []).filter((item) => !item.seasonal));
-
-    if (!content) {
-      setState({ ...EMPTY_STATE, isReturningFromBreak });
-      setLoading(false);
-      return;
-    }
-
-    // Filtra por usuário + data (não por content_id): se o conteúdo do dia
-    // mudar entre uma abertura e outra da tela, ainda reaproveita a sessão do dia
-    // em vez de criar outra. Vale também para sessão já concluída: reler o
-    // devocional de hoje não deve criar uma linha nova no histórico a cada vez.
-    const startOfToday = startOfLocalDay().toISOString();
-    let sessionQuery = supabase
-      .from('devotional_sessions')
-      .select('*')
-      .eq('user_id', userId)
-      .gte('started_at', startOfToday);
-    // Dia de plano: reaproveita só a sessão de hoje DESTE devocional; uma sessão aberta antes com outro
-    // texto não vale (senão o plano nunca avançaria).
-    // Também ignora sessão já concluída: o servidor só avança o plano na primeira conclusão da sessão.
-    if (plan) sessionQuery = sessionQuery.eq('content_id', content.id).is('completed_at', null);
-    const { data: existingSession } = await sessionQuery
-      .order('started_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (existingSession) {
-      // O texto exibido segue a sessão (e não o cálculo do dia): se o catálogo mudou no meio
-      // do dia, a pergunta à IA e o histórico continuam apontando para o mesmo conteúdo.
-      const sessionContent =
-        (existingSession.content_id ? await contentById(existingSession.content_id) : null) ??
-        content;
-      setState({ content: sessionContent, session: existingSession, isReturningFromBreak, plan });
-      setLoading(false);
-      return;
-    }
-
-    const { data: newSession, error: insertError } = await supabase
-      .from('devotional_sessions')
-      .insert({ user_id: userId, content_id: content.id })
-      .select('*')
-      .single();
-
-    if (insertError || !newSession) {
-      setError(translate('errors.devotionalStart'));
-      setState({ content, session: null, isReturningFromBreak, plan });
-      setLoading(false);
-      return;
-    }
-    trackEvent('devotional_started');
-
-    setState({ content, session: newSession, isReturningFromBreak, plan });
-    setLoading(false);
-  }, []);
+    },
+    [language],
+  );
 
   useEffect(() => {
     if (!userId) {

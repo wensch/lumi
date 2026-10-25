@@ -102,6 +102,32 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['content']['Row']>;
         Relationships: [];
       };
+      content_translations: {
+        Row: {
+          content_id: string;
+          language: 'en';
+          title: string;
+          body: string;
+          application_text: string | null;
+          challenge_text: string | null;
+          prayer_text: string | null;
+        };
+        Insert: Database['public']['Tables']['content_translations']['Row'];
+        Update: Partial<Database['public']['Tables']['content_translations']['Row']>;
+        Relationships: [];
+      };
+      reading_plan_translations: {
+        Row: { plan_id: string; language: 'en'; title: string; description: string };
+        Insert: Database['public']['Tables']['reading_plan_translations']['Row'];
+        Update: Partial<Database['public']['Tables']['reading_plan_translations']['Row']>;
+        Relationships: [];
+      };
+      challenge_translations: {
+        Row: { challenge_id: string; language: 'en'; title: string; description: string };
+        Insert: Database['public']['Tables']['challenge_translations']['Row'];
+        Update: Partial<Database['public']['Tables']['challenge_translations']['Row']>;
+        Relationships: [];
+      };
       devotional_sessions: {
         Row: {
           id: string;

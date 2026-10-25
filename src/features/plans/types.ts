@@ -36,6 +36,8 @@ export type PlanDayState = 'done' | 'next' | 'locked';
 
 export type PlanDay = {
   day: number;
+  /** Conteúdo do dia (para achar a tradução). */
+  content_id: string;
   title: string;
   passage_reference: string | null;
   state: PlanDayState;

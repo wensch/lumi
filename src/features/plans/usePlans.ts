@@ -3,7 +3,22 @@ import { useFocusEffect } from 'expo-router';
 import { useAuth } from '@/features/auth';
 import { plansApi } from './api';
 import { useRequestOrder } from '@/lib/useRequestOrder';
+import { useTranslation } from '@/i18n';
+import { loadTranslations, localizeText, type Translations } from '@/lib/contentTranslations';
 import type { ActiveEvent, ActivePlan, PlanDetail, PlanSummary } from './types';
+
+/** Plano com título e descrição no idioma da pessoa (e os dias, pelo conteúdo de cada dia). */
+function localizePlan<T extends PlanSummary | PlanDetail>(plan: T, tr: Translations): T {
+  const local = localizeText(plan, tr.plans);
+  if (!('items' in plan)) return local;
+  return {
+    ...local,
+    items: plan.items.map((item) => {
+      const day = tr.content.get(item.content_id);
+      return day ? { ...item, title: day.title } : item;
+    }),
+  } as T;
+}
 
 /** Lista de planos com o progresso de cada um; recarrega ao voltar para a tela. */
 export function usePlans() {
@@ -13,19 +28,20 @@ export function usePlans() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const order = useRequestOrder();
+  const { language } = useTranslation();
 
   const load = useCallback(async () => {
     const ticket = order.next();
-    const result = await plansApi.list();
+    const [result, tr] = await Promise.all([plansApi.list(), loadTranslations(language)]);
     if (!order.isLatest(ticket)) return;
     if (result.error !== null) {
       setError(true);
     } else {
       setError(false);
-      setPlans(result.data);
+      setPlans(result.data.map((plan) => localizeText(plan, tr.plans)));
     }
     setLoading(false);
-  }, [order]);
+  }, [order, language]);
 
   useFocusEffect(
     useCallback(() => {
@@ -42,20 +58,21 @@ export function usePlan(planId: string | undefined) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const order = useRequestOrder();
+  const { language } = useTranslation();
 
   const load = useCallback(async () => {
     if (!planId) return;
     const ticket = order.next();
-    const result = await plansApi.detail(planId);
+    const [result, tr] = await Promise.all([plansApi.detail(planId), loadTranslations(language)]);
     if (!order.isLatest(ticket)) return;
     if (result.error !== null) {
       setError(true);
     } else {
       setError(false);
-      setPlan(result.data);
+      setPlan(localizePlan(result.data, tr));
     }
     setLoading(false);
-  }, [planId, order]);
+  }, [planId, order, language]);
 
   useFocusEffect(
     useCallback(() => {
@@ -72,11 +89,15 @@ export function useActivePlan() {
   const userId = session?.user.id ?? null;
   const [active, setActive] = useState<ActivePlan | null>(null);
 
+  const { language } = useTranslation();
+
   const load = useCallback(async () => {
-    const result = await plansApi.active();
+    const [result, tr] = await Promise.all([plansApi.active(), loadTranslations(language)]);
     // Sem rede: mantém o que já tinha em vez de esconder o cartão.
-    if (result.error === null) setActive(result.data);
-  }, []);
+    if (result.error === null) {
+      setActive(result.data ? localizeText(result.data, tr.plans, 'plan_id') : null);
+    }
+  }, [language]);
 
   useEffect(() => {
     if (!userId) {
@@ -103,10 +124,14 @@ export function useActiveEvents() {
   const userId = session?.user.id ?? null;
   const [events, setEvents] = useState<ActiveEvent[]>([]);
 
+  const { language } = useTranslation();
+
   const load = useCallback(async () => {
-    const result = await plansApi.events();
-    if (result.error === null) setEvents(result.data);
-  }, []);
+    const [result, tr] = await Promise.all([plansApi.events(), loadTranslations(language)]);
+    if (result.error === null) {
+      setEvents(result.data.map((event) => localizeText(event, tr.plans, 'plan_id')));
+    }
+  }, [language]);
 
   useEffect(() => {
     if (!userId) {

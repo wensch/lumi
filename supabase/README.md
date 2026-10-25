@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00027
+## Migrations 00004 a 00029
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -148,4 +148,10 @@ A `00027_pente_fino_planos_desafios.sql` (pente fino de 16/10) endurece os desaf
 (títulos invisíveis, tetos, toques simultâneos, desafio arquivado), corrige `reading_plan_detail` para
 planos de evento de edições passadas e faz sair/remover do círculo registrar antes o desafio que já bateu
 a meta (`leave_circle` virou uma função fina que chama `leave_circle_core`).
+A `00028_metrics_and_error_reports.sql` cria as métricas de uso (`app_events`, `track_event`, `metrics_summary`,
+só no SQL Editor) e o relatório de erros anônimo (`app_errors`, `report_app_error`). Guia em `docs/metricas.md`.
+A `00029_content_translations.sql` guarda as traduções para inglês do conteúdo (`content_translations`,
+`reading_plan_translations`, `challenge_translations`; leitura pública só do que está publicado). Depois dela,
+rode `supabase/seed-translations-en.sql` (73 devocionais, 9 planos e 9 desafios). A tradução foi feita pelo
+Claude e precisa de revisão antes da publicação.
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.
