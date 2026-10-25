@@ -22,6 +22,8 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 
 9.2 ✅ **Navegação (16/10)** — a aba Lumi virou **Jornada** (plano de leitura em andamento + desafios, com atalhos para criar os seus); o Lumi e o guarda-roupa abrem pelo botão/mascote no topo da Hoje. **Pente fino 16/10** — ver o relatório no chat; migration 00027.
 
+9.3 ✅ **Jornada com áreas separadas, histórico paginado e retorno do login YouVersion (25/10)** — a aba Jornada ganhou duas áreas coloridas (plano de leitura e desafios); o histórico de reflexões carrega mais (40 por vez), sem teto de 60; o retorno `lumi://callback` não derruba mais a tela de login (`app/+native-intent.tsx`; só dá para validar no aparelho).
+
 ## Bloco D — Qualidade
 10. **Inglês completo** — telas e devocionais.
 11. **Métricas** — ativação, D1/D7/D30, conclusão (briefing §16), sem dados de oração.

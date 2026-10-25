@@ -301,7 +301,8 @@ export const en: TranslationSchema = {
     suggestions: 'Suggestions',
   },
   journey: {
-    intro: 'Your path with the Word: a reading plan to follow and challenges to give you a nudge.',
+    planSubtitle: 'One devotional a day, at your pace',
+    challengesSubtitle: 'Short consistency goals',
     planTitle: 'Reading plan',
     planInvite: 'A sequence of devotionals on a theme, one a day. Pick one or create your own.',
     choosePlan: 'Choose a plan',
@@ -632,6 +633,7 @@ export const en: TranslationSchema = {
     },
   },
   journal: {
+    loadMore: 'See older moments',
     title: 'Your history',
     private: 'Your reflections stay with you. You can delete them whenever you like.',
     empty: 'Your moments and reflections show up here.',

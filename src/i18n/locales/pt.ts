@@ -304,8 +304,8 @@ export const pt = {
     suggestions: 'Sugestões',
   },
   journey: {
-    intro:
-      'Seu caminho com a Palavra: um plano de leitura para seguir e desafios para dar um empurrãozinho.',
+    planSubtitle: 'Um devocional por dia, no seu ritmo',
+    challengesSubtitle: 'Metas curtas de constância',
     planTitle: 'Plano de leitura',
     planInvite: 'Uma sequência de devocionais sobre um tema, um por dia. Escolha um ou crie o seu.',
     choosePlan: 'Escolher um plano',
@@ -639,6 +639,7 @@ export const pt = {
     },
   },
   journal: {
+    loadMore: 'Ver momentos mais antigos',
     title: 'Seu histórico',
     private: 'Suas reflexões ficam só com você. Você pode apagá-las quando quiser.',
     empty: 'Seus momentos e reflexões aparecem aqui.',

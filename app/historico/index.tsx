@@ -9,7 +9,8 @@ export default function HistoricoScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t, language } = useTranslation();
-  const { entries, loading, error, refetch, clearReflection } = useJournal();
+  const { entries, loading, error, hasMore, loadingMore, loadMore, refetch, clearReflection } =
+    useJournal();
 
   const confirmClear = (entry: JournalEntry) => {
     Alert.alert(t('journal.deleteConfirmTitle'), t('journal.deleteConfirmBody'), [
@@ -77,6 +78,17 @@ export default function HistoricoScreen() {
           </FadeIn>
         ))
       )}
+
+      {hasMore && !loading && !error ? (
+        <Button
+          label={loadingMore ? t('common.loading') : t('journal.loadMore')}
+          variant="secondary"
+          disabled={loadingMore}
+          onPress={async () => {
+            if (!(await loadMore())) Alert.alert(t('journal.loadError'));
+          }}
+        />
+      ) : null}
     </Screen>
   );
 }
