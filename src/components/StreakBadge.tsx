@@ -13,7 +13,12 @@ export function StreakBadge({ days }: StreakBadgeProps) {
   const { t } = useTranslation();
 
   return (
-    <View style={styles.container}>
+    // O leitor de tela lê "{n} dias" e ignora o fogo decorativo.
+    <View
+      style={styles.container}
+      accessible
+      accessibilityLabel={`${days} ${t(days === 1 ? 'home.day' : 'home.days')}`}
+    >
       <Text style={styles.icon}>🔥</Text>
       <Text style={styles.value}>
         {days} {t(days === 1 ? 'home.day' : 'home.days')}

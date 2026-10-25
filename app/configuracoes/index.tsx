@@ -355,7 +355,9 @@ const getStyles = (theme: Theme) =>
     },
     paletteChip: {
       flex: 1,
+      minHeight: 44,
       alignItems: 'center',
+      justifyContent: 'center',
       paddingVertical: theme.spacing.sm,
       borderRadius: theme.radius.pill,
       borderWidth: 2.5,

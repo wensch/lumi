@@ -235,7 +235,12 @@ function DayRow({
             ? t('plans.dayLabel', { day: item.day })
             : `${t('plans.dayLabel', { day: item.day })} · ${item.title}`}
         </Text>
-        <Text style={[theme.typography.caption, styles.muted]}>
+        <Text
+          style={[
+            theme.typography.caption,
+            item.state === 'next' ? styles.onCardMuted : styles.muted,
+          ]}
+        >
           {locked
             ? t('plans.lockedHint')
             : formatPassageReference(item.passage_reference, language)}
@@ -249,6 +254,10 @@ const getStyles = (theme: Theme) =>
   StyleSheet.create({
     muted: {
       color: theme.colors.muted,
+    },
+    // Texto secundário sobre cartão amarelo: `muted` não passa de 4,5:1 nesse fundo (recorte e noite).
+    onCardMuted: {
+      color: theme.colors.ink,
     },
     mutedCentered: {
       color: theme.colors.muted,

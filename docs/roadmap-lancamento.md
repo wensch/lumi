@@ -26,7 +26,7 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 10. **Inglês completo** — telas e devocionais.
 11. **Métricas** — ativação, D1/D7/D30, conclusão (briefing §16), sem dados de oração.
 12. **Relatório de erros** (crash reporting).
-13. **Acessibilidade e desempenho** — leitor de tela, fontes grandes, modo escuro, celulares simples.
+13. **Acessibilidade e desempenho** (auditoria de 25/10 feita com a skill `acessibilidade`: contraste nas 4 paletas, papéis/rótulos, alvos de toque e "reduzir movimento" corrigidos; falta testar com TalkBack e fonte máxima no aparelho) — leitor de tela, fontes grandes, modo escuro, celulares simples.
 
 ## Bloco E — Lançamento (por último)
 14. Nome definitivo e ícone final.

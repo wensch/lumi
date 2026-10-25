@@ -185,7 +185,7 @@ function ChallengeCard({
         <Text style={styles.icon}>{challenge.icon ?? '🎯'}</Text>
         <View style={styles.cardTitleBox}>
           <Text style={theme.typography.bodyStrong}>{challenge.title}</Text>
-          <Text style={[theme.typography.caption, styles.muted]}>
+          <Text style={[theme.typography.caption, isActive ? styles.onCardMuted : styles.muted]}>
             {challenge.custom ? `${t('challenges.customTag')} · ` : ''}
             {t('challenges.inDays', { count: challenge.window_days })}
             {challenge.completed_count > 0
@@ -201,7 +201,7 @@ function ChallengeCard({
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
           </View>
-          <Text style={[theme.typography.caption, styles.muted]}>
+          <Text style={[theme.typography.caption, isActive ? styles.onCardMuted : styles.muted]}>
             {t('challenges.progress', { done: challenge.progress, total: challenge.target })} ·{' '}
             {left === 0
               ? t('challenges.endsToday')
@@ -233,6 +233,10 @@ const getStyles = (theme: Theme) =>
   StyleSheet.create({
     muted: {
       color: theme.colors.muted,
+    },
+    // Texto secundário sobre cartão amarelo: `muted` não passa de 4,5:1 nesse fundo (recorte e noite).
+    onCardMuted: {
+      color: theme.colors.ink,
     },
     centeredCard: {
       alignItems: 'center',

@@ -34,7 +34,7 @@ export default function JornadaScreen() {
               <Text style={styles.icon}>{activePlan.icon ?? '📖'}</Text>
               <View style={styles.cardTitleBox}>
                 <Text style={theme.typography.bodyStrong}>{activePlan.title}</Text>
-                <Text style={[theme.typography.caption, styles.muted]}>
+                <Text style={[theme.typography.caption, styles.onCardMuted]}>
                   {t('plans.dayProgress', {
                     done: activePlan.last_day_done,
                     total: activePlan.days,
@@ -165,6 +165,10 @@ const getStyles = (theme: Theme) =>
   StyleSheet.create({
     muted: {
       color: theme.colors.muted,
+    },
+    // Texto secundário sobre cartão amarelo: `muted` não passa de 4,5:1 nesse fundo (recorte e noite).
+    onCardMuted: {
+      color: theme.colors.ink,
     },
     centeredText: {
       textAlign: 'center',

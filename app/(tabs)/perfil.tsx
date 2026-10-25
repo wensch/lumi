@@ -66,7 +66,7 @@ export default function PerfilScreen() {
                     <Pressable
                       key={achievement.id}
                       accessibilityRole="button"
-                      accessibilityLabel={title}
+                      accessibilityLabel={`${title}. ${t(unlocked ? 'achievementTap.unlocked' : 'achievementTap.locked')}`}
                       onPress={() =>
                         Alert.alert(
                           `${unlocked ? achievement.icon : '🔒'} ${title}`,

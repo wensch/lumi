@@ -24,7 +24,11 @@ export function TextField({ label, error, style, ...rest }: TextFieldProps) {
         keyboardAppearance={theme.palette.isDark ? 'dark' : 'light'}
         {...rest}
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? (
+        <Text style={styles.error} accessibilityLiveRegion="polite">
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 }

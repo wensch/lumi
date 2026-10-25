@@ -212,7 +212,15 @@ function ProgressBar({ progress, theme }: { progress: number; theme: Theme }) {
   }, [fill, progress]);
 
   return (
-    <View style={styles.progressTrack}>
+    <View
+      style={styles.progressTrack}
+      accessibilityRole="progressbar"
+      accessibilityValue={{
+        min: 0,
+        max: 100,
+        now: Math.round(Math.min(Math.max(progress, 0), 1) * 100),
+      }}
+    >
       <Animated.View
         style={[
           styles.progressFill,

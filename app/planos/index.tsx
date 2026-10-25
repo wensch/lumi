@@ -72,7 +72,12 @@ function PlanCard({ plan, theme }: { plan: PlanSummary; theme: Theme }) {
           <Text style={styles.icon}>{plan.icon ?? '📖'}</Text>
           <View style={styles.cardTitleBox}>
             <Text style={theme.typography.bodyStrong}>{plan.title}</Text>
-            <Text style={[theme.typography.caption, styles.muted]}>
+            <Text
+              style={[
+                theme.typography.caption,
+                plan.status === 'active' ? styles.onCardMuted : styles.muted,
+              ]}
+            >
               {plan.event_slug ? `${t('events.tag')} · ` : ''}
               {plan.custom ? `${t('plans.customTag')} · ` : ''}
               {t('plans.daysCount', { count: plan.days })}
@@ -86,7 +91,12 @@ function PlanCard({ plan, theme }: { plan: PlanSummary; theme: Theme }) {
             <View style={styles.progressTrack}>
               <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
             </View>
-            <Text style={[theme.typography.caption, styles.muted]}>
+            <Text
+              style={[
+                theme.typography.caption,
+                plan.status === 'active' ? styles.onCardMuted : styles.muted,
+              ]}
+            >
               {t('plans.dayProgress', { done: plan.last_day_done, total: plan.days })}
             </Text>
           </View>
@@ -100,6 +110,10 @@ const getStyles = (theme: Theme) =>
   StyleSheet.create({
     muted: {
       color: theme.colors.muted,
+    },
+    // Texto secundário sobre cartão amarelo: `muted` não passa de 4,5:1 nesse fundo (recorte e noite).
+    onCardMuted: {
+      color: theme.colors.ink,
     },
     centeredCard: {
       alignItems: 'center',

@@ -11,7 +11,8 @@ export function XPBadge({ xp }: XPBadgeProps) {
   const styles = getStyles(theme);
 
   return (
-    <View style={styles.container}>
+    // O leitor de tela lê "{xp} XP" e ignora a estrela decorativa.
+    <View style={styles.container} accessible accessibilityLabel={`${xp} XP`}>
       <Text style={styles.icon}>⭐</Text>
       <Text style={styles.value}>{xp} XP</Text>
     </View>

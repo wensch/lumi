@@ -6,6 +6,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { useReduceMotion } from '@/lib/useReduceMotion';
 import { useTheme } from '@/theme';
 
 type SkeletonProps = {
@@ -24,7 +25,11 @@ export function Skeleton({ width = '100%', height = 16, radius = 10, style }: Sk
   const theme = useTheme();
   const [pulse] = useState(() => new Animated.Value(0.45));
 
+  const reduceMotion = useReduceMotion();
+
   useEffect(() => {
+    // "Reduzir movimento": o bloco fica parado, sem pulsar.
+    if (reduceMotion) return;
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulse, {
@@ -43,7 +48,7 @@ export function Skeleton({ width = '100%', height = 16, radius = 10, style }: Sk
     );
     loop.start();
     return () => loop.stop();
-  }, [pulse]);
+  }, [pulse, reduceMotion]);
 
   return (
     <Animated.View

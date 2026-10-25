@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { LumiMascot } from '@/features/lumi';
+import { useReduceMotion } from '@/lib/useReduceMotion';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 
@@ -15,7 +16,11 @@ export function LoadingScreen() {
   const { t } = useTranslation();
   const [bob] = useState(() => new Animated.Value(0));
 
+  const reduceMotion = useReduceMotion();
+
   useEffect(() => {
+    // "Reduzir movimento": o mascote fica parado.
+    if (reduceMotion) return;
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(bob, {
@@ -34,7 +39,7 @@ export function LoadingScreen() {
     );
     loop.start();
     return () => loop.stop();
-  }, [bob]);
+  }, [bob, reduceMotion]);
 
   return (
     <View style={styles.container}>

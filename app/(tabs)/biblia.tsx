@@ -235,7 +235,12 @@ function BookGroup({
       <Text style={styles.groupTitle}>{title}</Text>
       <View style={styles.bookGrid}>
         {books.map((book) => (
-          <Pressable key={book.id} onPress={() => onSelectBook(book.id)} style={styles.bookChip}>
+          <Pressable
+            key={book.id}
+            onPress={() => onSelectBook(book.id)}
+            accessibilityRole="button"
+            style={styles.bookChip}
+          >
             <Text style={styles.bookChipLabel}>{book.title}</Text>
           </Pressable>
         ))}
@@ -260,7 +265,7 @@ function ChapterGrid({
 
   return (
     <View style={styles.bookListContainer}>
-      <Pressable onPress={onBack}>
+      <Pressable onPress={onBack} accessibilityRole="button" hitSlop={8} style={styles.linkTarget}>
         <Text style={styles.backLink}>{`← ${t('bible.books')}`}</Text>
       </Pressable>
 
@@ -275,6 +280,8 @@ function ChapterGrid({
               <Pressable
                 key={chapter.id}
                 onPress={() => onSelectChapter(bookId, Number(chapter.id))}
+                accessibilityRole="button"
+                accessibilityLabel={`${book.title} ${chapter.title}`}
                 style={styles.chapterChip}
               >
                 <Text style={styles.bookChipLabel}>{chapter.title}</Text>
@@ -392,7 +399,12 @@ function SearchSuggestions({
       </Text>
       <View style={styles.bookGrid}>
         {queries.map((query) => (
-          <Pressable key={query.text} onPress={() => onSelect(query.text)} style={styles.bookChip}>
+          <Pressable
+            key={query.text}
+            onPress={() => onSelect(query.text)}
+            accessibilityRole="button"
+            style={styles.bookChip}
+          >
             <Text style={styles.bookChipLabel}>{query.text}</Text>
           </Pressable>
         ))}
@@ -422,7 +434,14 @@ function SearchResults({
         <SearchResultRow key={result.id} result={result} onPress={() => onSelect(result)} />
       ))}
       {nextPage === 'available' || nextPage === 'loading' ? (
-        <Pressable onPress={onLoadMore} disabled={nextPage === 'loading'}>
+        <Pressable
+          onPress={onLoadMore}
+          disabled={nextPage === 'loading'}
+          accessibilityRole="button"
+          accessibilityState={{ busy: nextPage === 'loading' }}
+          hitSlop={8}
+          style={styles.linkTarget}
+        >
           <Text style={styles.backLink}>
             {nextPage === 'loading' ? t('bible.searching') : t('bible.loadMore')}
           </Text>
@@ -442,7 +461,7 @@ function SearchResultRow({ result, onPress }: { result: BibleSearchResult; onPre
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={passage?.reference ?? result.id}
+      accessibilityLabel={passage ? `${passage.reference}. ${passage.content}` : result.id}
       style={({ pressed }) => [styles.resultRow, pressed && styles.resultRowPressed]}
     >
       <Text style={styles.resultReference}>{passage?.reference ?? result.id}</Text>
@@ -492,6 +511,8 @@ const getStyles = (theme: Theme) =>
       gap: theme.spacing.sm,
     },
     bookChip: {
+      minHeight: 44,
+      justifyContent: 'center',
       backgroundColor: theme.colors.white,
       borderWidth: 2.5,
       borderColor: theme.colors.ink,
@@ -506,7 +527,9 @@ const getStyles = (theme: Theme) =>
       borderColor: theme.colors.ink,
       borderRadius: theme.radius.pill,
       minWidth: 44,
+      minHeight: 44,
       alignItems: 'center',
+      justifyContent: 'center',
       paddingVertical: 8,
       paddingHorizontal: 12,
       ...theme.shadow.chip,
@@ -515,6 +538,10 @@ const getStyles = (theme: Theme) =>
       ...theme.typography.button,
       fontSize: 14,
       color: theme.colors.ink,
+    },
+    linkTarget: {
+      minHeight: 44,
+      justifyContent: 'center',
     },
     backLink: {
       ...theme.typography.bodyStrong,

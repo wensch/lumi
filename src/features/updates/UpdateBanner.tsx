@@ -33,6 +33,7 @@ export function UpdateBanner() {
         <Pressable
           onPress={openDownload}
           accessibilityRole="button"
+          hitSlop={8}
           style={({ pressed }) => [styles.updateButton, pressed && styles.pressed]}
         >
           <Text style={styles.updateLabel}>{t('updates.update')}</Text>
