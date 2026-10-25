@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { trackEvent } from '@/features/metrics';
 import type { Challenge, CircleChallengeState, NewChallenge } from './types';
 
 /** Códigos de erro das funções do banco (migration 00020); o app os traduz. */
@@ -43,21 +44,29 @@ async function call<T>(
 
 export const challengesApi = {
   list: () => call<Challenge[]>(() => supabase.rpc('list_challenges')),
-  start: (challengeId: string) =>
-    call<null>(() => supabase.rpc('start_challenge', { p_challenge_id: challengeId })),
+  start: async (challengeId: string) => {
+    const result = await call<null>(() =>
+      supabase.rpc('start_challenge', { p_challenge_id: challengeId }),
+    );
+    if (result.error === null) trackEvent('challenge_started');
+    return result;
+  },
   abandon: (challengeId: string) =>
     call<null>(() => supabase.rpc('abandon_challenge', { p_challenge_id: challengeId })),
   circleState: (circleId: string) =>
     call<CircleChallengeState>(() =>
       supabase.rpc('circle_challenge_state', { p_circle_id: circleId }),
     ),
-  startCircle: (circleId: string, challengeId: string) =>
-    call<null>(() =>
+  startCircle: async (circleId: string, challengeId: string) => {
+    const result = await call<null>(() =>
       supabase.rpc('start_circle_challenge', {
         p_circle_id: circleId,
         p_challenge_id: challengeId,
       }),
-    ),
+    );
+    if (result.error === null) trackEvent('challenge_started');
+    return result;
+  },
   /** Cria um desafio próprio e já começa (pessoal, ou do círculo quando `circleId` vem). */
   createCustom: (input: NewChallenge, circleId: string | null) =>
     call<string>(() =>

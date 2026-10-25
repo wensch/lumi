@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { useAuth } from '@/features/auth';
 import { useTranslation } from '@/i18n';
+import { trackEvent } from '@/features/metrics';
 import { supabase } from '@/lib/supabase';
 import { registerPushToken, syncPushLanguage } from './pushToken';
 
@@ -59,6 +60,7 @@ export function usePushSetup(navigationReady: boolean) {
     // O id vem do payload da notificação e vai para a rota: só aceita um UUID.
     if (typeof circleId !== 'string' || !UUID_PATTERN.test(circleId)) return;
     handledResponse.current = responseId;
+    trackEvent('notification_opened');
     router.push(`/circulo/${circleId}`);
   }, [navigationReady, userId, responseId, circleId]);
 }

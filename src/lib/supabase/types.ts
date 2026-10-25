@@ -331,6 +331,20 @@ export interface Database {
         Args: { p_plan_id: string };
         Returns: undefined;
       };
+      track_event: {
+        Args: { p_name: string };
+        Returns: undefined;
+      };
+      report_app_error: {
+        Args: {
+          p_source: string;
+          p_message: string;
+          p_stack?: string;
+          p_app_version?: string;
+          p_platform?: string;
+        };
+        Returns: undefined;
+      };
       create_custom_plan: {
         Args: {
           p_title: string;

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { trackEvent } from '@/features/metrics';
 import type { ActiveEvent, ActivePlan, NewPlan, PlanDetail, PlanSummary } from './types';
 
 async function call<T>(
@@ -19,8 +20,13 @@ export const plansApi = {
     call<PlanDetail>(() => supabase.rpc('reading_plan_detail', { p_plan_id: planId })),
   events: () => call<ActiveEvent[]>(() => supabase.rpc('active_events')),
   active: () => call<ActivePlan | null>(() => supabase.rpc('active_reading_plan')),
-  start: (planId: string) =>
-    call<null>(() => supabase.rpc('start_reading_plan', { p_plan_id: planId })),
+  start: async (planId: string) => {
+    const result = await call<null>(() =>
+      supabase.rpc('start_reading_plan', { p_plan_id: planId }),
+    );
+    if (result.error === null) trackEvent('plan_started');
+    return result;
+  },
   /** Cria um plano próprio e já começa. Devolve o id do plano. */
   createCustom: (plan: NewPlan) =>
     call<string>(() =>

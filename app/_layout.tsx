@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { AppState, StyleSheet, Text } from 'react-native';
 import { router, Slot, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -34,9 +34,12 @@ import {
 import { LumiOutfitProvider } from '@/features/lumi';
 import { ThemeProvider, useTheme } from '@/theme';
 import { I18nProvider, useTranslation } from '@/i18n';
+import { trackEvent } from '@/features/metrics';
+import { installErrorReporting } from '@/lib/errorReporting';
 
 SplashScreen.preventAutoHideAsync();
 configureNotificationHandler();
+installErrorReporting();
 
 const youVersionAppKey = process.env.EXPO_PUBLIC_YOUVERSION_APP_KEY;
 
@@ -102,6 +105,18 @@ function ThemedStatusBar() {
   return <StatusBar style={theme.palette.isDark ? 'light' : 'dark'} />;
 }
 
+/** Conta a abertura do app uma vez por dia (e de novo ao voltar do segundo plano). */
+function useAppOpenMetric(active: boolean) {
+  useEffect(() => {
+    if (!active) return;
+    trackEvent('app_open');
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') trackEvent('app_open');
+    });
+    return () => subscription.remove();
+  }, [active]);
+}
+
 /**
  * Calcula a rota alvo (ou null se a rota atual já está correta) a partir
  * do estado de auth/onboarding. Mantido como função pura fora do
@@ -159,6 +174,7 @@ function RootNavigation() {
 
   const ready = !authLoading && !(session && profileLoading);
   usePushSetup(ready);
+  useAppOpenMetric(!!session && ready);
 
   useEffect(() => {
     if (!ready) return;

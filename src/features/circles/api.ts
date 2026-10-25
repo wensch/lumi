@@ -1,3 +1,4 @@
+import { trackEvent } from '@/features/metrics';
 import { supabase } from '@/lib/supabase';
 import type { CircleDetail, CircleEventsResult, CircleSummary, PrayerRequest } from './types';
 
@@ -75,7 +76,11 @@ export const circlesApi = {
       supabase.rpc('create_circle', { p_name: name }),
     ),
   /** Devolve o id do círculo, ou nulo quando o código não existe. */
-  join: (code: string) => call<string | null>(() => supabase.rpc('join_circle', { p_code: code })),
+  join: async (code: string) => {
+    const result = await call<string | null>(() => supabase.rpc('join_circle', { p_code: code }));
+    if (result.error === null && result.data) trackEvent('circle_joined');
+    return result;
+  },
   leave: (circleId: string) =>
     call<null>(() => supabase.rpc('leave_circle', { p_circle_id: circleId })),
   removeMember: (circleId: string, userId: string) =>

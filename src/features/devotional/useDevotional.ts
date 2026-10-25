@@ -6,6 +6,7 @@ import { calculateDaysSince, startOfLocalDay } from '@/lib/dates';
 import { translate } from '@/i18n';
 import type { ActivePlan } from '@/features/plans/types';
 import { selectDailyContent } from './selectDailyContent';
+import { trackEvent } from '@/features/metrics';
 
 type Content = Database['public']['Tables']['content']['Row'];
 type DevotionalSession = Database['public']['Tables']['devotional_sessions']['Row'];
@@ -138,6 +139,7 @@ export function useDevotional() {
       setLoading(false);
       return;
     }
+    trackEvent('devotional_started');
 
     setState({ content, session: newSession, isReturningFromBreak, plan });
     setLoading(false);
@@ -178,6 +180,7 @@ export function useDevotional() {
         return null;
       }
 
+      trackEvent('devotional_completed');
       return data[0];
     },
     [state.session],

@@ -25,9 +25,9 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 9.3 ✅ **Jornada com áreas separadas, histórico paginado e retorno do login YouVersion (25/10)** — a aba Jornada ganhou duas áreas coloridas (plano de leitura e desafios); o histórico de reflexões carrega mais (40 por vez), sem teto de 60; o retorno `lumi://callback` não derruba mais a tela de login (`app/+native-intent.tsx`; só dá para validar no aparelho).
 
 ## Bloco D — Qualidade
-10. **Inglês completo** — telas e devocionais.
-11. **Métricas** — ativação, D1/D7/D30, conclusão (briefing §16), sem dados de oração.
-12. **Relatório de erros** (crash reporting).
+10. **Inglês completo** — telas (feito: 616 textos nos dois idiomas, conferidos por `.claude/skills/i18n-sync/verificar.mjs`). Falta o conteúdo do banco, que só existe em português: 73 devocionais, 9 planos, 9 desafios e 20 conquistas. Precisa de decisão: traduzir em lotes com sua revisão, e guardar as traduções em tabela própria.
+11. ✅ **Métricas** (25/10) — eventos de uso só com nome e dia (`app_events`, migration 00028), resumo com ativação, D1/D7/D30, constância e conclusão (`metrics_summary()`, no SQL Editor). Sem dados de oração nem texto. Guia em `docs/metricas.md`. Pendente: avisos enviados e retorno após quebra de sequência.
+12. ✅ **Relatório de erros** (25/10) — erros de JavaScript vão para `app_errors`, sem identificação, com aspas, e-mails e links apagados e teto por hora. Sem serviço de terceiros. Pendente: erros nativos (travamentos fora do JavaScript); decidir se entra um serviço como o Sentry.
 13. **Acessibilidade e desempenho** (auditoria de 25/10 feita com a skill `acessibilidade`: contraste nas 4 paletas, papéis/rótulos, alvos de toque e "reduzir movimento" corrigidos; falta testar com TalkBack e fonte máxima no aparelho) — leitor de tela, fontes grandes, modo escuro, celulares simples.
 
 ## Bloco E — Lançamento (por último)
