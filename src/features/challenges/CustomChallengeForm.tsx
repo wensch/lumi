@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Button, Stepper, TextField } from '@/components';
+import { Button, LumiIcon, Stepper, TextField } from '@/components';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import {
@@ -57,6 +57,7 @@ export function CustomChallengeForm({ members, working, onSubmit, onCancel }: Pr
             key={option}
             theme={theme}
             label={option}
+            icon={option}
             selected={icon === option}
             onPress={() => setIcon(option)}
             accessibilityLabel={option}
@@ -131,12 +132,15 @@ export function CustomChallengeForm({ members, working, onSubmit, onCancel }: Pr
 function Chip({
   theme,
   label,
+  icon,
   selected,
   onPress,
   accessibilityLabel,
 }: {
   theme: Theme;
   label: string;
+  /** Emoji do ícone: o chip mostra o ícone de traço correspondente no lugar do texto. */
+  icon?: string;
   selected: boolean;
   onPress: () => void;
   accessibilityLabel?: string;
@@ -148,9 +152,13 @@ function Chip({
       accessibilityRole="radio"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ selected }}
-      style={[styles.chip, selected && styles.chipSelected]}
+      style={[styles.chip, icon && styles.chipIcon, selected && styles.chipSelected]}
     >
-      <Text style={styles.chipText}>{label}</Text>
+      {icon ? (
+        <LumiIcon name={icon} size={24} weight={selected ? 'fill' : 'duotone'} />
+      ) : (
+        <Text style={styles.chipText}>{label}</Text>
+      )}
     </Pressable>
   );
 }
@@ -180,6 +188,12 @@ const getStyles = (theme: Theme) =>
       borderWidth: 1.5,
       borderColor: `${theme.colors.muted}55`,
       backgroundColor: theme.colors.white,
+    },
+    chipIcon: {
+      minWidth: 48,
+      minHeight: 48,
+      alignItems: 'center',
+      paddingHorizontal: 0,
     },
     chipSelected: {
       borderColor: theme.colors.ink,

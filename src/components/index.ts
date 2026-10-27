@@ -14,3 +14,4 @@ export * from './TextField';
 export * from './XPBadge';
 export * from './Stepper';
 export * from './ProgressBar';
+export * from './LumiIcon';

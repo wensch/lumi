@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
+import { Button, Card, FadeIn, IconBadge, Screen, ScreenHeader, Skeleton } from '@/components';
 import { usePlans, type PlanSummary } from '@/features/plans';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -69,7 +69,7 @@ function PlanCard({ plan, theme }: { plan: PlanSummary; theme: Theme }) {
     >
       <Card style={[styles.card, plan.status === 'active' && styles.cardActive]}>
         <View style={styles.cardHeader}>
-          <Text style={styles.icon}>{plan.icon ?? '📖'}</Text>
+          <IconBadge name={plan.icon} fallback="📖" background={theme.colors.green} />
           <View style={styles.cardTitleBox}>
             <Text style={theme.typography.bodyStrong}>{plan.title}</Text>
             <Text
@@ -136,9 +136,6 @@ const getStyles = (theme: Theme) =>
     cardTitleBox: {
       flex: 1,
       gap: 2,
-    },
-    icon: {
-      fontSize: 34,
     },
     description: {
       color: theme.colors.ink,

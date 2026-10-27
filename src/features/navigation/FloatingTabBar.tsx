@@ -1,15 +1,21 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
+import type { ComponentType } from 'react';
+import type { IconProps } from 'phosphor-react-native';
+import { BookOpen } from 'phosphor-react-native/src/icons/BookOpen';
+import { Compass } from 'phosphor-react-native/src/icons/Compass';
+import { Sun } from 'phosphor-react-native/src/icons/Sun';
+import { UserCircle } from 'phosphor-react-native/src/icons/UserCircle';
+import { UsersThree } from 'phosphor-react-native/src/icons/UsersThree';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, type Theme } from '@/theme';
 
-const ICON_BY_ROUTE: Record<string, keyof typeof Ionicons.glyphMap> = {
-  index: 'sunny',
-  biblia: 'book',
-  jornada: 'compass',
-  circulos: 'people',
-  perfil: 'person-circle',
+const ICON_BY_ROUTE: Record<string, ComponentType<IconProps>> = {
+  index: Sun,
+  biblia: BookOpen,
+  jornada: Compass,
+  circulos: UsersThree,
+  perfil: UserCircle,
 };
 
 /**
@@ -32,7 +38,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
         const { options } = descriptors[route.key];
         const label = (options.title ?? route.name) as string;
         const isFocused = state.index === index;
-        const iconName = ICON_BY_ROUTE[route.name] ?? 'ellipse';
+        const TabIcon = ICON_BY_ROUTE[route.name] ?? Sun;
 
         const onPress = () => {
           const event = navigation.emit({
@@ -57,7 +63,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
             style={[styles.tab, compact && styles.tabCompact, isFocused && styles.tabActive]}
           >
             <View>
-              <Ionicons name={iconName} size={22} color={theme.colors.ink} />
+              <TabIcon size={24} color={theme.colors.ink} weight={isFocused ? 'fill' : 'regular'} />
               {options.tabBarBadge ? (
                 <View style={styles.badge} accessibilityElementsHidden>
                   <Text style={styles.badgeText} maxFontSizeMultiplier={1}>

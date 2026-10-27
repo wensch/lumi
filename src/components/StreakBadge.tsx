@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
+import { LumiIcon } from './LumiIcon';
 
 type StreakBadgeProps = {
   days: number;
@@ -19,7 +20,7 @@ export function StreakBadge({ days }: StreakBadgeProps) {
       accessible
       accessibilityLabel={`${days} ${t(days === 1 ? 'home.day' : 'home.days')}`}
     >
-      <Text style={styles.icon}>🔥</Text>
+      <LumiIcon name="🔥" size={18} weight="fill" />
       <Text style={styles.value}>
         {days} {t(days === 1 ? 'home.day' : 'home.days')}
       </Text>
@@ -41,9 +42,6 @@ const getStyles = (theme: Theme) =>
       paddingHorizontal: 14,
       alignSelf: 'flex-start',
       ...theme.shadow.chip,
-    },
-    icon: {
-      fontSize: 16,
     },
     value: {
       ...theme.typography.bodyStrong,

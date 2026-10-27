@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
+import { Button, Card, FadeIn, IconBadge, Screen, ScreenHeader, Skeleton } from '@/components';
 import {
   challengesApi,
   CustomChallengeForm,
@@ -182,7 +182,7 @@ function ChallengeCard({
   return (
     <Card style={[styles.card, isActive && styles.cardActive]}>
       <View style={styles.cardHeader}>
-        <Text style={styles.icon}>{challenge.icon ?? '🎯'}</Text>
+        <IconBadge name={challenge.icon} fallback="🎯" background={theme.colors.pink} />
         <View style={styles.cardTitleBox}>
           <Text style={theme.typography.bodyStrong}>{challenge.title}</Text>
           <Text style={[theme.typography.caption, isActive ? styles.onCardMuted : styles.muted]}>
@@ -265,9 +265,6 @@ const getStyles = (theme: Theme) =>
     cardTitleBox: {
       flex: 1,
       gap: 2,
-    },
-    icon: {
-      fontSize: 34,
     },
     progressBlock: {
       gap: 4,

@@ -1,7 +1,17 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, FadeIn, ProgressBar, Screen, ScreenHeader, Skeleton } from '@/components';
+import {
+  Button,
+  Card,
+  FadeIn,
+  IconBadge,
+  LumiIcon,
+  ProgressBar,
+  Screen,
+  ScreenHeader,
+  Skeleton,
+} from '@/components';
 import { daysLeft, useChallenges, type Challenge } from '@/features/challenges';
 import { useActivePlan } from '@/features/plans';
 import { useTheme, type Theme } from '@/theme';
@@ -38,7 +48,12 @@ export default function JornadaScreen() {
             <>
               <View style={styles.panel}>
                 <View style={styles.itemHeader}>
-                  <Text style={styles.itemIcon}>{activePlan.icon ?? '📖'}</Text>
+                  <IconBadge
+                    name={activePlan.icon}
+                    fallback="📖"
+                    background={theme.colors.green}
+                    diameter={44}
+                  />
                   <View style={styles.itemTitleBox}>
                     <Text style={theme.typography.bodyStrong}>{activePlan.title}</Text>
                     <Text style={[theme.typography.caption, styles.muted]}>
@@ -170,7 +185,7 @@ function Area({
     <Card style={styles.area}>
       <View style={[styles.areaHeader, { backgroundColor: color }]}>
         <View style={styles.areaIconCircle}>
-          <Text style={styles.areaIcon}>{icon}</Text>
+          <LumiIcon name={icon} size={30} />
         </View>
         <View style={styles.areaTitleBox}>
           <Text style={theme.typography.heading} accessibilityRole="header">
@@ -197,7 +212,12 @@ function ChallengeSummary({ challenge, theme }: { challenge: Challenge; theme: T
   return (
     <View style={styles.panel}>
       <View style={styles.itemHeader}>
-        <Text style={styles.itemIcon}>{challenge.icon ?? '🎯'}</Text>
+        <IconBadge
+          name={challenge.icon}
+          fallback="🎯"
+          background={theme.colors.pink}
+          diameter={44}
+        />
         <View style={styles.itemTitleBox}>
           <Text style={theme.typography.bodyStrong}>{challenge.title}</Text>
           <Text style={[theme.typography.caption, styles.muted]}>
@@ -250,9 +270,6 @@ const getStyles = (theme: Theme) =>
       borderWidth: 2.5,
       borderColor: theme.colors.ink,
     },
-    areaIcon: {
-      fontSize: 26,
-    },
     areaTitleBox: {
       flex: 1,
       gap: 2,
@@ -277,9 +294,6 @@ const getStyles = (theme: Theme) =>
     itemTitleBox: {
       flex: 1,
       gap: 2,
-    },
-    itemIcon: {
-      fontSize: 30,
     },
     actions: {
       flexDirection: 'row',

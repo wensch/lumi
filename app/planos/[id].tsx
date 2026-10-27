@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
+import { Button, Card, FadeIn, IconBadge, Screen, ScreenHeader, Skeleton } from '@/components';
 import {
   formatPassageReference,
   plansApi,
@@ -72,7 +72,12 @@ export default function PlanoScreen() {
         <>
           <FadeIn>
             <Card style={styles.headerCard}>
-              <Text style={styles.icon}>{plan.icon ?? '📖'}</Text>
+              <IconBadge
+                name={plan.icon}
+                fallback="📖"
+                background={theme.colors.green}
+                diameter={72}
+              />
               <Text style={[theme.typography.body, styles.centeredText]}>{plan.description}</Text>
               {plan.status === 'active' || plan.status === 'paused' || plan.status === 'done' ? (
                 <View style={styles.progressBlock}>
@@ -274,9 +279,6 @@ const getStyles = (theme: Theme) =>
     headerCard: {
       alignItems: 'center',
       gap: theme.spacing.sm,
-    },
-    icon: {
-      fontSize: 44,
     },
     progressBlock: {
       alignSelf: 'stretch',

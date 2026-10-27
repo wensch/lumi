@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useTheme, type Theme } from '@/theme';
+import { LumiIcon } from './LumiIcon';
 
 type XPBadgeProps = {
   xp: number;
@@ -13,7 +14,7 @@ export function XPBadge({ xp }: XPBadgeProps) {
   return (
     // O leitor de tela lê "{xp} XP" e ignora a estrela decorativa.
     <View style={styles.container} accessible accessibilityLabel={`${xp} XP`}>
-      <Text style={styles.icon}>⭐</Text>
+      <LumiIcon name="⭐" size={18} weight="fill" />
       <Text style={styles.value}>{xp} XP</Text>
     </View>
   );
@@ -33,9 +34,6 @@ const getStyles = (theme: Theme) =>
       paddingHorizontal: 14,
       alignSelf: 'flex-start',
       ...theme.shadow.chip,
-    },
-    icon: {
-      fontSize: 16,
     },
     value: {
       ...theme.typography.bodyStrong,
