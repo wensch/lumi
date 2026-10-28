@@ -23,7 +23,15 @@ export type OutfitId =
   | 'dawn'
   | 'sprout'
   | 'bell'
-  | 'backpack';
+  | 'backpack'
+  | 'headband'
+  | 'ivy'
+  | 'pencil'
+  | 'heartpin'
+  | 'halo'
+  | 'medal'
+  | 'rosette'
+  | 'circlepin';
 
 /** Um item de cada categoria pode ser usado ao mesmo tempo. */
 export type OutfitSlot = 'neck' | 'face' | 'head' | 'back' | 'aura';
@@ -43,6 +51,11 @@ export type Outfit = {
   /** Itens de evento: liberados pela conquista de terminar o plano do evento (nunca se perdem). */
   achievement?: string;
   event?: OutfitEvent;
+  /**
+   * Recompensa de desafio: o `slug` do desafio de exemplo que libera o item, ou 'custom' (concluir um desafio
+   * criado pela própria pessoa). Nunca se perde (vem de desafios já concluídos).
+   */
+  challenge?: string;
   icon: string;
   /** Desenhado ATRÁS do corpo (capa, brilho). */
   back?: string;
@@ -67,7 +80,7 @@ const star = (x: number, y: number, r = 8) =>
  * Itens do Lumi, no mesmo viewBox 200x200 do mascote (ver svgs/lumiHappySvg.ts).
  * Um item de cada vez; evolução representa constância, não espiritualidade (briefing §8.7).
  */
-export const OUTFITS: Outfit[] = [
+const BASE_OUTFITS: Outfit[] = [
   {
     id: 'sprout',
     slot: 'head',
@@ -319,6 +332,101 @@ export const OUTFITS: Outfit[] = [
   },
 ];
 
+/** Folhas em arco, da esquerda para a direita (coroa de folhas). */
+const leafArc = (cx: number, cy: number, r: number, from: number, to: number, count: number) =>
+  Array.from({ length: count }, (_, index) => {
+    const angle = ((from + ((to - from) * index) / (count - 1)) * Math.PI) / 180;
+    const x = (cx + r * Math.cos(angle)).toFixed(1);
+    const y = (cy + r * Math.sin(angle)).toFixed(1);
+    const rotation = ((angle * 180) / Math.PI + 90).toFixed(0);
+    return `<ellipse cx="${x}" cy="${y}" rx="8" ry="4" fill="${index % 2 ? '#4CC46A' : '#6BD68A'}" stroke-width="2" transform="rotate(${rotation} ${x} ${y})"></ellipse>`;
+  }).join('');
+
+/** Recompensas dos desafios (um item por desafio de exemplo, mais os de desafio próprio e de círculo). */
+const CHALLENGE_OUTFITS: Outfit[] = [
+  {
+    id: 'headband',
+    slot: 'head',
+    challenge: 'semana-constancia',
+    icon: '🔥',
+    front:
+      '<path d="M58 70Q100 52 142 70L141 81Q100 63 59 81Z" fill="#E8604C"></path>' +
+      '<path d="M142 72l11-7M142 77l12 3" stroke="#E8604C" stroke-width="4"></path>' +
+      '<path d="M100 57Q93 66 100 74Q107 66 100 57Z" fill="#FFD35A" stroke-width="2"></path>',
+  },
+  {
+    id: 'ivy',
+    slot: 'head',
+    challenge: 'cinco-de-sete',
+    icon: '🌿',
+    front: leafArc(100, 92, 46, -165, -15, 7),
+  },
+  {
+    id: 'pencil',
+    slot: 'head',
+    challenge: 'semana-reflexao',
+    icon: '✍️',
+    front:
+      '<g transform="rotate(22 142 70)"><rect x="138" y="40" width="9" height="36" rx="2" fill="#FFD35A"></rect>' +
+      '<rect x="138" y="38" width="9" height="7" rx="2" fill="#FF8FB3"></rect>' +
+      '<path d="M138 76h9l-4.5 10z" fill="#F6D3A8"></path><path d="M141 83h3" stroke-width="2.5"></path></g>',
+  },
+  {
+    id: 'heartpin',
+    slot: 'neck',
+    challenge: 'semana-torcida',
+    icon: '💛',
+    front:
+      '<path d="M78 152C62 142 66 129 73 129C76 129 78 132 78 132C78 132 80 129 83 129C90 129 94 142 78 152Z" fill="#FF6F91" stroke-width="3"></path>' +
+      '<path d="M70 135q2-3 5-2" stroke="#FFFFFF" stroke-width="2"></path>',
+  },
+  {
+    id: 'halo',
+    slot: 'aura',
+    motion: 'pulse',
+    challenge: 'semana-oracao',
+    icon: '🙏',
+    front:
+      '<ellipse cx="100" cy="36" rx="28" ry="8" fill="none" stroke="#F0B73C" stroke-width="9"></ellipse>' +
+      '<ellipse cx="100" cy="36" rx="28" ry="8" fill="none" stroke="#FFD35A" stroke-width="5"></ellipse>',
+  },
+  {
+    id: 'medal',
+    slot: 'neck',
+    challenge: 'mes-vinte',
+    icon: '🏅',
+    front:
+      '<path d="M82 120L100 148L118 120L109 117L100 133L91 117Z" fill="#3F6FE0"></path>' +
+      '<circle cx="100" cy="154" r="12" fill="#FFD35A" stroke-width="3"></circle>' +
+      '<path d="M100 147l2.6 5.2 5.7.8-4.1 4 1 5.7-5.2-2.7-5.2 2.7 1-5.7-4.1-4 5.7-.8z" fill="#F0B73C" stroke-width="1.5"></path>',
+  },
+  {
+    id: 'rosette',
+    slot: 'neck',
+    challenge: 'custom',
+    icon: '🎯',
+    front:
+      '<path d="M91 156l-9 24 10-5 6 8 3-24z" fill="#4C7BE8" stroke-width="3"></path>' +
+      '<path d="M109 156l9 24-10-5-6 8-3-24z" fill="#3F6FE0" stroke-width="3"></path>' +
+      '<circle cx="100" cy="148" r="14" fill="#FF8FB3" stroke-width="3"></circle>' +
+      '<circle cx="100" cy="148" r="7" fill="#FFD35A" stroke-width="2.5"></circle>',
+  },
+  {
+    id: 'circlepin',
+    slot: 'neck',
+    achievement: 'challenge_circle',
+    icon: '🤝',
+    front:
+      '<circle cx="78" cy="142" r="13" fill="#FFFFFF" stroke-width="3"></circle>' +
+      '<circle cx="78" cy="136" r="3.5" fill="#FF8FB3" stroke-width="1.5"></circle>' +
+      '<circle cx="72" cy="146" r="3.5" fill="#4C7BE8" stroke-width="1.5"></circle>' +
+      '<circle cx="84" cy="146" r="3.5" fill="#4CC46A" stroke-width="1.5"></circle>',
+  },
+];
+
+/** Todos os itens do guarda-roupa. */
+export const OUTFITS: Outfit[] = [...BASE_OUTFITS, ...CHALLENGE_OUTFITS];
+
 export function outfitById(id: string): Outfit | undefined {
   return OUTFITS.find((outfit) => outfit.id === id);
 }
@@ -335,15 +443,31 @@ export function outfitsForAchievements(codes: readonly string[]): Outfit[] {
 
 /**
  * O item está liberado? Itens comuns vêm dos marcos de sequência; itens de evento, da conquista do plano
- * do evento. Nenhum se perde quando a sequência quebra.
+ * do evento; recompensas de desafio, de desafios já concluídos. Nenhum se perde quando a sequência quebra.
  */
 export function isOutfitUnlocked(
   outfit: Outfit,
   reachedMilestones: readonly number[],
   achievementCodes: ReadonlySet<string>,
+  challengeRewards: ReadonlySet<string> = new Set(),
 ): boolean {
   if (outfit.milestone !== undefined && reachedMilestones.includes(outfit.milestone)) return true;
+  if (outfit.challenge !== undefined && challengeRewards.has(outfit.challenge)) return true;
   return outfit.achievement !== undefined && achievementCodes.has(outfit.achievement);
+}
+
+/** Item que um desafio dá ao ser concluído (desafio próprio: a roseta; exemplo: o item do seu `slug`). */
+export function rewardForChallenge(challenge: {
+  slug: string;
+  custom?: boolean;
+}): Outfit | undefined {
+  const key = challenge.custom ? 'custom' : challenge.slug;
+  return OUTFITS.find((outfit) => outfit.challenge === key);
+}
+
+/** Item que o desafio de círculo dá a quem conclui junto. */
+export function rewardForCircleChallenge(): Outfit | undefined {
+  return outfitById('circlepin');
 }
 
 /** Ordem em que as categorias são desenhadas: de trás para a frente. */

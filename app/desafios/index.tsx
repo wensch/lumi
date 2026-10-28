@@ -5,13 +5,16 @@ import * as Haptics from 'expo-haptics';
 import { Button, Card, FadeIn, IconBadge, Screen, ScreenHeader, Skeleton } from '@/components';
 import {
   challengesApi,
+  ChallengeReward,
   CustomChallengeForm,
   daysLeft,
+  useChallengeRewards,
   useChallenges,
   type Challenge,
   type ChallengeErrorCode,
   type NewChallenge,
 } from '@/features/challenges';
+import { rewardForChallenge } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { goBackOrHome } from '@/lib/navigation';
@@ -21,6 +24,7 @@ export default function DesafiosScreen() {
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const { challenges, loading, error, refetch } = useChallenges();
+  const rewards = useChallengeRewards();
   const [working, setWorking] = useState(false);
   // Vindo da aba Jornada (Criar meu desafio), o formulário já abre.
   const { novo } = useLocalSearchParams<{ novo?: string }>();
@@ -110,6 +114,7 @@ export default function DesafiosScreen() {
                   <ChallengeCard
                     challenge={challenge}
                     theme={theme}
+                    rewards={rewards}
                     actionLabel={t('challenges.abandon')}
                     actionVariant="tertiary"
                     onAction={() => confirmAbandon(challenge)}
@@ -142,6 +147,7 @@ export default function DesafiosScreen() {
               <ChallengeCard
                 challenge={challenge}
                 theme={theme}
+                rewards={rewards}
                 actionLabel={t('challenges.start')}
                 actionVariant="secondary"
                 onAction={() => void run(() => challengesApi.start(challenge.id))}
@@ -159,6 +165,7 @@ export default function DesafiosScreen() {
 function ChallengeCard({
   challenge,
   theme,
+  rewards,
   actionLabel,
   actionVariant,
   onAction,
@@ -167,6 +174,8 @@ function ChallengeCard({
 }: {
   challenge: Challenge;
   theme: Theme;
+  /** Desafios já concluídos (liberam os itens do Lumi). */
+  rewards: ReadonlySet<string>;
   actionLabel: string;
   actionVariant: 'secondary' | 'tertiary';
   onAction: () => void;
@@ -178,6 +187,7 @@ function ChallengeCard({
   const isActive = challenge.state === 'active';
   const progress = challenge.target > 0 ? Math.min(challenge.progress / challenge.target, 1) : 0;
   const left = daysLeft(challenge.ends_at);
+  const reward = rewardForChallenge(challenge);
 
   return (
     <Card style={[styles.card, isActive && styles.cardActive]}>
@@ -195,6 +205,12 @@ function ChallengeCard({
         </View>
       </View>
       <Text style={theme.typography.body}>{challenge.description}</Text>
+      {reward ? (
+        <ChallengeReward
+          outfit={reward}
+          earned={rewards.has(challenge.custom ? 'custom' : challenge.slug)}
+        />
+      ) : null}
 
       {isActive ? (
         <View style={styles.progressBlock}>

@@ -44,6 +44,8 @@ async function call<T>(
 
 export const challengesApi = {
   list: () => call<Challenge[]>(() => supabase.rpc('list_challenges')),
+  /** Desafios já concluídos (slug dos exemplos e 'custom'): liberam itens do Lumi. */
+  rewards: () => call<string[]>(() => supabase.rpc('my_challenge_rewards')),
   start: async (challengeId: string) => {
     const result = await call<null>(() =>
       supabase.rpc('start_challenge', { p_challenge_id: challengeId }),

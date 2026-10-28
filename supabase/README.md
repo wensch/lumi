@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00029
+## Migrations 00004 a 00030
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -154,4 +154,6 @@ A `00029_content_translations.sql` guarda as traduções para inglês do conteú
 `reading_plan_translations`, `challenge_translations`; leitura pública só do que está publicado). Depois dela,
 rode `supabase/seed-translations-en.sql` (73 devocionais, 9 planos e 9 desafios). A tradução foi feita pelo
 Claude e precisa de revisão antes da publicação.
+A `00030_challenge_rewards.sql` cria `my_challenge_rewards()` (quais desafios a pessoa já concluiu: o slug dos exemplos e
+'custom'); o app usa isso para liberar os itens do Lumi que cada desafio dá (src/features/lumi/outfits.ts).
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.

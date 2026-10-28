@@ -5,7 +5,7 @@ import { useReduceMotion } from '@/lib/useReduceMotion';
 import { useTranslation } from '@/i18n';
 import type { LumiMood } from '@/lib/supabase';
 import { lumiSvgWithFace, type LumiFace } from './svgs/lumiFaces';
-import { applyOutfits, motionFor, type OutfitMotion } from './outfits';
+import { applyOutfits, motionFor, type OutfitId, type OutfitMotion } from './outfits';
 import { useLumiOutfit } from './LumiOutfitProvider';
 
 /** Variantes visuais: `normal` usa o rosto feliz e `missing_you` o triste; as demais têm rosto próprio. */
@@ -51,6 +51,8 @@ export function lumiMoodToVariant(mood: LumiMood): LumiMoodVariant {
 type LumiMascotProps = {
   mood?: LumiMoodVariant;
   size?: number;
+  /** Mostra estes itens em vez dos que a pessoa está vestindo (ex.: prévia de uma recompensa). */
+  outfits?: readonly OutfitId[];
 };
 
 const MOTION_DURATION: Record<OutfitMotion, number> = { sway: 2600, float: 2200, pulse: 1800 };
@@ -107,9 +109,10 @@ function useMascotMotion(motion: OutfitMotion | null) {
   }
 }
 
-export function LumiMascot({ mood = 'normal', size = 160 }: LumiMascotProps) {
+export function LumiMascot({ mood = 'normal', size = 160, outfits }: LumiMascotProps) {
   const { t } = useTranslation();
-  const { outfitIds } = useLumiOutfit();
+  const { outfitIds: wornIds } = useLumiOutfit();
+  const outfitIds = outfits ?? wornIds;
   const motionStyle = useMascotMotion(motionFor(outfitIds));
   // O SVG montado só muda com o humor ou com os itens vestidos (a tela do devocional re-renderiza a cada tecla).
   const xml = useMemo(

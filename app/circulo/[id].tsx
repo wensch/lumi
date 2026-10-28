@@ -4,8 +4,11 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
+import { useAchievementCodes } from '@/features/achievements';
+import { rewardForCircleChallenge } from '@/features/lumi';
 import {
   challengesApi,
+  ChallengeReward,
   CustomChallengeForm,
   daysLeft,
   useCircleChallenge,
@@ -31,6 +34,8 @@ export default function CirculoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { detail, prayers, loading, error, refetch } = useCircle(id);
   const { state: challengeState, refetch: refetchChallenge } = useCircleChallenge(id);
+  const achievementCodes = useAchievementCodes();
+  const circleReward = rewardForCircleChallenge();
   // Uma ação do círculo por vez (cheer, orar, desafio...).
   const busyRef = useRef(false);
   const [creatingChallenge, setCreatingChallenge] = useState(false);
@@ -381,6 +386,12 @@ export default function CirculoScreen() {
           <FadeIn delay={150}>
             <Card style={styles.sectionCard}>
               <Text style={styles.sectionTitle}>{t('challenges.circleTitle')}</Text>
+              {circleReward ? (
+                <ChallengeReward
+                  outfit={circleReward}
+                  earned={achievementCodes.has('challenge_circle')}
+                />
+              ) : null}
               {challengeState?.active ? (
                 <>
                   <Text style={theme.typography.bodyStrong}>

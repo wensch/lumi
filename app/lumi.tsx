@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
 import { useAchievementCodes } from '@/features/achievements';
+import { useChallengeRewards } from '@/features/challenges';
 import { lumiGreeting, useHomeData } from '@/features/home';
 import {
   getJourney,
@@ -25,6 +26,7 @@ export default function LumiScreen() {
     useHomeData();
   const { outfitIds, toggleOutfit, clearOutfits } = useLumiOutfit();
   const achievementCodes = useAchievementCodes();
+  const challengeRewards = useChallengeRewards();
 
   if (loading) {
     return (
@@ -108,7 +110,12 @@ export default function LumiScreen() {
           <Text style={styles.slotTitle}>{t(`lumi.slots.${slot}`)}</Text>
           <View style={styles.wardrobeGrid}>
             {OUTFITS.filter((outfit) => outfit.slot === slot).map((outfit) => {
-              const unlocked = isOutfitUnlocked(outfit, journey.reached, achievementCodes);
+              const unlocked = isOutfitUnlocked(
+                outfit,
+                journey.reached,
+                achievementCodes,
+                challengeRewards,
+              );
               return (
                 <WardrobeTile
                   key={outfit.id}
@@ -118,9 +125,17 @@ export default function LumiScreen() {
                       ? t(`lumi.outfits.${outfit.id}`)
                       : outfit.event
                         ? t('lumi.outfitLockedEvent', { event: t(`events.${outfit.event}`) })
-                        : outfit.achievement
-                          ? t('lumi.outfitLockedFirst')
-                          : t('lumi.outfitLocked', { days: outfit.milestone })
+                        : outfit.challenge === 'custom'
+                          ? t('lumi.outfitLockedCustom')
+                          : outfit.challenge
+                            ? t('lumi.outfitLockedChallenge', {
+                                name: t(`lumi.challengeNames.${outfit.challenge}`),
+                              })
+                            : outfit.achievement === 'challenge_circle'
+                              ? t('lumi.outfitLockedCircle')
+                              : outfit.achievement
+                                ? t('lumi.outfitLockedFirst')
+                                : t('lumi.outfitLocked', { days: outfit.milestone })
                   }
                   selected={outfitIds.includes(outfit.id)}
                   unlocked={unlocked}

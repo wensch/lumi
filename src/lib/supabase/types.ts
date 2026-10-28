@@ -394,6 +394,10 @@ export interface Database {
         Args: Record<string, never>;
         Returns: unknown;
       };
+      my_challenge_rewards: {
+        Args: Record<string, never>;
+        Returns: string[];
+      };
       start_challenge: {
         Args: { p_challenge_id: string };
         Returns: undefined;
