@@ -48,12 +48,7 @@ export default function JornadaScreen() {
             <>
               <View style={styles.panel}>
                 <View style={styles.itemHeader}>
-                  <IconBadge
-                    name={activePlan.icon}
-                    fallback="📖"
-                    background={theme.colors.green}
-                    diameter={44}
-                  />
+                  <IconBadge name={activePlan.icon} fallback="📖" diameter={44} />
                   <View style={styles.itemTitleBox}>
                     <Text style={theme.typography.bodyStrong}>{activePlan.title}</Text>
                     <Text style={[theme.typography.caption, styles.muted]}>
@@ -212,12 +207,7 @@ function ChallengeSummary({ challenge, theme }: { challenge: Challenge; theme: T
   return (
     <View style={styles.panel}>
       <View style={styles.itemHeader}>
-        <IconBadge
-          name={challenge.icon}
-          fallback="🎯"
-          background={theme.colors.pink}
-          diameter={44}
-        />
+        <IconBadge name={challenge.icon} fallback="🎯" diameter={44} />
         <View style={styles.itemTitleBox}>
           <Text style={theme.typography.bodyStrong}>{challenge.title}</Text>
           <Text style={[theme.typography.caption, styles.muted]}>
@@ -295,11 +285,11 @@ const getStyles = (theme: Theme) =>
       flex: 1,
       gap: 2,
     },
+    // Um botão por linha: lado a lado o texto quebrava em duas linhas em telas estreitas.
     actions: {
-      flexDirection: 'row',
       gap: theme.spacing.sm,
     },
     action: {
-      flex: 1,
+      alignSelf: 'stretch',
     },
   });

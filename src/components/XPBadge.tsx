@@ -14,7 +14,7 @@ export function XPBadge({ xp }: XPBadgeProps) {
   return (
     // O leitor de tela lê "{xp} XP" e ignora a estrela decorativa.
     <View style={styles.container} accessible accessibilityLabel={`${xp} XP`}>
-      <LumiIcon name="⭐" size={18} weight="fill" />
+      <LumiIcon name="⭐" size={18} />
       <Text style={styles.value}>{xp} XP</Text>
     </View>
   );

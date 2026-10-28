@@ -72,12 +72,7 @@ export default function PlanoScreen() {
         <>
           <FadeIn>
             <Card style={styles.headerCard}>
-              <IconBadge
-                name={plan.icon}
-                fallback="📖"
-                background={theme.colors.green}
-                diameter={72}
-              />
+              <IconBadge name={plan.icon} fallback="📖" diameter={72} />
               <Text style={[theme.typography.body, styles.centeredText]}>{plan.description}</Text>
               {plan.status === 'active' || plan.status === 'paused' || plan.status === 'done' ? (
                 <View style={styles.progressBlock}>

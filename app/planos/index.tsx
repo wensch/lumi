@@ -69,7 +69,7 @@ function PlanCard({ plan, theme }: { plan: PlanSummary; theme: Theme }) {
     >
       <Card style={[styles.card, plan.status === 'active' && styles.cardActive]}>
         <View style={styles.cardHeader}>
-          <IconBadge name={plan.icon} fallback="📖" background={theme.colors.green} />
+          <IconBadge name={plan.icon} fallback="📖" />
           <View style={styles.cardTitleBox}>
             <Text style={theme.typography.bodyStrong}>{plan.title}</Text>
             <Text

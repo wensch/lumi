@@ -182,7 +182,7 @@ function ChallengeCard({
   return (
     <Card style={[styles.card, isActive && styles.cardActive]}>
       <View style={styles.cardHeader}>
-        <IconBadge name={challenge.icon} fallback="🎯" background={theme.colors.pink} />
+        <IconBadge name={challenge.icon} fallback="🎯" />
         <View style={styles.cardTitleBox}>
           <Text style={theme.typography.bodyStrong}>{challenge.title}</Text>
           <Text style={[theme.typography.caption, isActive ? styles.onCardMuted : styles.muted]}>

@@ -20,7 +20,7 @@ export function StreakBadge({ days }: StreakBadgeProps) {
       accessible
       accessibilityLabel={`${days} ${t(days === 1 ? 'home.day' : 'home.days')}`}
     >
-      <LumiIcon name="🔥" size={18} weight="fill" />
+      <LumiIcon name="🔥" size={18} />
       <Text style={styles.value}>
         {days} {t(days === 1 ? 'home.day' : 'home.days')}
       </Text>

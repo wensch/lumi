@@ -154,11 +154,7 @@ function Chip({
       accessibilityState={{ selected }}
       style={[styles.chip, icon && styles.chipIcon, selected && styles.chipSelected]}
     >
-      {icon ? (
-        <LumiIcon name={icon} size={24} weight={selected ? 'fill' : 'duotone'} />
-      ) : (
-        <Text style={styles.chipText}>{label}</Text>
-      )}
+      {icon ? <LumiIcon name={icon} size={24} /> : <Text style={styles.chipText}>{label}</Text>}
     </Pressable>
   );
 }
