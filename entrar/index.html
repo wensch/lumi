@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Convite para um círculo no Lumi</title>
+    <style>
+      :root {
+        --ink: #264a35;
+        --bg: #f3faf1;
+        --blue: #b5ccff;
+        --white: #fff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          sans-serif;
+        padding: 20px;
+      }
+      main {
+        width: 100%;
+        max-width: 420px;
+        background: var(--white);
+        border: 2.5px solid var(--ink);
+        border-radius: 28px;
+        padding: 28px 22px;
+        text-align: center;
+        box-shadow: 0 6px 0 rgba(38, 74, 53, 0.18);
+      }
+      h1 {
+        font-size: 28px;
+        line-height: 1.15;
+        margin: 0 0 8px;
+      }
+      p {
+        font-size: 17px;
+        line-height: 1.4;
+        margin: 0 0 16px;
+      }
+      .code {
+        font-size: 38px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        margin: 6px 0 18px;
+        word-break: break-all;
+      }
+      .btn {
+        display: block;
+        width: 100%;
+        margin: 0 0 12px;
+        padding: 15px 18px;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--ink);
+        background: var(--blue);
+        border: 2.5px solid var(--ink);
+        border-radius: 18px;
+        text-decoration: none;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn.ghost {
+        background: var(--white);
+        border-style: dashed;
+      }
+      .small {
+        font-size: 14px;
+        opacity: 0.75;
+        margin-top: 6px;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Convite para um círculo no Lumi 🐑</h1>
+      <div id="withCode" class="hidden">
+        <p>Alguém quer caminhar com você. Seu código de convite:</p>
+        <div class="code" id="code"></div>
+        <a class="btn" id="open" href="#">Abrir no Lumi</a>
+        <button class="btn ghost" id="copy" type="button">Copiar código</button>
+        <a
+          class="btn ghost"
+          id="download"
+          href="https://github.com/wensch/lumi/releases/tag/apk-latest"
+          >Baixar o app</a
+        >
+        <p class="small">No app, abra a aba Círculos e toque em &ldquo;Entrar com código&rdquo;.</p>
+      </div>
+      <div id="noCode" class="hidden">
+        <p>Este convite está incompleto. Peça um novo link para quem te convidou.</p>
+        <a class="btn ghost" href="https://github.com/wensch/lumi/releases/tag/apk-latest"
+          >Baixar o app</a
+        >
+      </div>
+    </main>
+    <script>
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var raw = (params.get('c') || '').toUpperCase();
+        var code = /^[A-Z0-9]{4,12}$/.test(raw) ? raw : '';
+        var download = 'https://github.com/wensch/lumi/releases/tag/apk-latest';
+        if (!code) {
+          document.getElementById('noCode').classList.remove('hidden');
+          return;
+        }
+
+        document.getElementById('withCode').classList.remove('hidden');
+        document.getElementById('code').textContent = code;
+
+        var deepLink = 'lumi://entrar?codigo=' + code;
+        var isAndroid = /android/i.test(navigator.userAgent);
+        // No Android, o intent abre o app se estiver instalado e cai na página de download se não estiver.
+        var openHref = isAndroid
+          ? 'intent://entrar?codigo=' +
+            code +
+            '#Intent;scheme=lumi;package=com.lumi.app;S.browser_fallback_url=' +
+            encodeURIComponent(download) +
+            ';end'
+          : deepLink;
+        document.getElementById('open').setAttribute('href', openHref);
+
+        document.getElementById('copy').addEventListener('click', function () {
+          var btn = this;
+          function done() {
+            btn.textContent = 'Código copiado';
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(done, done);
+          } else {
+            done();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
