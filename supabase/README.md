@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00030
+## Migrations 00004 a 00031
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -156,4 +156,9 @@ rode `supabase/seed-translations-en.sql` (73 devocionais, 9 planos e 9 desafios)
 Claude e precisa de revisão antes da publicação.
 A `00030_challenge_rewards.sql` cria `my_challenge_rewards()` (quais desafios a pessoa já concluiu: o slug dos exemplos e
 'custom'); o app usa isso para liberar os itens do Lumi que cada desafio dá (src/features/lumi/outfits.ts).
+A `00031_challenge_invites.sql` deixa convidar alguém para o mesmo desafio pessoal: `challenge_invites` e
+`challenge_participants` (sem acesso direto), `create_challenge_invite`, `challenge_invite_preview`,
+`accept_challenge_invite` (até 8 pessoas por convite, mesmo limite de 3 desafios ativos) e `challenge_group_state`
+(nome e andamento de cada pessoa do grupo, nada mais). `list_challenges` passou a trazer também o desafio de outra
+pessoa que a gente aceitou e quantas pessoas fazem junto. O link do convite é a página `site/desafio`.
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.

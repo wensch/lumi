@@ -15,17 +15,25 @@ import {
 type InviteShareProps = {
   circleName: string;
   code: string;
+  /** Outro tipo de convite (ex.: de desafio): link e texto próprios no lugar dos do círculo. */
+  link?: string;
+  text?: string;
 };
 
 /** Linha de atalhos para enviar o convite: WhatsApp, Telegram, copiar o link e o menu do sistema. */
-export function InviteShare({ circleName, code }: InviteShareProps) {
+export function InviteShare({
+  circleName,
+  code,
+  link: customLink,
+  text: customText,
+}: InviteShareProps) {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
   const [linkCopied, setLinkCopied] = useState(false);
 
-  const link = buildInviteLink(code);
-  const text = t('circles.shareText', { name: circleName, code });
+  const link = customLink ?? buildInviteLink(code);
+  const text = customText ?? t('circles.shareText', { name: circleName, code });
   const message = `${text}\n${link}`;
 
   const tap = () => Haptics.selectionAsync().catch(() => {});

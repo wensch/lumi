@@ -1,10 +1,13 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Button, Card, FadeIn, IconBadge, Screen, ScreenHeader, Skeleton } from '@/components';
 import {
   challengesApi,
+  ChallengeCodeEntry,
+  ChallengeInvite,
+  ChallengeInviteCard,
   ChallengeReward,
   CustomChallengeForm,
   daysLeft,
@@ -14,6 +17,7 @@ import {
   type ChallengeErrorCode,
   type NewChallenge,
 } from '@/features/challenges';
+import { normalizeInviteCode } from '@/features/circles';
 import { rewardForChallenge } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -27,10 +31,18 @@ export default function DesafiosScreen() {
   const rewards = useChallengeRewards();
   const [working, setWorking] = useState(false);
   // Vindo da aba Jornada (Criar meu desafio), o formulário já abre.
-  const { novo } = useLocalSearchParams<{ novo?: string }>();
+  const { novo, convite } = useLocalSearchParams<{ novo?: string; convite?: string }>();
   // Trava síncrona contra toque duplo (o estado `working` só vale no próximo render).
   const busyRef = useRef(false);
   const [creating, setCreating] = useState(novo === '1');
+  // Convite recebido (link ou código digitado): mostra o desafio e deixa aceitar.
+  const [inviteCode, setInviteCode] = useState<string | null>(normalizeInviteCode(convite));
+  const [enteringCode, setEnteringCode] = useState(false);
+  useEffect(() => {
+    const code = normalizeInviteCode(convite);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- um link novo chega com a tela já aberta
+    if (code) setInviteCode(code);
+  }, [convite]);
 
   const active = challenges.filter((challenge) => challenge.state === 'active');
   const available = challenges.filter((challenge) => challenge.state === 'available');
@@ -92,6 +104,15 @@ export default function DesafiosScreen() {
       <ScreenHeader title={t('challenges.title')} onBackPress={goBackOrHome} />
       <Text style={[theme.typography.caption, styles.muted]}>{t('challenges.intro')}</Text>
 
+      {inviteCode ? (
+        <ChallengeInviteCard
+          key={inviteCode}
+          code={inviteCode}
+          onClose={() => setInviteCode(null)}
+          onAccepted={refetch}
+        />
+      ) : null}
+
       {loading ? (
         <>
           <Skeleton height={130} radius={theme.radius.lg} />
@@ -138,6 +159,21 @@ export default function DesafiosScreen() {
               label={t('challenges.createOwn')}
               variant="secondary"
               onPress={() => setCreating(true)}
+            />
+          )}
+
+          {enteringCode ? (
+            <ChallengeCodeEntry
+              onSubmit={(code) => {
+                setInviteCode(code);
+                setEnteringCode(false);
+              }}
+            />
+          ) : (
+            <Button
+              label={t('challenges.haveInvite')}
+              variant="ghost"
+              onPress={() => setEnteringCode(true)}
             />
           )}
 
@@ -196,7 +232,11 @@ function ChallengeCard({
         <View style={styles.cardTitleBox}>
           <Text style={theme.typography.bodyStrong}>{challenge.title}</Text>
           <Text style={[theme.typography.caption, isActive ? styles.onCardMuted : styles.muted]}>
-            {challenge.custom ? `${t('challenges.customTag')} · ` : ''}
+            {challenge.invited
+              ? `${t('challenges.invitedTag')} · `
+              : challenge.custom
+                ? `${t('challenges.customTag')} · `
+                : ''}
             {t('challenges.inDays', { count: challenge.window_days })}
             {challenge.completed_count > 0
               ? ` · ${t('challenges.doneTimes', { count: challenge.completed_count })}`
@@ -231,6 +271,8 @@ function ChallengeCard({
       ) : challenge.last_status === 'expired' ? (
         <Text style={[theme.typography.caption, styles.muted]}>{t('challenges.lastExpired')}</Text>
       ) : null}
+
+      {isActive ? <ChallengeInvite challenge={challenge} /> : null}
 
       <Button label={actionLabel} variant={actionVariant} onPress={onAction} disabled={disabled} />
       {onRemove ? (

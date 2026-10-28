@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Card, FadeIn, Screen, Skeleton, StreakBadge, XPBadge } from '@/components';
+import { usePendingChallengeInvite } from '@/features/challenges';
 import { daysUntil, useActiveEvents, useActivePlan } from '@/features/plans';
 import { lumiGreeting, useHomeData, type WeekDay } from '@/features/home';
 import { LumiMascot } from '@/features/lumi';
@@ -17,6 +18,8 @@ export default function HojeScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
+  // Abriu um link de convite de desafio antes de entrar: depois do login, leva à lista de desafios.
+  usePendingChallengeInvite();
   const {
     currentStreak,
     longestStreak,

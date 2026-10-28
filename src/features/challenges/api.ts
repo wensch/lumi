@@ -1,6 +1,12 @@
 import { supabase } from '@/lib/supabase';
 import { trackEvent } from '@/features/metrics';
-import type { Challenge, CircleChallengeState, NewChallenge } from './types';
+import type {
+  Challenge,
+  ChallengeGroupMember,
+  ChallengeInvitePreview,
+  CircleChallengeState,
+  NewChallenge,
+} from './types';
 
 /** Códigos de erro das funções do banco (migration 00020); o app os traduz. */
 export type ChallengeErrorCode =
@@ -11,6 +17,8 @@ export type ChallengeErrorCode =
   | 'forbidden'
   | 'invalid_input'
   | 'too_many_created'
+  | 'invite_full'
+  | 'too_many_attempts'
   | 'unknown';
 
 const KNOWN: ChallengeErrorCode[] = [
@@ -21,6 +29,8 @@ const KNOWN: ChallengeErrorCode[] = [
   'forbidden',
   'invalid_input',
   'too_many_created',
+  'invite_full',
+  'too_many_attempts',
 ];
 
 function errorCode(error: { message?: string } | null | undefined): ChallengeErrorCode {
@@ -82,6 +92,26 @@ export const challengesApi = {
         p_target: input.target,
         p_window_days: input.windowDays,
       }),
+    ),
+  /** Código de convite do desafio que a pessoa está fazendo (o mesmo nas próximas vezes). */
+  createInvite: (challengeId: string) =>
+    call<string>(() => supabase.rpc('create_challenge_invite', { p_challenge_id: challengeId })),
+  /** Prévia do convite; `null` quando o código não vale (nem existe, ou o desafio saiu da lista). */
+  invitePreview: (code: string) =>
+    call<ChallengeInvitePreview | null>(() =>
+      supabase.rpc('challenge_invite_preview', { p_code: code }),
+    ),
+  /** Aceita o convite: começa o mesmo desafio. Devolve o id do desafio, ou `null` se o código não vale. */
+  acceptInvite: async (code: string) => {
+    const result = await call<string | null>(() =>
+      supabase.rpc('accept_challenge_invite', { p_code: code }),
+    );
+    if (result.error === null && result.data) trackEvent('challenge_started');
+    return result;
+  },
+  groupState: (challengeId: string) =>
+    call<ChallengeGroupMember[]>(() =>
+      supabase.rpc('challenge_group_state', { p_challenge_id: challengeId }),
     ),
   archiveCustom: (challengeId: string) =>
     call<null>(() => supabase.rpc('archive_custom_challenge', { p_challenge_id: challengeId })),

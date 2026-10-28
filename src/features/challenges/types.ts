@@ -16,6 +16,34 @@ export type Challenge = {
   completed_count: number;
   /** Criado pela própria pessoa (e não um dos exemplos). */
   custom?: boolean;
+  /** Criado por outra pessoa e aceito por convite. */
+  invited?: boolean;
+  /** Quantas pessoas fazem este desafio junto (contando você); 0 ou 1 = só você. */
+  group_size?: number;
+};
+
+/** O que se vê de um convite antes de aceitar. */
+export type ChallengeInvitePreview = {
+  challenge_id: string;
+  title: string;
+  description: string;
+  icon: string | null;
+  target: number;
+  window_days: number;
+  inviter_name: string;
+  /** Quantas pessoas já estão no grupo (contando quem convidou). */
+  people: number;
+  joined: boolean;
+  already_active: boolean;
+};
+
+/** Uma pessoa do grupo do desafio: só nome e andamento. */
+export type ChallengeGroupMember = {
+  name: string;
+  is_me: boolean;
+  status: 'active' | 'completed' | 'expired' | 'abandoned' | 'none';
+  progress: number;
+  target: number;
 };
 
 /** O que um desafio próprio mede (as mesmas medidas automáticas dos exemplos). */

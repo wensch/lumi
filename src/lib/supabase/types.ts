@@ -398,6 +398,22 @@ export interface Database {
         Args: Record<string, never>;
         Returns: string[];
       };
+      create_challenge_invite: {
+        Args: { p_challenge_id: string };
+        Returns: string;
+      };
+      challenge_invite_preview: {
+        Args: { p_code: string };
+        Returns: unknown;
+      };
+      accept_challenge_invite: {
+        Args: { p_code: string };
+        Returns: string | null;
+      };
+      challenge_group_state: {
+        Args: { p_challenge_id: string };
+        Returns: unknown;
+      };
       start_challenge: {
         Args: { p_challenge_id: string };
         Returns: undefined;

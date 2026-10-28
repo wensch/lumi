@@ -12,7 +12,12 @@ import {
   ScreenHeader,
   Skeleton,
 } from '@/components';
-import { daysLeft, useChallenges, type Challenge } from '@/features/challenges';
+import {
+  daysLeft,
+  useChallenges,
+  usePendingChallengeInvite,
+  type Challenge,
+} from '@/features/challenges';
 import { useActivePlan } from '@/features/plans';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -25,6 +30,8 @@ export default function JornadaScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
+  // Veio de um link de convite de desafio: abre a lista de desafios com o convite.
+  usePendingChallengeInvite();
   const { active: activePlan } = useActivePlan();
   const { challenges, loading, error, refetch } = useChallenges();
 
