@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { router } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { useAuth } from '@/features/auth';
@@ -7,6 +7,10 @@ import { useTranslation } from '@/i18n';
 import { trackEvent } from '@/features/metrics';
 import { supabase } from '@/lib/supabase';
 import { registerPushToken, syncPushLanguage } from './pushToken';
+
+/** Na web (usada só em testes) o módulo de notificações não tem esse recurso: sem toque em aviso. */
+const useLastNotificationResponse =
+  Platform.OS === 'web' ? () => null : Notifications.useLastNotificationResponse;
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -49,7 +53,7 @@ export function usePushSetup(navigationReady: boolean) {
   }, [userId, language]);
 
   // Toque num aviso (app aberto, em segundo plano ou fechado) leva ao círculo.
-  const lastResponse = Notifications.useLastNotificationResponse();
+  const lastResponse = useLastNotificationResponse();
   const responseId = lastResponse?.notification.request.identifier ?? null;
   const circleId = lastResponse?.notification.request.content.data?.circleId;
   // Cada toque abre o círculo uma vez só: sair e entrar de novo na conta não repete a navegação.
