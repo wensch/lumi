@@ -47,6 +47,8 @@ export default function DesafiosScreen() {
   // Convite recebido (link ou código digitado): mostra o desafio e deixa aceitar.
   const [inviteCode, setInviteCode] = useState<string | null>(normalizeInviteCode(convite));
   const [enteringCode, setEnteringCode] = useState(false);
+  // Código digitado à mão: se o convite não valer, o campo volta com ele em vez de sumir.
+  const [typedCode, setTypedCode] = useState('');
   useEffect(() => {
     const code = normalizeInviteCode(convite);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- um link novo chega com a tela já aberta
@@ -119,7 +121,10 @@ export default function DesafiosScreen() {
         <ChallengeInviteCard
           key={inviteCode}
           code={inviteCode}
-          onClose={() => setInviteCode(null)}
+          onClose={() => {
+            setInviteCode(null);
+            if (typedCode) setEnteringCode(true);
+          }}
           onAccepted={refetch}
         />
       ) : null}
@@ -175,7 +180,9 @@ export default function DesafiosScreen() {
 
           {enteringCode ? (
             <ChallengeCodeEntry
+              initialValue={typedCode}
               onSubmit={(code) => {
+                setTypedCode(code);
                 setInviteCode(code);
                 setEnteringCode(false);
               }}

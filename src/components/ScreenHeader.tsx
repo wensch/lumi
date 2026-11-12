@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme, type Theme } from '@/theme';
@@ -21,6 +21,13 @@ export function ScreenHeader({ title, onBackPress, onSettingsPress }: ScreenHead
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
+  // A palavra mais longa tem de caber na linha ("Configurações" quebrava no meio em 320 de largura):
+  // diminui a fonte em vez de partir a palavra. Largura útil: tela menos margens, botão e espaços.
+  const { width } = useWindowDimensions();
+  const longestWord = Math.max(...title.split(/\s+/).map((word) => word.length), 1);
+  const available = width - 44 - 46 - 16;
+  const baseSize = theme.typography.display.fontSize ?? 40;
+  const fontSize = Math.max(22, Math.min(baseSize, Math.floor(available / (longestWord * 0.62))));
 
   return (
     <View style={styles.container}>
@@ -36,7 +43,11 @@ export function ScreenHeader({ title, onBackPress, onSettingsPress }: ScreenHead
         </Pressable>
       ) : null}
       <Text
-        style={[theme.typography.display, styles.title]}
+        style={[
+          theme.typography.display,
+          styles.title,
+          { fontSize, lineHeight: Math.round(fontSize * 1.1) },
+        ]}
         numberOfLines={2}
         adjustsFontSizeToFit
         minimumFontScale={0.6}

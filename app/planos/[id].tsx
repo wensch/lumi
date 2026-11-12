@@ -56,10 +56,14 @@ export default function PlanoScreen() {
     const otherActive = plans.find((item) => item.status === 'active' && item.id !== plan.id);
     const go = () => run(() => plansApi.start(plan.id));
     if (otherActive) {
-      Alert.alert(t('plans.switchTitle'), `${otherActive.title}\n${t('plans.switchBody')}`, [
-        { text: t('common.cancel'), style: 'cancel' },
-        { text: t('plans.switchAction'), onPress: () => void go() },
-      ]);
+      Alert.alert(
+        t('plans.switchTitle'),
+        `${otherActive.title} → ${plan.title}\n${t('plans.switchBody')}`,
+        [
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('plans.switchAction'), onPress: () => void go() },
+        ],
+      );
       return;
     }
     await go();

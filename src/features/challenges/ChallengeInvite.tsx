@@ -214,11 +214,18 @@ export function ChallengeInviteCard({ code, onClose, onAccepted }: ReceivedProps
 }
 
 /** "Tenho um código": para quando o link não abriu o app. */
-export function ChallengeCodeEntry({ onSubmit }: { onSubmit: (code: string) => void }) {
+export function ChallengeCodeEntry({
+  onSubmit,
+  initialValue = '',
+}: {
+  onSubmit: (code: string) => void;
+  /** Texto já digitado (ao voltar de um convite que não valeu, o campo não some nem esvazia). */
+  initialValue?: string;
+}) {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(initialValue);
   const code = normalizeInviteCode(value);
 
   return (
