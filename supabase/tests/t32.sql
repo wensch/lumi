@@ -27,3 +27,16 @@ select public.create_circle(E'Círculo⁧');
 \echo '== círculo normal (esperado: um objeto com código)'
 select (public.create_circle('Círculo da Ana'))->>'invite_code' is not null;
 reset role;
+
+\echo '== (00034) emoji composto em nome e círculo passa; só ZWJ continua barrado (esperado: UPDATE 1, t, invalid_input)'
+set role authenticated; select set_config('request.jwt.claim.sub','aaaa0000-0000-0000-0000-000000000001',false);
+update public.profiles set display_name = E'Ana \U0001F468\u200D\U0001F469\u200D\U0001F467 \U0001F3F3\uFE0F\u200D\U0001F308' where id = :A;
+select (public.create_circle(E'Família \U0001F468\u200D\U0001F469\u200D\U0001F467'))->>'invite_code' is not null;
+update public.profiles set display_name = E'\u200D\u200D' where id = :A;
+reset role;
+
+\echo '== (00035) descrição vazia continua válida; só espaços ou só U+200D no nome é barrado (esperado: t, invalid_input)'
+set role authenticated; select set_config('request.jwt.claim.sub','aaaa0000-0000-0000-0000-000000000001',false);
+select public.create_custom_challenge('personal', null, 'Desafio sem descrição', '', null, 'prayers', 2, 7) is not null;
+update public.profiles set display_name = E'‍ ‍' where id = :A;
+reset role;
