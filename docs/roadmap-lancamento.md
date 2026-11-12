@@ -39,7 +39,7 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 ## Banco de ideias (fora do roadmap até o dono decidir)
 Ideias que apareceram durante o desenvolvimento. Nenhuma está no escopo do lançamento; cada uma entra no roadmap só quando o dono decidir.
 
-**I1. Ler antes de rolar: pausa gentil dos apps de distração** (ideia vista no app BibleScroll, de Screen Detox Inc, em 25/11/2026).
+**I1. Ler antes de rolar: pausa gentil dos apps de distração** (ideia vista no app BibleScroll, de Screen Detox Inc, em 12/11/2026).
 - **O que é:** a pessoa escolhe apps que a distraem (ex.: Instagram) e, ao abri-los, o celular lembra de fazer o momento do dia no Lumi antes. Quem faz, ganha acesso liberado; a sequência continua sendo o prêmio. O BibleScroll vende isso como "Read the Bible before you scroll" e "Read the Bible to unlock Instagram", com contagem de dias seguidos e "um versículo para começar o dia". Nota 4,9 com 22 mil avaliações, grátis com compras no app, 26 MB, na categoria "Foco Cristão".
 - **Encaixe com o Lumi:** a ideia reforça a constância, que é o coração do app. O cuidado é com o tom: o Lumi não cobra nem culpa (briefing §7.3), então a versão do Lumi deveria ser uma **pausa convidativa** ("Que tal um minuto de devocional antes?") com saída fácil ("Agora não"), nunca um bloqueio rígido. Isso precisa de decisão do dono.
 - **Como poderia funcionar (a confirmar antes de construir):**
