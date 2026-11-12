@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00032
+## Migrations 00004 a 00033
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -164,4 +164,7 @@ pessoa que a gente aceitou e quantas pessoas fazem junto. O link do convite é a
 A `00032_text_guards.sql` limita o nome de exibição a 100 caracteres (também por PATCH em `profiles`) e barra, por
 gatilho (`guard_visible_text`), caracteres invisíveis e de direção em títulos de desafio/plano, nome de círculo,
 nome de exibição e título de dia de plano próprio (achados do loop de agentes). Teste: `supabase/tests/t32.sql`.
+A `00033_translation_policies_fix.sql` conserta a leitura das traduções de plano e de desafio: as políticas consultavam
+`reading_plans`/`challenges`, que anon/authenticated não podem ler, e a leitura toda falhava (o app em inglês ficava com
+planos e desafios em português). Agora usam as funções `is_published_plan` e `is_published_challenge`. Teste: `t33.sql`.
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.
