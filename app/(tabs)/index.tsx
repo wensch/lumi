@@ -20,7 +20,11 @@ export default function HojeScreen() {
   const { t } = useTranslation();
   // Em telas baixas (iPhone SE) o mascote de 290 empurrava o botão do devocional para fora da tela.
   const { height: windowHeight } = useWindowDimensions();
-  const mascotSize = Math.round(Math.min(290, Math.max(160, windowHeight * 0.3)));
+  // Telas baixas (iPhone SE): o botão do devocional vem antes do mascote, que fica menor, para aparecer sem rolar.
+  const compactHeight = windowHeight < 760;
+  const mascotSize = compactHeight
+    ? 150
+    : Math.round(Math.min(290, Math.max(200, windowHeight * 0.3)));
   // Abriu um link de convite de desafio antes de entrar: depois do login, leva à lista de desafios.
   usePendingChallengeInvite();
   const {
@@ -75,6 +79,21 @@ export default function HojeScreen() {
   const freezeCoversYesterday = !completedToday && daysSinceLastCompleted === 2 && freezes > 0;
   const isVeryLate = !completedToday && new Date().getHours() >= 23;
 
+  const mascotBlock = (
+    <FadeIn delay={60} rise={18}>
+      <Pressable
+        onPress={() => router.push('/lumi')}
+        accessibilityRole="button"
+        accessibilityLabel={t('journey.openLumi')}
+      >
+        <View style={styles.mascotArea}>
+          <View style={styles.mascotBackdrop} />
+          <LumiMascot mood={isVeryLate ? 'sleepy' : greeting.mood} size={mascotSize} />
+        </View>
+      </Pressable>
+    </FadeIn>
+  );
+
   return (
     <Screen>
       <UpdateBanner />
@@ -121,18 +140,7 @@ export default function HojeScreen() {
         </Text>
       ) : null}
 
-      <FadeIn delay={60} rise={18}>
-        <Pressable
-          onPress={() => router.push('/lumi')}
-          accessibilityRole="button"
-          accessibilityLabel={t('journey.openLumi')}
-        >
-          <View style={styles.mascotArea}>
-            <View style={styles.mascotBackdrop} />
-            <LumiMascot mood={isVeryLate ? 'sleepy' : greeting.mood} size={mascotSize} />
-          </View>
-        </Pressable>
-      </FadeIn>
+      {!compactHeight ? mascotBlock : null}
 
       {completedToday ? (
         <>
@@ -174,6 +182,8 @@ export default function HojeScreen() {
           <Button label={t('home.startDevotional')} onPress={() => router.push('/devocional')} />
         </>
       )}
+
+      {compactHeight ? mascotBlock : null}
 
       {eventCard ? (
         <FadeIn>
