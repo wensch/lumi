@@ -204,7 +204,11 @@ export function ChallengeInviteCard({ code, onClose, onAccepted }: ReceivedProps
           )}
         </>
       ) : null}
-      <Button label={t('challenges.invite.close')} variant="ghost" onPress={onClose} />
+      <Button
+        label={t(state === 'done' ? 'challenges.invite.closeDone' : 'challenges.invite.close')}
+        variant="ghost"
+        onPress={onClose}
+      />
     </Card>
   );
 }

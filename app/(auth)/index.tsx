@@ -188,7 +188,7 @@ export default function AuthScreen() {
             {method === 'password' ? (
               <TextField
                 label={t('common.password')}
-                placeholder="••••••••"
+                placeholder={t('auth.passwordPlaceholder')}
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}

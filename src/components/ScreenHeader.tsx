@@ -37,7 +37,7 @@ export function ScreenHeader({ title, onBackPress, onSettingsPress }: ScreenHead
       ) : null}
       <Text
         style={[theme.typography.display, styles.title]}
-        numberOfLines={1}
+        numberOfLines={2}
         adjustsFontSizeToFit
         minimumFontScale={0.6}
       >

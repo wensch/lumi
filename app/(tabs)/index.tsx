@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Button, Card, FadeIn, Screen, Skeleton, StreakBadge, XPBadge } from '@/components';
@@ -18,6 +18,9 @@ export default function HojeScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { t } = useTranslation();
+  // Em telas baixas (iPhone SE) o mascote de 290 empurrava o botão do devocional para fora da tela.
+  const { height: windowHeight } = useWindowDimensions();
+  const mascotSize = Math.round(Math.min(290, Math.max(160, windowHeight * 0.3)));
   // Abriu um link de convite de desafio antes de entrar: depois do login, leva à lista de desafios.
   usePendingChallengeInvite();
   const {
@@ -126,7 +129,7 @@ export default function HojeScreen() {
         >
           <View style={styles.mascotArea}>
             <View style={styles.mascotBackdrop} />
-            <LumiMascot mood={isVeryLate ? 'sleepy' : greeting.mood} size={290} />
+            <LumiMascot mood={isVeryLate ? 'sleepy' : greeting.mood} size={mascotSize} />
           </View>
         </Pressable>
       </FadeIn>

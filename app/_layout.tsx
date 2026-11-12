@@ -6,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { YouVersionProvider } from '@youversion/platform-react-native-expo-ui';
 import { YouVersionProvider as YouVersionDataProvider } from '@youversion/platform-react-hooks';
+import '@/lib/webAlert';
 import { useFonts } from 'expo-font';
 // Importa só os pesos usados (o pacote inteiro leva ~2,7 MB de fontes sem uso para o app).
 import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';

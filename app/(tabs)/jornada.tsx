@@ -18,7 +18,7 @@ import {
   usePendingChallengeInvite,
   type Challenge,
 } from '@/features/challenges';
-import { useActivePlan } from '@/features/plans';
+import { useActivePlan, usePlans } from '@/features/plans';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 
@@ -33,6 +33,9 @@ export default function JornadaScreen() {
   // Veio de um link de convite de desafio: abre a lista de desafios com o convite.
   usePendingChallengeInvite();
   const { active: activePlan } = useActivePlan();
+  const { plans } = usePlans();
+  // Plano pausado some da área; mostra um atalho para retomar.
+  const pausedPlan = plans.find((plan) => plan.status === 'paused');
   const { challenges, loading, error, refetch } = useChallenges();
 
   const activeChallenges = challenges
@@ -109,6 +112,18 @@ export default function JornadaScreen() {
           ) : (
             <>
               <Text style={theme.typography.body}>{t('journey.planInvite')}</Text>
+              {pausedPlan ? (
+                <View style={styles.panel}>
+                  <Text style={theme.typography.bodyStrong}>
+                    {t('journey.pausedPlan', { title: pausedPlan.title })}
+                  </Text>
+                  <Button
+                    label={t('journey.resumePlan')}
+                    variant="secondary"
+                    onPress={() => router.push(`/planos/${pausedPlan.id}`)}
+                  />
+                </View>
+              ) : null}
               <Button label={t('journey.choosePlan')} onPress={() => router.push('/planos')} />
               <Button
                 label={t('journey.createPlan')}

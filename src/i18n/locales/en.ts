@@ -30,7 +30,8 @@ export const en: TranslationSchema = {
     sendMagicLink: 'Send magic link',
     magicLinkSent: 'Link sent! Check your email.',
     signUpConfirmationSent: 'Account created! Check your email to confirm before signing in.',
-    useMagicLink: 'Sign in without a password (magic link)',
+    useMagicLink: 'Sign in without a password (email link)',
+    passwordPlaceholder: 'Your password',
     usePassword: 'Sign in with password',
     forgotPassword: 'Forgot my password',
     noAccountYet: "Don't have an account yet?",
@@ -38,7 +39,8 @@ export const en: TranslationSchema = {
     backToLogin: 'Back to sign in',
     alreadyHaveAccount: 'Already have an account?',
     signInWithYouVersion: 'Sign in with YouVersion',
-    youVersionHint: 'We sent a confirmation link to the email on your YouVersion account.',
+    youVersionHint:
+      'When you sign in with YouVersion, we send a confirmation link to the email on your account.',
     youVersionError: "Couldn't connect to YouVersion. Try again.",
     youVersionNoEmail:
       "Your YouVersion account didn't return an email. Try another sign-in method.",
@@ -78,7 +80,7 @@ export const en: TranslationSchema = {
     nameQuestion: 'What should we call you?',
     nameLabel: 'Name',
     namePlaceholder: 'Your name',
-    nameRequired: 'What should we call you?',
+    nameRequired: 'Write your name to continue.',
     ageQuestion: 'What age range are you in?',
     ageHelper: 'This helps us personalize your experience.',
     ageRequired: 'Choose an age range.',
@@ -481,11 +483,13 @@ export const en: TranslationSchema = {
       accept: 'Accept the challenge',
       accepted: 'All set! The challenge is on your list, in progress.',
       alreadyIn: "You're already in this challenge.",
-      invalid: 'This invite is no longer valid. Ask the person who invited you for a new one.',
+      invalid:
+        "We couldn't find that invite. Check the letters of the code; if they're right, it may have been closed: ask the person who invited you for a new one.",
       haveCode: 'Invite code',
       codePlaceholder: 'E.g. ABCD2345',
       seeInvite: 'See invite',
       close: 'Not now',
+      closeDone: 'Close',
     },
     errors: {
       invite_full: 'This group is full (up to 8 people).',
