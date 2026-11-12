@@ -261,6 +261,8 @@ export const pt = {
     stepOf: 'Passo {{current}} de {{total}}',
     verseUnavailable: 'Não foi possível carregar o versículo agora.',
     scrollHint: 'Role para ler mais ↓',
+    reflectCounter: '{{count}} de {{max}} caracteres',
+    reflectLimit: 'Limite de {{max}} caracteres atingido: o texto não passa daqui.',
     aiDisclaimer:
       'Resposta gerada por IA a partir do texto do devocional. Não substitui conversar com alguém de confiança.',
     returnWelcomeTitle: 'Que bom te ver de novo!',

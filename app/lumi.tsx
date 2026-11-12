@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton } from '@/components';
+import { Button, Card, FadeIn, LumiIcon, Screen, ScreenHeader, Skeleton } from '@/components';
 import { useAchievementCodes } from '@/features/achievements';
 import { useChallengeRewards } from '@/features/challenges';
 import { lumiGreeting, useHomeData } from '@/features/home';
@@ -118,10 +118,13 @@ export default function LumiScreen() {
                 achievementCodes,
                 challengeRewards,
               );
+              // Recompensa de desafio: o nome e o desenho aparecem mesmo trancados (o cartão do desafio já mostra).
+              const isReward = !!outfit.challenge || outfit.achievement === 'challenge_circle';
               return (
                 <WardrobeTile
                   key={outfit.id}
                   icon={outfit.icon}
+                  previewLocked={isReward}
                   label={
                     unlocked
                       ? t(`lumi.outfits.${outfit.id}`)
@@ -139,6 +142,7 @@ export default function LumiScreen() {
                                 ? t('lumi.outfitLockedFirst')
                                 : t('lumi.outfitLocked', { days: outfit.milestone })
                   }
+                  lockedName={isReward ? t(`lumi.outfits.${outfit.id}`) : undefined}
                   selected={outfitIds.includes(outfit.id)}
                   unlocked={unlocked}
                   onPress={() => toggleOutfit(outfit.id)}
@@ -176,6 +180,8 @@ export default function LumiScreen() {
 function WardrobeTile({
   icon,
   label,
+  previewLocked = false,
+  lockedName,
   selected,
   unlocked,
   onPress,
@@ -183,6 +189,10 @@ function WardrobeTile({
 }: {
   icon: string;
   label: string;
+  /** Mostra o desenho do item mesmo trancado (recompensas de desafio). */
+  previewLocked?: boolean;
+  /** Nome do item, mostrado acima do requisito quando trancado. */
+  lockedName?: string;
   selected: boolean;
   unlocked: boolean;
   onPress: () => void;
@@ -201,10 +211,15 @@ function WardrobeTile({
         !unlocked && styles.wardrobeTileLocked,
       ]}
     >
-      <Text style={[styles.wardrobeIcon, !unlocked && styles.wardrobeIconLocked]}>
-        {unlocked ? icon : '🔒'}
-      </Text>
-      <Text style={styles.wardrobeLabel} numberOfLines={2}>
+      <View style={!unlocked && styles.wardrobeIconLocked}>
+        {unlocked || previewLocked ? (
+          <LumiIcon name={icon} size={30} />
+        ) : (
+          <Text style={styles.wardrobeIcon}>🔒</Text>
+        )}
+      </View>
+      {!unlocked && lockedName ? <Text style={styles.wardrobeName}>{lockedName}</Text> : null}
+      <Text style={styles.wardrobeLabel} numberOfLines={3}>
         {label}
       </Text>
     </Pressable>
@@ -387,6 +402,12 @@ const getStyles = (theme: Theme) =>
     },
     wardrobeIconLocked: {
       opacity: 0.7,
+    },
+    wardrobeName: {
+      ...theme.typography.bodyStrong,
+      fontSize: 13,
+      color: theme.colors.ink,
+      textAlign: 'center',
     },
     wardrobeLabel: {
       ...theme.typography.caption,

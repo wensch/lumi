@@ -257,6 +257,8 @@ export const en: TranslationSchema = {
     },
     stepOf: 'Step {{current}} of {{total}}',
     scrollHint: 'Scroll to read more ↓',
+    reflectCounter: '{{count}} of {{max}} characters',
+    reflectLimit: 'Limit of {{max}} characters reached: the text stops here.',
     verseUnavailable: "Couldn't load the verse right now.",
     aiDisclaimer:
       "AI-generated answer based on the devotional text. It doesn't replace talking with someone you trust.",

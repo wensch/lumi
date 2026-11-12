@@ -58,6 +58,8 @@ function lumiCompletionKey(milestone: boolean, unlocked: number, isFirst: boolea
 const ACHIEVEMENT_XP = 20;
 // O banco recusa reflexões acima disso (complete_devotional_session).
 const REFLECTION_MAX_LENGTH = 5000;
+/** A partir daqui mostra quantos caracteres faltam (o campo corta em silêncio no limite). */
+const REFLECTION_COUNTER_FROM = 4500;
 
 type Content = Database['public']['Tables']['content']['Row'];
 type Result = {
@@ -542,6 +544,16 @@ export default function DevocionalScreen() {
                   maxLength={REFLECTION_MAX_LENGTH}
                   style={styles.reflectionInput}
                 />
+                {reflection.length >= REFLECTION_COUNTER_FROM ? (
+                  <Text style={styles.reflectionCounter} accessibilityLiveRegion="polite">
+                    {t(
+                      reflection.length >= REFLECTION_MAX_LENGTH
+                        ? 'devotional.reflectLimit'
+                        : 'devotional.reflectCounter',
+                      { count: reflection.length, max: REFLECTION_MAX_LENGTH },
+                    )}
+                  </Text>
+                ) : null}
               </>
             ) : null}
 
@@ -821,6 +833,11 @@ const getStyles = (theme: Theme) =>
     },
     reflectionInput: {
       minHeight: 140,
+    },
+    reflectionCounter: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
+      textAlign: 'right',
     },
     askBox: {
       gap: theme.spacing.sm,
