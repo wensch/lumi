@@ -100,6 +100,8 @@ export default function LumiScreen() {
       <Pressable
         onPress={clearOutfits}
         accessibilityRole="button"
+        accessibilityLabel={t('lumi.outfitNone')}
+        hitSlop={6}
         disabled={outfitIds.length === 0}
         style={[styles.clearButton, outfitIds.length === 0 && styles.clearButtonDisabled]}
       >
@@ -334,6 +336,8 @@ const getStyles = (theme: Theme) =>
       borderWidth: 2.5,
       borderColor: theme.colors.ink,
       borderRadius: theme.radius.pill,
+      minHeight: 44,
+      justifyContent: 'center',
       paddingVertical: 6,
       paddingHorizontal: 14,
     },

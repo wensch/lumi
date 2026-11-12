@@ -2,7 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { Button, Card, FadeIn, IconBadge, Screen, ScreenHeader, Skeleton } from '@/components';
+import {
+  Button,
+  Card,
+  FadeIn,
+  IconBadge,
+  ProgressBar,
+  Screen,
+  ScreenHeader,
+  Skeleton,
+} from '@/components';
 import {
   challengesApi,
   ChallengeCodeEntry,
@@ -56,6 +65,8 @@ export default function DesafiosScreen() {
     busyRef.current = false;
     if (result.error !== null) {
       Alert.alert(t(`challenges.errors.${result.error}`));
+      // Erro de lista velha (já iniciado em outro aparelho, arquivado...): recarrega para o cartão refletir o servidor.
+      void refetch();
       return;
     }
     Haptics.selectionAsync().catch(() => {});
@@ -254,9 +265,13 @@ function ChallengeCard({
 
       {isActive ? (
         <View style={styles.progressBlock}>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
-          </View>
+          <ProgressBar
+            progress={progress}
+            accessibilityLabel={t('challenges.progress', {
+              done: challenge.progress,
+              total: challenge.target,
+            })}
+          />
           <Text style={[theme.typography.caption, isActive ? styles.onCardMuted : styles.muted]}>
             {t('challenges.progress', { done: challenge.progress, total: challenge.target })} ·{' '}
             {left === 0
@@ -326,18 +341,6 @@ const getStyles = (theme: Theme) =>
     },
     progressBlock: {
       gap: 4,
-    },
-    progressTrack: {
-      height: 16,
-      borderRadius: 8,
-      borderWidth: 2.5,
-      borderColor: theme.colors.ink,
-      backgroundColor: theme.colors.white,
-      overflow: 'hidden',
-    },
-    progressFill: {
-      height: '100%',
-      backgroundColor: theme.colors.green,
     },
     statusLine: {
       ...theme.typography.bodyStrong,

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import * as Speech from 'expo-speech';
 import type { Voice } from 'expo-speech';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { getSavedVoice, isNetworkVoice, listVoices, saveVoice } from './voices';

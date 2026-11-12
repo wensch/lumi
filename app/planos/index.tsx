@@ -1,6 +1,15 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, FadeIn, IconBadge, Screen, ScreenHeader, Skeleton } from '@/components';
+import {
+  Button,
+  Card,
+  FadeIn,
+  IconBadge,
+  ProgressBar,
+  Screen,
+  ScreenHeader,
+  Skeleton,
+} from '@/components';
 import { usePlans, type PlanSummary } from '@/features/plans';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
@@ -88,9 +97,13 @@ function PlanCard({ plan, theme }: { plan: PlanSummary; theme: Theme }) {
         <Text style={[theme.typography.body, styles.description]}>{plan.description}</Text>
         {plan.status === 'active' || plan.status === 'paused' ? (
           <View style={styles.progressBlock}>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
-            </View>
+            <ProgressBar
+              progress={progress}
+              accessibilityLabel={t('plans.dayProgress', {
+                done: plan.last_day_done,
+                total: plan.days,
+              })}
+            />
             <Text
               style={[
                 theme.typography.caption,
@@ -142,17 +155,5 @@ const getStyles = (theme: Theme) =>
     },
     progressBlock: {
       gap: 4,
-    },
-    progressTrack: {
-      height: 14,
-      borderRadius: 7,
-      borderWidth: 2.5,
-      borderColor: theme.colors.ink,
-      backgroundColor: theme.colors.white,
-      overflow: 'hidden',
-    },
-    progressFill: {
-      height: '100%',
-      backgroundColor: theme.colors.green,
     },
   });

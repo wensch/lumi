@@ -1,7 +1,16 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Button, Card, FadeIn, IconBadge, Screen, ScreenHeader, Skeleton } from '@/components';
+import {
+  Button,
+  Card,
+  FadeIn,
+  IconBadge,
+  ProgressBar,
+  Screen,
+  ScreenHeader,
+  Skeleton,
+} from '@/components';
 import {
   formatPassageReference,
   plansApi,
@@ -19,14 +28,19 @@ export default function PlanoScreen() {
   const { t, language } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { plan, loading, error, refetch } = usePlan(id);
-  const { plans } = usePlans();
+  const { plans, loading: plansLoading } = usePlans();
   const [working, setWorking] = useState(false);
+  // Trava síncrona contra toque duplo (o estado `working` só vale no próximo render).
+  const busyRef = useRef(false);
 
   /** Roda a ação no servidor e recarrega; falha mostra um aviso simples. */
   const run = async (action: () => Promise<{ error: string | null }>) => {
+    if (busyRef.current) return false;
+    busyRef.current = true;
     setWorking(true);
     const result = await action();
     setWorking(false);
+    busyRef.current = false;
     if (result.error !== null) {
       Alert.alert(
         result.error.includes('not_available') ? t('events.notAvailable') : t('plans.errorAction'),
@@ -76,11 +90,13 @@ export default function PlanoScreen() {
               <Text style={[theme.typography.body, styles.centeredText]}>{plan.description}</Text>
               {plan.status === 'active' || plan.status === 'paused' || plan.status === 'done' ? (
                 <View style={styles.progressBlock}>
-                  <View style={styles.progressTrack}>
-                    <View
-                      style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]}
-                    />
-                  </View>
+                  <ProgressBar
+                    progress={progress}
+                    accessibilityLabel={t('plans.dayProgress', {
+                      done: plan.last_day_done,
+                      total: plan.days,
+                    })}
+                  />
                   <Text style={[theme.typography.caption, styles.centeredText]}>
                     {t('plans.dayProgress', { done: plan.last_day_done, total: plan.days })}
                   </Text>
@@ -102,7 +118,11 @@ export default function PlanoScreen() {
             )
           ) : plan.status === 'paused' ? (
             <>
-              <Button label={t('plans.resume')} onPress={startPlan} disabled={working} />
+              <Button
+                label={t('plans.resume')}
+                onPress={startPlan}
+                disabled={working || plansLoading}
+              />
               <Text style={[theme.typography.caption, styles.mutedCentered]}>
                 {t('plans.pausedHint')}
               </Text>
@@ -116,12 +136,16 @@ export default function PlanoScreen() {
                 label={t('plans.restart')}
                 variant="secondary"
                 onPress={startPlan}
-                disabled={working}
+                disabled={working || plansLoading}
               />
             </>
           ) : (
             <>
-              <Button label={t('plans.start')} onPress={startPlan} disabled={working} />
+              <Button
+                label={t('plans.start')}
+                onPress={startPlan}
+                disabled={working || plansLoading}
+              />
               <Text style={[theme.typography.caption, styles.mutedCentered]}>
                 {t('plans.onePerDay')}
               </Text>
@@ -278,18 +302,6 @@ const getStyles = (theme: Theme) =>
     progressBlock: {
       alignSelf: 'stretch',
       gap: 4,
-    },
-    progressTrack: {
-      height: 16,
-      borderRadius: 8,
-      borderWidth: 2.5,
-      borderColor: theme.colors.ink,
-      backgroundColor: theme.colors.white,
-      overflow: 'hidden',
-    },
-    progressFill: {
-      height: '100%',
-      backgroundColor: theme.colors.green,
     },
     dayList: {
       gap: theme.spacing.sm,
