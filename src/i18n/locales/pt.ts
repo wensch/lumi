@@ -247,7 +247,7 @@ export const pt = {
     completedTitle: 'Devocional concluído!',
     freezeUsed: 'Sua Folga cobriu o dia que ficou pra trás. A sequência segue firme!',
     freezeEarned: 'Você ganhou uma Folga! Ela cobre um dia perdido, sem culpa.',
-    outfitWon: 'Você ganhou: {{item}}! Veja na aba Lumi.',
+    outfitWon: 'Você ganhou: {{item}}! Veja no guarda-roupa do Lumi, na aba Hoje.',
     milestoneTitle: '{{count}} dias seguidos!',
     nextMilestone: 'Próximo marco: {{title}}, em {{count}} dias.',
     lumiSays: {
@@ -260,6 +260,7 @@ export const pt = {
     },
     stepOf: 'Passo {{current}} de {{total}}',
     verseUnavailable: 'Não foi possível carregar o versículo agora.',
+    scrollHint: 'Role para ler mais ↓',
     aiDisclaimer:
       'Resposta gerada por IA a partir do texto do devocional. Não substitui conversar com alguém de confiança.',
     returnWelcomeTitle: 'Que bom te ver de novo!',
@@ -480,6 +481,7 @@ export const pt = {
       shareText: 'Topa fazer o desafio "{{title}}" comigo no Lumi? Use o código {{code}}.',
       receivedTitle: 'Convite para um desafio',
       from: '{{name}} convidou você · {{count}} pessoas no grupo',
+      fromOne: '{{name}} convidou você · 1 pessoa no grupo',
       accept: 'Aceitar o desafio',
       accepted: 'Pronto! O desafio já está na sua lista, em andamento.',
       alreadyIn: 'Você já está neste desafio.',

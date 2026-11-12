@@ -186,7 +186,10 @@ export function ChallengeInviteCard({ code, onClose, onAccepted }: ReceivedProps
           <Text style={theme.typography.heading}>{preview.title}</Text>
           <Text style={theme.typography.body}>{preview.description}</Text>
           <Text style={[theme.typography.caption, styles.muted]}>
-            {t('challenges.invite.from', { name: preview.inviter_name, count: preview.people })}
+            {t(preview.people === 1 ? 'challenges.invite.fromOne' : 'challenges.invite.from', {
+              name: preview.inviter_name,
+              count: preview.people,
+            })}
             {' · '}
             {t('challenges.inDays', { count: preview.window_days })}
           </Text>

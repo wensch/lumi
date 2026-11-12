@@ -93,7 +93,7 @@ export function InviteShare({
             style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
           >
             {option.icon}
-            <Text style={styles.label} numberOfLines={1} maxFontSizeMultiplier={1.2}>
+            <Text style={styles.label} maxFontSizeMultiplier={1.2}>
               {option.label}
             </Text>
           </Pressable>
@@ -115,10 +115,13 @@ const getStyles = (theme: Theme) =>
     },
     row: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: theme.spacing.sm,
     },
     option: {
-      flex: 1,
+      // Duas por linha: com quatro lado a lado os rótulos eram cortados ("Wh…", "Cop…").
+      flexGrow: 1,
+      flexBasis: '40%',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 4,

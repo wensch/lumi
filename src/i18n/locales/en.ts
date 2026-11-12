@@ -244,7 +244,7 @@ export const en: TranslationSchema = {
     completedTitle: 'Devotional complete!',
     freezeUsed: 'Your Rest day covered the day you missed. The streak keeps going!',
     freezeEarned: 'You earned a Rest day! It covers one missed day, no guilt.',
-    outfitWon: 'You earned: {{item}}! Check the Lumi tab.',
+    outfitWon: 'You earned: {{item}}! Find it in the Lumi wardrobe, on the Today tab.',
     milestoneTitle: '{{count}} days in a row!',
     nextMilestone: 'Next milestone: {{title}}, in {{count}} days.',
     lumiSays: {
@@ -256,6 +256,7 @@ export const en: TranslationSchema = {
       normal3: "Small and steady. That's how you go far. 🐑",
     },
     stepOf: 'Step {{current}} of {{total}}',
+    scrollHint: 'Scroll to read more ↓',
     verseUnavailable: "Couldn't load the verse right now.",
     aiDisclaimer:
       "AI-generated answer based on the devotional text. It doesn't replace talking with someone you trust.",
@@ -474,6 +475,7 @@ export const en: TranslationSchema = {
       shareText: 'Want to do the "{{title}}" challenge with me on Lumi? Use the code {{code}}.',
       receivedTitle: 'Invite to a challenge',
       from: '{{name}} invited you · {{count}} people in the group',
+      fromOne: '{{name}} invited you · 1 person in the group',
       accept: 'Accept the challenge',
       accepted: 'All set! The challenge is on your list, in progress.',
       alreadyIn: "You're already in this challenge.",

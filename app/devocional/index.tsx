@@ -30,6 +30,7 @@ import { useReadAloud } from '@/features/audio';
 import { cancelTodaysReminders } from '@/features/notifications';
 import { useAskAboutDevotional, useDevotional } from '@/features/devotional';
 import { useVersePassage, verseVersionId } from '@/features/bible';
+import { formatPassageReference } from '@/features/plans/passageReference';
 import {
   getJourney,
   JOURNEY_MILESTONES,
@@ -158,6 +159,11 @@ export default function DevocionalScreen() {
   }, [result]);
   const [showAsk, setShowAsk] = useState(false);
   const { ref: stepScrollRef, onScroll: onStepScroll } = useScrollFocusedInput();
+  // Texto maior que o cartão: mostra a barra e um aviso "role para ler mais" até chegar ao fim.
+  const [scrollMetrics, setScrollMetrics] = useState({ content: 0, layout: 0, y: 0 });
+  const hasMoreToRead =
+    scrollMetrics.content > scrollMetrics.layout + 12 &&
+    scrollMetrics.y + scrollMetrics.layout < scrollMetrics.content - 12;
   const [question, setQuestion] = useState('');
   const {
     ask,
@@ -184,6 +190,7 @@ export default function DevocionalScreen() {
     passage: versePassage,
     loading: verseLoading,
     error: verseError,
+    refetch: refetchVerse,
   } = useVersePassage(
     isVerseStep ? verseVersionId(content?.youversion_version_id ?? null, language) : null,
     isVerseStep ? (content?.passage_reference ?? null) : null,
@@ -474,25 +481,46 @@ export default function DevocionalScreen() {
         <View style={styles.stepCard}>
           <ScrollView
             ref={stepScrollRef}
-            onScroll={onStepScroll}
+            onScroll={(event) => {
+              onStepScroll(event);
+              const y = event.nativeEvent.contentOffset.y;
+              setScrollMetrics((current) => (current.y === y ? current : { ...current, y }));
+            }}
+            onContentSizeChange={(_width, content) =>
+              setScrollMetrics((current) => ({ ...current, content }))
+            }
+            onLayout={(event) => {
+              const layout = event.nativeEvent.layout.height;
+              setScrollMetrics((current) => ({ ...current, layout }));
+            }}
             scrollEventThrottle={16}
             style={styles.stepScroll}
             contentContainerStyle={styles.stepCardContent}
             keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator
           >
             <Text style={styles.stepPill}>{t(currentStep.labelKey)}</Text>
 
             {currentStep.kind === 'verse' ? (
               <>
                 <Text style={styles.verseReference}>
-                  {versePassage?.reference ?? (verseLoading ? '' : content.passage_reference)}
+                  {versePassage?.reference ??
+                    (verseLoading
+                      ? ''
+                      : formatPassageReference(content.passage_reference, language))}
                 </Text>
                 {verseLoading ? (
                   <Text style={styles.stepText}>{t('devotional.preparing')}</Text>
                 ) : null}
                 {verseError ? (
-                  <Text style={styles.stepText}>{t('devotional.verseUnavailable')}</Text>
+                  <>
+                    <Text style={styles.stepText}>{t('devotional.verseUnavailable')}</Text>
+                    <Button
+                      label={t('common.retry')}
+                      variant="secondary"
+                      onPress={() => refetchVerse()}
+                    />
+                  </>
                 ) : null}
                 {versePassage ? <Text style={styles.stepText}>{versePassage.content}</Text> : null}
               </>
@@ -588,6 +616,11 @@ export default function DevocionalScreen() {
               />
             </View>
           </ScrollView>
+          {hasMoreToRead ? (
+            <View style={styles.scrollHint} pointerEvents="none">
+              <Text style={styles.scrollHintText}>{t('devotional.scrollHint')}</Text>
+            </View>
+          ) : null}
         </View>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -746,6 +779,19 @@ const getStyles = (theme: Theme) =>
     stepScroll: {
       flex: 1,
       borderRadius: 25,
+    },
+    scrollHint: {
+      position: 'absolute',
+      bottom: 10,
+      alignSelf: 'center',
+      backgroundColor: theme.colors.ink,
+      borderRadius: theme.radius.pill,
+      paddingVertical: 6,
+      paddingHorizontal: 14,
+    },
+    scrollHintText: {
+      ...theme.typography.caption,
+      color: theme.colors.white,
     },
     stepCardContent: {
       flexGrow: 1,
