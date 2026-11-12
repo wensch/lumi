@@ -314,6 +314,8 @@ export const en: TranslationSchema = {
     seeAllPlans: 'See all plans',
     createPlan: 'Create my plan',
     seePlan: 'See the plan',
+    pausedPlan: 'Paused plan: {{title}}',
+    resumePlan: 'Resume the plan',
     challengesTitle: 'Challenges',
     challengesInvite: 'Short goals to nudge your consistency, on your own or with your circle.',
     seeChallenges: 'See challenges',

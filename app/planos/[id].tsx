@@ -69,7 +69,7 @@ export default function PlanoScreen() {
 
   return (
     <Screen>
-      <ScreenHeader title={plan?.title ?? t('plans.title')} onBackPress={goBackOrHome} />
+      <ScreenHeader title={t('plans.title')} onBackPress={goBackOrHome} />
 
       {loading ? (
         <>
@@ -87,6 +87,7 @@ export default function PlanoScreen() {
           <FadeIn>
             <Card style={styles.headerCard}>
               <IconBadge name={plan.icon} fallback="📖" diameter={72} />
+              <Text style={[theme.typography.heading, styles.centeredText]}>{plan.title}</Text>
               <Text style={[theme.typography.body, styles.centeredText]}>{plan.description}</Text>
               {plan.status === 'active' || plan.status === 'paused' || plan.status === 'done' ? (
                 <View style={styles.progressBlock}>

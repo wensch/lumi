@@ -2,7 +2,8 @@
 // Uso (na raiz do repositório): node .claude/skills/i18n-sync/verificar.mjs
 // O typecheck já garante as chaves (en é tipado a partir de pt); aqui entram os placeholders e os plurais.
 import { createRequire } from 'node:module';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 
 const require = createRequire(import.meta.url);
 const ts = require('typescript');
@@ -63,6 +64,30 @@ for (const key of Object.keys(pt)) {
   ) {
     problems.push(`igual nos dois idiomas (talvez sem traduzir): ${key} = "${pt[key]}"`);
   }
+}
+
+// Chaves usadas no código com texto fixo, ex.: t('journey.pausedPlan'). Se faltar em pt (e em en), a tela mostraria
+// '[missing ... translation]'; comparar pt x en não pega isso quando faltam nos dois.
+function sourceFiles(dir, out = []) {
+  for (const name of readdirSync(dir)) {
+    if (name === 'node_modules' || name.startsWith('.')) continue;
+    const path = join(dir, name);
+    if (statSync(path).isDirectory()) sourceFiles(path, out);
+    else if (/\.(ts|tsx)$/.test(name) && !path.includes('/locales/')) out.push(path);
+  }
+  return out;
+}
+const used = new Map();
+for (const file of [...sourceFiles('app'), ...sourceFiles('src')]) {
+  const text = readFileSync(file, 'utf8');
+  for (const m of text.matchAll(/\bt\(\s*(?:[^'"`()]*\?\s*)?'([a-zA-Z][\w]*(?:\.[\w-]+)+)'/g)) {
+    if (!used.has(m[1])) used.set(m[1], file);
+  }
+}
+const isPrefix = (key) => Object.keys(pt).some((k) => k.startsWith(`${key}.`));
+for (const [key, file] of used) {
+  if (!(key in pt) && !isPrefix(key))
+    problems.push(`usada no código mas sem texto em pt: ${key}  (${file})`);
 }
 console.log(`${Object.keys(pt).length} textos em pt, ${Object.keys(en).length} em en.`);
 if (problems.length === 0) console.log('Tudo certo: mesmas chaves, mesmos placeholders.');

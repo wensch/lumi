@@ -118,8 +118,9 @@ export default function LumiScreen() {
                 achievementCodes,
                 challengeRewards,
               );
-              // Recompensa de desafio: o nome e o desenho aparecem mesmo trancados (o cartão do desafio já mostra).
-              const isReward = !!outfit.challenge || outfit.achievement === 'challenge_circle';
+              // Item trancado mostra o desenho e o nome (esmaecidos) e o que falta para ganhar: dois itens do mesmo
+              // marco ('Com 50 dias') ou de eventos iguais não se confundem.
+              const isReward = true;
               return (
                 <WardrobeTile
                   key={outfit.id}

@@ -317,6 +317,8 @@ export const pt = {
     seeAllPlans: 'Ver todos os planos',
     createPlan: 'Criar meu plano',
     seePlan: 'Ver o plano',
+    pausedPlan: 'Plano pausado: {{title}}',
+    resumePlan: 'Retomar o plano',
     challengesTitle: 'Desafios',
     challengesInvite:
       'Metas curtas para dar um empurrãozinho na constância, sozinho ou com o seu círculo.',
