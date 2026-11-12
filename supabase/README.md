@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00031
+## Migrations 00004 a 00032
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -161,4 +161,7 @@ A `00031_challenge_invites.sql` deixa convidar alguém para o mesmo desafio pess
 `accept_challenge_invite` (até 8 pessoas por convite, mesmo limite de 3 desafios ativos) e `challenge_group_state`
 (nome e andamento de cada pessoa do grupo, nada mais). `list_challenges` passou a trazer também o desafio de outra
 pessoa que a gente aceitou e quantas pessoas fazem junto. O link do convite é a página `site/desafio`.
+A `00032_text_guards.sql` limita o nome de exibição a 100 caracteres (também por PATCH em `profiles`) e barra, por
+gatilho (`guard_visible_text`), caracteres invisíveis e de direção em títulos de desafio/plano, nome de círculo,
+nome de exibição e título de dia de plano próprio (achados do loop de agentes). Teste: `supabase/tests/t32.sql`.
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.

@@ -18,7 +18,22 @@ import { supabase } from '@/lib/supabase';
  * sessão é setada manualmente via setSession (só é documentado para o
  * fluxo automático com detectSessionInUrl: true).
  */
+/**
+ * Só o endereço de retorno do próprio login (AUTH_REDIRECT_URL) vale. Antes qualquer link com
+ * `access_token`/`refresh_token` em QUALQUER lugar da URL (ex.: `lumi://x#access_token=...`) estabelecia a
+ * sessão — quem recebesse um link assim passaria a usar a conta de quem o criou. Isto estreita a porta;
+ * o fechamento completo é o login com PKCE (o código só vale para o aparelho que iniciou o fluxo).
+ */
+function isAuthCallbackUrl(url: string) {
+  return (
+    url === AUTH_REDIRECT_URL ||
+    url.startsWith(`${AUTH_REDIRECT_URL}#`) ||
+    url.startsWith(`${AUTH_REDIRECT_URL}?`)
+  );
+}
+
 function extractAuthParamsFromUrl(url: string) {
+  if (!isAuthCallbackUrl(url)) return null;
   const fragment = url.split('#')[1] ?? url.split('?')[1];
   if (!fragment) return null;
 
