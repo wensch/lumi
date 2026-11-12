@@ -35,3 +35,17 @@ Cada bloco é entregue, testado em aparelho e só então começa o próximo.
 15. Política de privacidade, termos e **apagar conta e dados** (exigido pelas lojas).
 16. Assinatura de release (Play Store / App Store), fichas das lojas, capturas de tela.
 17. **Apagar os dados de teste** do Supabase e publicar. Antes de publicar nas lojas: restringir `apk.yml`/`site.yml` à branch `main` (hoje qualquer `ccr-*` publica o `apk-latest`), migrar o login para PKCE e guardar a sessão no SecureStore, e restringir a chave de API do Firebase ao pacote `com.lumi.app`. Antes: rodar `supabase/patches/restore-event-windows.sql` (volta as datas reais dos eventos de 2026).
+
+## Banco de ideias (fora do roadmap até o dono decidir)
+Ideias que apareceram durante o desenvolvimento. Nenhuma está no escopo do lançamento; cada uma entra no roadmap só quando o dono decidir.
+
+**I1. Ler antes de rolar: pausa gentil dos apps de distração** (ideia vista no app BibleScroll, de Screen Detox Inc, em 25/11/2026).
+- **O que é:** a pessoa escolhe apps que a distraem (ex.: Instagram) e, ao abri-los, o celular lembra de fazer o momento do dia no Lumi antes. Quem faz, ganha acesso liberado; a sequência continua sendo o prêmio. O BibleScroll vende isso como "Read the Bible before you scroll" e "Read the Bible to unlock Instagram", com contagem de dias seguidos e "um versículo para começar o dia". Nota 4,9 com 22 mil avaliações, grátis com compras no app, 26 MB, na categoria "Foco Cristão".
+- **Encaixe com o Lumi:** a ideia reforça a constância, que é o coração do app. O cuidado é com o tom: o Lumi não cobra nem culpa (briefing §7.3), então a versão do Lumi deveria ser uma **pausa convidativa** ("Que tal um minuto de devocional antes?") com saída fácil ("Agora não"), nunca um bloqueio rígido. Isso precisa de decisão do dono.
+- **Como poderia funcionar (a confirmar antes de construir):**
+  - Android: detectar o app aberto (permissão de "acesso ao uso" do sistema) e mostrar uma tela do Lumi por cima. Cuidado: a Google Play restringe serviços de acessibilidade e sobreposição de tela, e a análise da loja pode barrar.
+  - iOS: só pelo Screen Time (Family Controls), que exige uma permissão especial aprovada pela Apple.
+  - Nos dois casos é código nativo (fora do Expo Go; exige build de desenvolvimento e um módulo ou plugin próprio) e a pessoa precisa conceder permissões que assustam: a política de privacidade teria de explicar bem.
+- **Passos baratos antes do bloqueio de verdade:** (1) lembrete no horário em que a pessoa mais rola (já existe lembrete diário); (2) versículo do dia como aviso ou widget; (3) uma pesquisa curta com as primeiras pessoas para saber se querem isso, antes de gastar com o nativo.
+- **Outras ideias do mesmo app, para avaliar junto:** versículo do dia para começar o dia; mostrar a sequência na própria tela de pausa; liberar por um tempo (ex.: 15 minutos) depois do momento.
+- **Decisões do dono:** entra no produto? Como pausa suave ou bloqueio? Só Android no começo? Antes ou depois do lançamento?
