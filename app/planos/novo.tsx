@@ -375,12 +375,12 @@ const getStyles = (theme: Theme) =>
       gap: theme.spacing.xs,
     },
     chip: {
-      minHeight: 40,
+      minHeight: 44,
       paddingHorizontal: theme.spacing.md,
       justifyContent: 'center',
       borderRadius: theme.radius.md,
       borderWidth: 1.5,
-      borderColor: `${theme.colors.muted}55`,
+      borderColor: `${theme.colors.ink}66`,
       backgroundColor: theme.colors.white,
     },
     chipSelected: {

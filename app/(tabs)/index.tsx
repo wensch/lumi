@@ -278,7 +278,7 @@ const getStyles = (theme: Theme) =>
       borderWidth: 2.5,
       borderColor: theme.colors.ink,
       borderRadius: theme.radius.pill,
-      minHeight: 40,
+      minHeight: 44,
       paddingHorizontal: 12,
       ...theme.shadow.chip,
     },

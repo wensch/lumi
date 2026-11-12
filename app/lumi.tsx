@@ -203,7 +203,7 @@ function WardrobeTile({
     <Pressable
       onPress={unlocked ? onPress : undefined}
       accessibilityRole="button"
-      accessibilityLabel={label}
+      accessibilityLabel={!unlocked && lockedName ? `${lockedName}. ${label}` : label}
       accessibilityState={{ selected, disabled: !unlocked }}
       style={[
         styles.wardrobeTile,

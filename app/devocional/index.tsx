@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   BackHandler,
@@ -162,10 +162,13 @@ export default function DevocionalScreen() {
   const [showAsk, setShowAsk] = useState(false);
   const { ref: stepScrollRef, onScroll: onStepScroll } = useScrollFocusedInput();
   // Texto maior que o cartão: mostra a barra e um aviso "role para ler mais" até chegar ao fim.
-  const [scrollMetrics, setScrollMetrics] = useState({ content: 0, layout: 0, y: 0 });
-  const hasMoreToRead =
-    scrollMetrics.content > scrollMetrics.layout + 12 &&
-    scrollMetrics.y + scrollMetrics.layout < scrollMetrics.content - 12;
+  // As medidas ficam em ref (mudam a cada quadro de rolagem); só o booleano vira estado e re-renderiza.
+  const scrollMetrics = useRef({ content: 0, layout: 0, y: 0 });
+  const [hasMoreToRead, setHasMoreToRead] = useState(false);
+  const updateHasMoreToRead = () => {
+    const { content, layout, y } = scrollMetrics.current;
+    setHasMoreToRead(content > layout + 12 && y + layout < content - 12);
+  };
   const [question, setQuestion] = useState('');
   const {
     ask,
@@ -485,15 +488,16 @@ export default function DevocionalScreen() {
             ref={stepScrollRef}
             onScroll={(event) => {
               onStepScroll(event);
-              const y = event.nativeEvent.contentOffset.y;
-              setScrollMetrics((current) => (current.y === y ? current : { ...current, y }));
+              scrollMetrics.current.y = event.nativeEvent.contentOffset.y;
+              updateHasMoreToRead();
             }}
-            onContentSizeChange={(_width, content) =>
-              setScrollMetrics((current) => ({ ...current, content }))
-            }
+            onContentSizeChange={(_width, content) => {
+              scrollMetrics.current.content = content;
+              updateHasMoreToRead();
+            }}
             onLayout={(event) => {
-              const layout = event.nativeEvent.layout.height;
-              setScrollMetrics((current) => ({ ...current, layout }));
+              scrollMetrics.current.layout = event.nativeEvent.layout.height;
+              updateHasMoreToRead();
             }}
             scrollEventThrottle={16}
             style={styles.stepScroll}

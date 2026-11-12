@@ -3,7 +3,16 @@ import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
-import { Button, Card, FadeIn, Screen, ScreenHeader, Skeleton, TextField } from '@/components';
+import {
+  Button,
+  Card,
+  FadeIn,
+  ProgressBar,
+  Screen,
+  ScreenHeader,
+  Skeleton,
+  TextField,
+} from '@/components';
 import { useAchievementCodes } from '@/features/achievements';
 import { rewardForCircleChallenge } from '@/features/lumi';
 import {
@@ -400,21 +409,17 @@ export default function CirculoScreen() {
                   <Text style={[theme.typography.caption, styles.mutedText]}>
                     {challengeState.active.description}
                   </Text>
-                  <View style={styles.challengeTrack}>
-                    <View
-                      style={[
-                        styles.challengeFill,
-                        {
-                          width: `${Math.round(
-                            Math.min(
-                              challengeState.active.progress / challengeState.active.target,
-                              1,
-                            ) * 100,
-                          )}%`,
-                        },
-                      ]}
-                    />
-                  </View>
+                  <ProgressBar
+                    progress={
+                      challengeState.active.target > 0
+                        ? challengeState.active.progress / challengeState.active.target
+                        : 0
+                    }
+                    accessibilityLabel={t('challenges.circleProgress', {
+                      done: challengeState.active.progress,
+                      total: challengeState.active.target,
+                    })}
+                  />
                   <Text style={[theme.typography.caption, styles.mutedText]}>
                     {t('challenges.circleProgress', {
                       done: challengeState.active.progress,
@@ -560,18 +565,6 @@ const getStyles = (theme: Theme) =>
     },
     sectionCard: {
       gap: theme.spacing.sm,
-    },
-    challengeTrack: {
-      height: 16,
-      borderRadius: 8,
-      borderWidth: 2.5,
-      borderColor: theme.colors.ink,
-      backgroundColor: theme.colors.white,
-      overflow: 'hidden',
-    },
-    challengeFill: {
-      height: '100%',
-      backgroundColor: theme.colors.green,
     },
     challengeOption: {
       gap: theme.spacing.xs,
