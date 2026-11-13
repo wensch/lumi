@@ -37,7 +37,7 @@ type RequestBody = {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_BODY_BYTES = 4096;
-const GEMINI_TIMEOUT_MS = 20000;
+const GEMINI_TIMEOUT_MS = 15000;
 // Perguntas por usuário por dia (aplicado no banco por consume_ai_quota, migration 00014).
 const DAILY_QUESTION_LIMIT = 15;
 
@@ -149,25 +149,40 @@ Deno.serve(async (req) => {
     ? `${SYSTEM_INSTRUCTION}\n- Responda em inglês.`
     : SYSTEM_INSTRUCTION;
 
-  let geminiResponse: Response;
-  try {
-    geminiResponse = await fetch(`${GEMINI_ENDPOINT}?key=${geminiApiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
-      body: JSON.stringify({
-        model: GEMINI_MODEL,
-        input: prompt,
-        system_instruction: systemInstruction,
-        generation_config: { temperature: 0.4 },
-      }),
-    });
-  } catch {
-    // Não loga o erro: a mensagem de falha de rede pode conter a URL (com a chave).
+  // O modelo às vezes responde 503 ("alta demanda"): tenta de novo uma vez antes de desistir.
+  // "store: false" pede ao Google para não guardar a conversa (a pergunta da pessoa não fica no histórico).
+  const geminiBody = JSON.stringify({
+    model: GEMINI_MODEL,
+    input: prompt,
+    system_instruction: systemInstruction,
+    generation_config: { temperature: 0.4 },
+    store: false,
+  });
+  let geminiResponse: Response | null = null;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      // A chave vai no cabeçalho (não na URL): assim ela não aparece em mensagens de erro nem em logs.
+      geminiResponse = await fetch(GEMINI_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiApiKey },
+        signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
+        body: geminiBody,
+      });
+    } catch (error) {
+      // Loga só o tipo do erro (timeout, rede...), nunca a mensagem inteira.
+      console.warn(
+        `Falha ao chamar o Gemini: ${error instanceof Error ? error.name : 'desconhecida'}`,
+      );
+      return jsonResponse({ error: 'Não foi possível responder agora.' }, 502);
+    }
+    if (geminiResponse.status !== 503 && geminiResponse.status !== 500) break;
+    if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 1500));
+  }
+  if (!geminiResponse) {
     return jsonResponse({ error: 'Não foi possível responder agora.' }, 502);
   }
 
-  if (geminiResponse.status === 429) {
+  if (geminiResponse.status === 429 || geminiResponse.status === 503) {
     return jsonResponse(
       { error: 'Muitos pedidos agora. Tenta de novo em instantes.', code: 'busy' },
       429,
@@ -175,6 +190,14 @@ Deno.serve(async (req) => {
   }
 
   if (!geminiResponse.ok) {
+    // Registra só o código e a mensagem de erro do Google (nunca a pergunta nem a chave).
+    let detail = '';
+    try {
+      detail = (await geminiResponse.text()).slice(0, 300);
+    } catch {
+      // sem detalhe
+    }
+    console.warn(`Gemini respondeu ${geminiResponse.status}: ${detail}`);
     return jsonResponse({ error: 'Não foi possível responder agora.' }, 502);
   }
 
@@ -201,6 +224,7 @@ Deno.serve(async (req) => {
     .trim();
 
   if (!answer) {
+    console.warn(`Gemini respondeu sem texto (steps: ${modelSteps.map((step) => step.type).join(',')}).`);
     return jsonResponse({ error: 'Não foi possível responder agora.' }, 502);
   }
 
