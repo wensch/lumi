@@ -89,6 +89,17 @@ export const en: TranslationSchema = {
     ageTeen: 'Teen',
     ageAdult: 'Adult',
     ageSenior: 'Senior',
+    consentTitle: 'Parental consent',
+    consentBody:
+      'For a child to use Lumi, a parent or legal guardian must authorize it. Enter the details of the person authorizing. What we keep and how to ask for deletion is in the privacy policy.',
+    guardianName: 'Name of parent or guardian',
+    guardianEmail: 'Guardian e-mail',
+    consentCheck:
+      "I am this child's parent or legal guardian and I authorize the use of Lumi and the use of the data described in the privacy policy.",
+    guardianNameRequired: 'Enter the guardian name.',
+    guardianEmailInvalid: 'Check the guardian e-mail.',
+    consentCheckRequired: 'The guardian must tick the authorization to continue.',
+    consentFailed: "Couldn't record the consent right now. Try again.",
     timeQuestion: 'What time do you want to be reminded?',
     timeHelper: 'You can change this later in your profile.',
     continue: 'Continue',
@@ -771,6 +782,17 @@ export const en: TranslationSchema = {
     languageEnglish: 'English',
     account: 'Account',
     connectedAs: 'Signed in as {{email}}',
+    deleteAccount: 'Delete my account and data',
+    deleteHint: 'Opens the instructions to delete the account forever',
+    deleteTitle: 'Delete the account forever?',
+    deleteBody:
+      'This deletes your account and everything that is yours: reflections, history, streak, achievements, Lumi items, plans and challenges, and the prayer requests and records you made in circles. If you created a circle, it passes to its longest-standing member. This cannot be undone.',
+    deleteTypeToConfirm: 'To confirm, type {{word}}',
+    deleteWord: 'DELETE',
+    deleteConfirm: 'Delete forever',
+    deleting: 'Deleting…',
+    deleteError:
+      "Couldn't delete right now. Check your connection and try again. If it keeps failing, write to the contact in the privacy policy.",
     privacy: 'Privacy',
     privacyHint:
       'How Lumi handles your data: what it stores, who it goes through and how to ask for deletion.',

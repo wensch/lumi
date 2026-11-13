@@ -92,6 +92,17 @@ export const pt = {
     ageTeen: 'Adolescente',
     ageAdult: 'Adulto',
     ageSenior: 'Idoso',
+    consentTitle: 'Consentimento dos pais',
+    consentBody:
+      'Para uma criança usar o Lumi, um dos pais ou o responsável legal precisa autorizar. Informe os dados de quem autoriza. O que guardamos e como pedir a exclusão está na política de privacidade.',
+    guardianName: 'Nome do pai, mãe ou responsável',
+    guardianEmail: 'E-mail do responsável',
+    consentCheck:
+      'Sou o pai, a mãe ou o responsável legal desta criança e autorizo o uso do Lumi e o uso dos dados descritos na política de privacidade.',
+    guardianNameRequired: 'Escreva o nome do responsável.',
+    guardianEmailInvalid: 'Confira o e-mail do responsável.',
+    consentCheckRequired: 'O responsável precisa marcar a autorização para continuar.',
+    consentFailed: 'Não foi possível registrar o consentimento agora. Tente de novo.',
     timeQuestion: 'Que horas você quer ser lembrado?',
     timeHelper: 'Pode ajustar isso depois no seu perfil.',
     continue: 'Continuar',
@@ -778,6 +789,17 @@ export const pt = {
     languageEnglish: 'English',
     account: 'Conta',
     connectedAs: 'Conectado como {{email}}',
+    deleteAccount: 'Excluir minha conta e meus dados',
+    deleteHint: 'Abre as instruções para apagar a conta para sempre',
+    deleteTitle: 'Excluir a conta para sempre?',
+    deleteBody:
+      'Isto apaga a sua conta e tudo que é seu: reflexões, histórico, sequência, conquistas, itens do Lumi, planos e desafios, e os pedidos de oração e registros que você fez nos círculos. Se você criou um círculo, ele passa para o membro mais antigo. Não dá para desfazer.',
+    deleteTypeToConfirm: 'Para confirmar, digite {{word}}',
+    deleteWord: 'EXCLUIR',
+    deleteConfirm: 'Excluir para sempre',
+    deleting: 'Excluindo…',
+    deleteError:
+      'Não foi possível excluir agora. Confira a conexão e tente de novo. Se continuar, escreva para o contato da política de privacidade.',
     privacy: 'Privacidade',
     privacyHint:
       'Como o Lumi trata os seus dados: o que guarda, com quem passa e como pedir a exclusão.',

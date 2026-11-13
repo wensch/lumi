@@ -4,6 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Button, Screen, ScreenHeader, Section } from '@/components';
 import { openPrivacyPolicy } from '@/lib/privacy';
+import { DeleteAccountPanel } from '@/features/account';
 import { useAuth } from '@/features/auth';
 import { VoicePicker } from '@/features/audio';
 import { useNotificationPreferences } from '@/features/settings';
@@ -250,6 +251,7 @@ export default function ConfiguracoesScreen() {
           {t('settings.connectedAs', { email: session?.user.email ?? '' })}
         </Text>
         <Button variant="tertiary" label={t('common.signOut')} onPress={signOut} />
+        <DeleteAccountPanel />
       </Section>
 
       <Section label={t('settings.privacy')}>

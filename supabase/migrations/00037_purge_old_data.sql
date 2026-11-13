@@ -43,3 +43,15 @@ end;
 $$;
 
 revoke execute on function public.purge_old_data() from public, anon, authenticated;
+
+-- Agenda a limpeza todo dia às 03:17 UTC quando a extensão pg_cron existe (no Supabase existe; no Postgres local dos
+-- testes não, e então só a função fica criada).
+do $$
+begin
+  if exists (select 1 from pg_available_extensions where name = 'pg_cron') then
+    create extension if not exists pg_cron;
+    perform cron.unschedule(jobid) from cron.job where jobname = 'lumi-purge-old-data';
+    perform cron.schedule('lumi-purge-old-data', '17 3 * * *', 'select public.purge_old_data()');
+  end if;
+end;
+$$;

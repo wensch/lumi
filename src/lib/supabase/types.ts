@@ -469,6 +469,10 @@ export interface Database {
         };
         Returns: undefined;
       };
+      record_parental_consent: {
+        Args: { p_guardian_name: string; p_guardian_email: string; p_version: string };
+        Returns: undefined;
+      };
       complete_onboarding: {
         Args: {
           p_display_name: string;

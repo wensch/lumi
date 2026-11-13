@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00038
+## Migrations 00004 a 00039
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -173,4 +173,8 @@ ao membro mais antigo, passa o desafio próprio a quem começou primeiro e guard
 (`circle_reports.reporter_id` vira anulável). A `00037_purge_old_data.sql` cria `purge_old_data()` (limpeza dos prazos da
 política de privacidade, agendada por pg_cron todo dia às 03:17 UTC). A `00038_scrub_error_text_more.sql` limpa também
 aspas curvas, crases e tokens nos relatórios de erro. Teste: `t34.sql`.
+A `00039_parental_consent.sql` guarda o consentimento dos pais para a faixa 'Criança' (`parental_consents`,
+`record_parental_consent`) e faz `complete_onboarding` recusar 'kid' sem ele. Teste: `t35.sql`.
+A função de servidor `delete-account` (supabase/functions/delete-account) exclui a conta de quem chama; só a publique depois
+da 00036. O botão está em Configurações > Conta (src/features/account).
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.

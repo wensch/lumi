@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BackHandler, Platform, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, Platform, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { Button, Card, Screen, TextField } from '@/components';
@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import type { AgeRange } from '@/lib/supabase';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
+import { openPrivacyPolicy } from '@/lib/privacy';
 
 const AGE_RANGE_KEYS: Record<AgeRange, string> = {
   kid: 'ageKid',
@@ -18,13 +19,16 @@ const AGE_RANGE_KEYS: Record<AgeRange, string> = {
   senior: 'ageSenior',
 };
 
-const STEPS = ['name', 'age', 'time'] as const;
-type Step = (typeof STEPS)[number];
+type Step = 'name' | 'age' | 'consent' | 'time';
+
+/** Versão do texto de consentimento dos pais (guardada junto com o registro). */
+const CONSENT_VERSION = '2026-11';
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export default function OnboardingScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { session } = useAuth();
   const { refetch, markOnboardingCompleted } = useProfile();
 
@@ -34,9 +38,15 @@ export default function OnboardingScreen() {
   }));
 
   const [stepIndex, setStepIndex] = useState(0);
-  const step: Step = STEPS[stepIndex];
   const [displayName, setDisplayName] = useState('');
   const [ageRange, setAgeRange] = useState<AgeRange | null>(null);
+  // Criança: um dos pais ou responsável precisa consentir antes de terminar o cadastro (LGPD, art. 14).
+  const steps: Step[] =
+    ageRange === 'kid' ? ['name', 'age', 'consent', 'time'] : ['name', 'age', 'time'];
+  const step: Step = steps[stepIndex];
+  const [guardianName, setGuardianName] = useState('');
+  const [guardianEmail, setGuardianEmail] = useState('');
+  const [consentChecked, setConsentChecked] = useState(false);
   const [preferredTime, setPreferredTime] = useState(new Date(2000, 0, 1, 8, 0));
   const [showPicker, setShowPicker] = useState(Platform.OS === 'ios');
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +65,22 @@ export default function OnboardingScreen() {
     if (step === 'age') {
       if (!ageRange) {
         setError(t('onboarding.ageRequired'));
+        return;
+      }
+      setStepIndex(stepIndex + 1);
+      return;
+    }
+    if (step === 'consent') {
+      if (guardianName.trim().length < 2) {
+        setError(t('onboarding.guardianNameRequired'));
+        return;
+      }
+      if (!EMAIL_PATTERN.test(guardianEmail.trim())) {
+        setError(t('onboarding.guardianEmailInvalid'));
+        return;
+      }
+      if (!consentChecked) {
+        setError(t('onboarding.consentCheckRequired'));
         return;
       }
       setStepIndex(stepIndex + 1);
@@ -87,6 +113,17 @@ export default function OnboardingScreen() {
     ).padStart(2, '0')}:00`;
 
     try {
+      if (ageRange === 'kid') {
+        const { error: consentError } = await supabase.rpc('record_parental_consent', {
+          p_guardian_name: guardianName.trim(),
+          p_guardian_email: guardianEmail.trim(),
+          p_version: CONSENT_VERSION,
+        });
+        if (consentError) {
+          setError(t('onboarding.consentFailed'));
+          return;
+        }
+      }
       const { error: onboardingError } = await supabase.rpc('complete_onboarding', {
         p_display_name: displayName.trim(),
         p_age_range: ageRange,
@@ -122,7 +159,7 @@ export default function OnboardingScreen() {
   return (
     <Screen centered contentContainerStyle={styles.content}>
       <View style={styles.progress}>
-        {STEPS.map((s, index) => (
+        {steps.map((s, index) => (
           <View
             key={s}
             style={[styles.progressDot, index <= stepIndex && styles.progressDotActive]}
@@ -159,6 +196,44 @@ export default function OnboardingScreen() {
                 />
               ))}
             </View>
+          </>
+        ) : null}
+
+        {step === 'consent' ? (
+          <>
+            <Text style={theme.typography.heading}>{t('onboarding.consentTitle')}</Text>
+            <Text style={styles.helperText}>{t('onboarding.consentBody')}</Text>
+            <TextField
+              label={t('onboarding.guardianName')}
+              value={guardianName}
+              onChangeText={setGuardianName}
+              autoCapitalize="words"
+              maxLength={100}
+            />
+            <TextField
+              label={t('onboarding.guardianEmail')}
+              value={guardianEmail}
+              onChangeText={setGuardianEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              maxLength={200}
+            />
+            <View style={styles.consentRow}>
+              <Switch
+                value={consentChecked}
+                onValueChange={setConsentChecked}
+                accessibilityLabel={t('onboarding.consentCheck')}
+              />
+              <Text style={[theme.typography.body, styles.consentText]}>
+                {t('onboarding.consentCheck')}
+              </Text>
+            </View>
+            <Button
+              variant="ghost"
+              label={t('settings.privacyPolicy')}
+              onPress={() => void openPrivacyPolicy(language)}
+            />
           </>
         ) : null}
 
@@ -241,6 +316,14 @@ const getStyles = (theme: Theme) =>
     helperText: {
       ...theme.typography.body,
       color: theme.colors.muted,
+    },
+    consentRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+    },
+    consentText: {
+      flex: 1,
     },
     optionsGrid: {
       gap: theme.spacing.sm,

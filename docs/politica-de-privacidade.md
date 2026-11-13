@@ -2,7 +2,7 @@
 
 Atualizada em 13/11/2026
 
-> Rascunho: o nome do responsável e o e-mail de contato (marcados entre colchetes) serão preenchidos antes da publicação nas lojas. Os prazos da seção 4 passam a valer quando a limpeza automática for ativada.
+> Rascunho em revisão: o texto será revisado antes da publicação nas lojas. Os prazos da seção 4 passam a valer quando a limpeza automática for ativada.
 
 ## Em poucas linhas
 
@@ -10,18 +10,19 @@ Atualizada em 13/11/2026
 - Só você vê o que escreve nas suas reflexões. Você pode apagá-las no app.
 - Pedidos de oração só são vistos pelos membros do círculo em que você os compartilhou.
 - Se você fizer uma pergunta à inteligência artificial, a pergunta e o texto do devocional vão para o Google.
-- Para apagar a conta e os dados, por enquanto escreva ao e-mail de contato (a exclusão dentro do app está em desenvolvimento).
+- Para apagar a conta e os dados, use Configurações > Conta no app ou escreva para o e-mail de contato.
 
 ## 1. Quem somos
 
 O Lumi é um aplicativo de constância espiritual: um devocional diário curto, planos de leitura, desafios e círculos de oração entre amigos.
 
-Quem cuida dos seus dados pessoais (o "controlador", na lei) é [NOME DO RESPONSÁVEL]. Para qualquer assunto de privacidade, escreva para [E-MAIL DE CONTATO].
+Quem cuida dos seus dados pessoais (o "controlador", na lei) é Wensch, responsável pelo Lumi. Para qualquer assunto de privacidade, escreva para wensch22@gmail.com.
 
 ## 2. Que dados usamos e para quê
 
 - **Conta.** Seu e-mail e a senha que você escolhe (a senha fica protegida no serviço de login; nós não a vemos). Se você entrar com a YouVersion, recebemos o e-mail da sua conta YouVersion. Serve para criar e acessar a sua conta.
 - **Perfil.** O nome que você escolhe, a faixa etária, o horário do lembrete, o fuso horário e o idioma. Serve para personalizar o app e o lembrete diário.
+- **Consentimento dos pais (só para crianças).** O nome e o e-mail do pai, mãe ou responsável que autoriza, a data e a versão do texto do consentimento.
 - **Seu uso.** Devocionais iniciados e concluídos, sequência de dias, XP, conquistas, itens do Lumi, planos de leitura e desafios (inclusive os que você mesmo cria).
 - **Suas reflexões.** O texto que você escreve ao final do devocional é privado: só você o vê. Você pode apagar cada reflexão no histórico. Ele não entra nas métricas e não é enviado à inteligência artificial.
 - **Círculos.** O nome do círculo, o seu nome para os outros membros, os pedidos de oração que você compartilha e os registros de "orei" e "torci". Isso só aparece para os membros do círculo. Se alguém denunciar um conteúdo, guardamos a denúncia (quem denunciou, quem foi denunciado e o motivo) para moderação.
@@ -65,10 +66,10 @@ As cópias de segurança do provedor podem guardar dados já excluídos por um p
 
 Pela lei brasileira de proteção de dados (LGPD, art. 18) você pode pedir: saber se usamos seus dados, ver os dados, corrigi-los, torná-los anônimos, bloquear ou apagar, receber uma cópia, saber com quem compartilhamos e retirar um consentimento. Também pode se opor a um uso.
 
-Para exercer qualquer direito, escreva para [E-MAIL DE CONTATO]. Respondemos em até 15 dias.
+Para exercer qualquer direito, escreva para wensch22@gmail.com. Respondemos em até 15 dias.
 
 - No próprio app você pode mudar o nome, o idioma, os lembretes e os avisos, apagar uma reflexão no histórico, sair de um círculo e desistir de um desafio.
-- **Excluir a conta e os dados:** por enquanto, peça pelo e-mail acima; a exclusão direto no app está em desenvolvimento. Ao excluir, apagamos seus dados pessoais, inclusive os pedidos de oração, "orei" e "torci" que você fez. Se você criou um círculo, ele passa para o membro mais antigo (ou é removido, se ninguém mais estiver nele); um desafio criado por você que outras pessoas fazem passa para quem começou primeiro. Assim ninguém perde o que é seu.
+- **Excluir a conta e os dados:** no app, em Configurações > Conta > Excluir minha conta e meus dados, ou pelo e-mail acima. Ao excluir, apagamos seus dados pessoais, inclusive os pedidos de oração, "orei" e "torci" que você fez. Se você criou um círculo, ele passa para o membro mais antigo (ou é removido, se ninguém mais estiver nele); um desafio criado por você que outras pessoas fazem passa para quem começou primeiro. Assim ninguém perde o que é seu.
 
 ## 6. Segurança
 
@@ -76,7 +77,9 @@ Usamos conexão protegida (HTTPS), controle de acesso por conta (cada pessoa só
 
 ## 7. Crianças e adolescentes
 
-Se você tem menos de 18 anos, peça a um responsável para ler esta política e acompanhar o seu uso.
+Criança: para uma criança usar o Lumi, um dos pais ou o responsável legal precisa consentir no cadastro, informando o próprio nome e e-mail e marcando a autorização. Guardamos esse nome, esse e-mail, a data e a versão do texto do consentimento. O responsável pode pedir, pelo e-mail de contato, para ver, corrigir ou apagar os dados da criança.
+
+Adolescentes e demais menores de 18 anos: peça a um responsável para ler esta política e acompanhar o seu uso.
 
 ## 8. Mudanças nesta política
 
