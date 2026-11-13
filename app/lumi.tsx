@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated,
+  Easing,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { Button, Card, FadeIn, LumiIcon, Screen, ScreenHeader, Skeleton } from '@/components';
 import { useAchievementCodes } from '@/features/achievements';
 import { useChallengeRewards } from '@/features/challenges';
@@ -26,6 +34,8 @@ export default function LumiScreen() {
     useHomeData();
   const { outfitIds, toggleOutfit, clearOutfits } = useLumiOutfit();
   const achievementCodes = useAchievementCodes();
+  const { width: windowWidth } = useWindowDimensions();
+  const tileWidth = windowWidth < 400 ? '48%' : '31%';
   const challengeRewards = useChallengeRewards();
 
   if (loading) {
@@ -126,6 +136,7 @@ export default function LumiScreen() {
                   key={outfit.id}
                   icon={outfit.icon}
                   previewLocked={isReward}
+                  tileWidth={tileWidth}
                   label={
                     unlocked
                       ? t(`lumi.outfits.${outfit.id}`)
@@ -183,6 +194,7 @@ function WardrobeTile({
   label,
   previewLocked = false,
   lockedName,
+  tileWidth,
   selected,
   unlocked,
   onPress,
@@ -194,6 +206,8 @@ function WardrobeTile({
   previewLocked?: boolean;
   /** Nome do item, mostrado acima do requisito quando trancado. */
   lockedName?: string;
+  /** Largura do cartão: 3 por linha em telas largas, 2 em telas estreitas (o requisito é texto longo). */
+  tileWidth: '31%' | '48%';
   selected: boolean;
   unlocked: boolean;
   onPress: () => void;
@@ -208,6 +222,7 @@ function WardrobeTile({
       accessibilityState={{ selected, disabled: !unlocked }}
       style={[
         styles.wardrobeTile,
+        { width: tileWidth },
         selected && styles.wardrobeTileSelected,
         !unlocked && styles.wardrobeTileLocked,
       ]}
@@ -220,9 +235,7 @@ function WardrobeTile({
         )}
       </View>
       {!unlocked && lockedName ? <Text style={styles.wardrobeName}>{lockedName}</Text> : null}
-      <Text style={styles.wardrobeLabel} numberOfLines={4}>
-        {label}
-      </Text>
+      <Text style={styles.wardrobeLabel}>{label}</Text>
     </Pressable>
   );
 }

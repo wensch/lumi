@@ -363,9 +363,9 @@ export const pt = {
     wardrobeHint: 'Toque num item para o Lumi vestir. Dá para combinar um de cada tipo.',
     outfitNone: 'Sem item',
     outfitLocked: 'Com {{days}} dias',
-    outfitLockedEvent: 'Complete:\u00A0{{event}}',
+    outfitLockedEvent: 'Complete: {{event}}',
     outfitLockedFirst: 'Complete o 1º devocional',
-    outfitLockedChallenge: 'Desafio:\u00A0{{name}}',
+    outfitLockedChallenge: 'Desafio: {{name}}',
     outfitLockedCustom: 'Conclua um desafio seu',
     outfitLockedCircle: 'Conclua um desafio do círculo',
     challengeNames: {

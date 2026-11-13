@@ -359,9 +359,9 @@ export const en: TranslationSchema = {
     wardrobeHint: 'Tap an item for Lumi to wear. You can mix one of each kind.',
     outfitNone: 'No item',
     outfitLocked: 'At {{days}} days',
-    outfitLockedEvent: 'Complete:\u00A0{{event}}',
+    outfitLockedEvent: 'Complete: {{event}}',
     outfitLockedFirst: 'Complete your 1st devotional',
-    outfitLockedChallenge: 'Challenge:\u00A0{{name}}',
+    outfitLockedChallenge: 'Challenge: {{name}}',
     outfitLockedCustom: 'Finish a challenge of your own',
     outfitLockedCircle: 'Finish a circle challenge',
     challengeNames: {
