@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BackHandler, Platform, StyleSheet, Switch, Text, View } from 'react-native';
+import { BackHandler, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { Button, Card, Screen, TextField } from '@/components';
@@ -96,12 +96,14 @@ export default function OnboardingScreen() {
   useEffect(() => {
     if (stepIndex === 0) return;
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Durante o envio o voltar não faz nada (o botão da tela também fica desabilitado).
+      if (submitting) return true;
       setError(null);
       setStepIndex((current) => Math.max(0, current - 1));
       return true;
     });
     return () => subscription.remove();
-  }, [stepIndex]);
+  }, [stepIndex, submitting]);
 
   const finish = async () => {
     if (!session || !ageRange) return;
@@ -219,16 +221,20 @@ export default function OnboardingScreen() {
               autoCorrect={false}
               maxLength={200}
             />
-            <View style={styles.consentRow}>
-              <Switch
-                value={consentChecked}
-                onValueChange={setConsentChecked}
-                accessibilityLabel={t('onboarding.consentCheck')}
-              />
+            <Pressable
+              style={styles.consentRow}
+              onPress={() => setConsentChecked((value) => !value)}
+              accessibilityRole="switch"
+              accessibilityState={{ checked: consentChecked }}
+              accessibilityLabel={t('onboarding.consentCheck')}
+            >
+              <View importantForAccessibility="no-hide-descendants" pointerEvents="none">
+                <Switch value={consentChecked} />
+              </View>
               <Text style={[theme.typography.body, styles.consentText]}>
                 {t('onboarding.consentCheck')}
               </Text>
-            </View>
+            </Pressable>
             <Button
               variant="ghost"
               label={t('settings.privacyPolicy')}
@@ -267,7 +273,11 @@ export default function OnboardingScreen() {
           </>
         ) : null}
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {error ? (
+          <Text style={styles.errorText} accessibilityLiveRegion="polite">
+            {error}
+          </Text>
+        ) : null}
 
         <Button
           label={step === 'time' ? t('onboarding.finish') : t('onboarding.continue')}
@@ -320,6 +330,7 @@ const getStyles = (theme: Theme) =>
     consentRow: {
       flexDirection: 'row',
       alignItems: 'center',
+      minHeight: 44,
       gap: theme.spacing.sm,
     },
     consentText: {

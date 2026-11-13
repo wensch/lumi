@@ -25,9 +25,12 @@ export function DeleteAccountPanel() {
     busyRef.current = true;
     setWorking(true);
     const result = await deleteAccount();
-    setWorking(false);
-    busyRef.current = false;
-    if (result === 'error') Alert.alert(t('settings.deleteError'));
+    // Depois de excluir, o botão continua travado até a tela sair (a sessão acaba logo em seguida).
+    if (result === 'error') {
+      setWorking(false);
+      busyRef.current = false;
+      Alert.alert(t('settings.deleteError'));
+    }
   };
 
   if (!open) {

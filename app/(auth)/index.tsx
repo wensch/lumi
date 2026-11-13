@@ -302,6 +302,7 @@ const getStyles = (theme: Theme) =>
     },
     privacyLinkText: {
       color: theme.colors.ink,
+      textAlign: 'center',
       textDecorationLine: 'underline',
     },
     scrollContent: {
