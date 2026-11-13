@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+} from 'react-native';
 import { router } from 'expo-router';
 import { useYVAuth } from '@youversion/platform-react-native-expo-core';
 import { Button, Card, FadeIn, ScreenContainer, TextField } from '@/components';
@@ -7,6 +15,7 @@ import { isValidEmail, translateAuthError, useAuth } from '@/features/auth';
 import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
+import { openPrivacyPolicy } from '@/lib/privacy';
 
 type Mode = 'sign_in' | 'sign_up';
 type Method = 'password' | 'magic_link';
@@ -14,7 +23,7 @@ type Method = 'password' | 'magic_link';
 export default function AuthScreen() {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { signInWithPassword, signUpWithPassword, signInWithMagicLink } = useAuth();
   const {
     signIn: signInWithYouVersion,
@@ -262,6 +271,16 @@ export default function AuthScreen() {
               {t('auth.youVersionHint')}
             </Text>
           </Card>
+          <Pressable
+            onPress={() => void openPrivacyPolicy(language)}
+            accessibilityRole="link"
+            hitSlop={8}
+            style={styles.privacyLink}
+          >
+            <Text style={[theme.typography.caption, styles.privacyLinkText]}>
+              {t('auth.privacyLink')}
+            </Text>
+          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
     </ScreenContainer>
@@ -275,6 +294,15 @@ const getStyles = (theme: Theme) =>
     },
     flex: {
       flex: 1,
+    },
+    privacyLink: {
+      alignSelf: 'center',
+      minHeight: 44,
+      justifyContent: 'center',
+    },
+    privacyLinkText: {
+      color: theme.colors.ink,
+      textDecorationLine: 'underline',
     },
     scrollContent: {
       flexGrow: 1,

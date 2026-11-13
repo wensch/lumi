@@ -64,6 +64,8 @@ Em desenvolvimento nada é enviado.
 
 ## Privacidade (para a política)
 
+A política publicada está em `docs/politica-de-privacidade.md` (e em `site/privacidade`). Se algo aqui mudar, atualize lá também.
+
 - Base: medir o uso para melhorar o app; sem venda nem compartilhamento.
 - Ainda não há opção para desligar as métricas. Antes da publicação, decidir se entra na tela de
   Configurações (recomendado para a política de privacidade).

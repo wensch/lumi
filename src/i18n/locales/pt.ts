@@ -43,6 +43,7 @@ export const pt = {
     backToLogin: 'Voltar ao login',
     alreadyHaveAccount: 'Já tem conta?',
     signInWithYouVersion: 'Entrar com YouVersion',
+    privacyLink: 'Política de privacidade',
     youVersionHint:
       'Ao entrar com a YouVersion, enviamos um link de confirmação para o email da sua conta.',
     youVersionError: 'Não foi possível conectar com a YouVersion. Tente de novo.',
@@ -776,6 +777,11 @@ export const pt = {
     languageEnglish: 'English',
     account: 'Conta',
     connectedAs: 'Conectado como {{email}}',
+    privacy: 'Privacidade',
+    privacyHint:
+      'Como o Lumi trata os seus dados: o que guarda, com quem passa e como pedir a exclusão.',
+    privacyPolicy: 'Política de privacidade',
+    privacyOpenError: 'Não foi possível abrir a página agora. Confira a conexão e tente de novo.',
   },
   share: {
     share: 'Compartilhar',

@@ -3,6 +3,7 @@ import { Alert, Linking, Platform, Pressable, StyleSheet, Switch, Text, View } f
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Button, Screen, ScreenHeader, Section } from '@/components';
+import { openPrivacyPolicy } from '@/lib/privacy';
 import { useAuth } from '@/features/auth';
 import { VoicePicker } from '@/features/audio';
 import { useNotificationPreferences } from '@/features/settings';
@@ -249,6 +250,19 @@ export default function ConfiguracoesScreen() {
           {t('settings.connectedAs', { email: session?.user.email ?? '' })}
         </Text>
         <Button variant="tertiary" label={t('common.signOut')} onPress={signOut} />
+      </Section>
+
+      <Section label={t('settings.privacy')}>
+        <Text style={styles.helperText}>{t('settings.privacyHint')}</Text>
+        <Button
+          variant="secondary"
+          label={t('settings.privacyPolicy')}
+          onPress={() => {
+            void openPrivacyPolicy(language).then((opened) => {
+              if (!opened) Alert.alert(t('settings.privacyOpenError'));
+            });
+          }}
+        />
       </Section>
     </Screen>
   );

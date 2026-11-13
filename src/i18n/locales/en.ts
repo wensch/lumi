@@ -39,6 +39,7 @@ export const en: TranslationSchema = {
     backToLogin: 'Back to sign in',
     alreadyHaveAccount: 'Already have an account?',
     signInWithYouVersion: 'Sign in with YouVersion',
+    privacyLink: 'Privacy policy',
     youVersionHint:
       'When you sign in with YouVersion, we send a confirmation link to the email on your account.',
     youVersionError: "Couldn't connect to YouVersion. Try again.",
@@ -769,6 +770,11 @@ export const en: TranslationSchema = {
     languageEnglish: 'English',
     account: 'Account',
     connectedAs: 'Signed in as {{email}}',
+    privacy: 'Privacy',
+    privacyHint:
+      'How Lumi handles your data: what it stores, who it goes through and how to ask for deletion.',
+    privacyPolicy: 'Privacy policy',
+    privacyOpenError: "Couldn't open the page right now. Check your connection and try again.",
   },
   share: {
     share: 'Share',
