@@ -2,52 +2,73 @@
 
 Atualizada em 13/11/2026
 
-> Rascunho: o nome do responsável e o e-mail de contato (marcados entre colchetes) serão preenchidos antes da publicação nas lojas.
+> Rascunho: o nome do responsável e o e-mail de contato (marcados entre colchetes) serão preenchidos antes da publicação nas lojas. Os prazos da seção 4 passam a valer quando a limpeza automática for ativada.
+
+## Em poucas linhas
+
+- Não vendemos os seus dados e não há anúncios.
+- Só você vê o que escreve nas suas reflexões. Você pode apagá-las no app.
+- Pedidos de oração só são vistos pelos membros do círculo em que você os compartilhou.
+- Se você fizer uma pergunta à inteligência artificial, a pergunta e o texto do devocional vão para o Google.
+- Para apagar a conta e os dados, por enquanto escreva ao e-mail de contato (a exclusão dentro do app está em desenvolvimento).
 
 ## 1. Quem somos
 
 O Lumi é um aplicativo de constância espiritual: um devocional diário curto, planos de leitura, desafios e círculos de oração entre amigos.
 
-O responsável pelo tratamento dos seus dados pessoais (controlador) é [NOME DO RESPONSÁVEL]. Para qualquer assunto de privacidade, escreva para [E-MAIL DE CONTATO].
+Quem cuida dos seus dados pessoais (o "controlador", na lei) é [NOME DO RESPONSÁVEL]. Para qualquer assunto de privacidade, escreva para [E-MAIL DE CONTATO].
 
-## 2. Que dados tratamos e para quê
+## 2. Que dados usamos e para quê
 
 - **Conta.** Seu e-mail e a senha que você escolhe (a senha fica protegida no serviço de login; nós não a vemos). Se você entrar com a YouVersion, recebemos o e-mail da sua conta YouVersion. Serve para criar e acessar a sua conta.
 - **Perfil.** O nome que você escolhe, a faixa etária, o horário do lembrete, o fuso horário e o idioma. Serve para personalizar o app e o lembrete diário.
 - **Seu uso.** Devocionais iniciados e concluídos, sequência de dias, XP, conquistas, itens do Lumi, planos de leitura e desafios (inclusive os que você mesmo cria).
 - **Suas reflexões.** O texto que você escreve ao final do devocional é privado: só você o vê. Você pode apagar cada reflexão no histórico. Ele não entra nas métricas e não é enviado à inteligência artificial.
-- **Círculos.** O nome do círculo, o seu nome para os outros membros, os pedidos de oração que você compartilha e os registros de "orei" e "torci". Isso só aparece para os membros do círculo. Se alguém denunciar um conteúdo, guardamos a denúncia (quem, o quê e o motivo) para moderação.
-- **Convites de desafio.** Quem faz o mesmo desafio com você vê o seu nome e o andamento do desafio (só a contagem), nada além disso.
-- **Perguntas à inteligência artificial.** Se você usa "Tirar uma dúvida sobre esse texto", enviamos a sua pergunta (até 500 caracteres) e o texto do devocional daquele dia ao serviço Gemini, do Google, para gerar a resposta. O Lumi não guarda a pergunta nem a resposta; guarda só a contagem diária (no máximo 15 perguntas por dia). Não escreva dados pessoais ou sensíveis na pergunta.
-- **Avisos no celular.** O identificador do aparelho para avisos (Firebase Cloud Messaging, do Google) e o seu idioma, para enviar os avisos dos círculos. O aviso nunca traz o texto de um pedido de oração.
+- **Círculos.** O nome do círculo, o seu nome para os outros membros, os pedidos de oração que você compartilha e os registros de "orei" e "torci". Isso só aparece para os membros do círculo. Se alguém denunciar um conteúdo, guardamos a denúncia (quem denunciou, quem foi denunciado e o motivo) para moderação.
+- **Convites de desafio.** Quem faz o mesmo desafio com você vê o seu nome e o andamento do desafio (só a contagem e se já terminou). Quem recebe o código do convite vê, antes de aceitar, o seu nome e o desafio.
+- **Perguntas à inteligência artificial.** Se você usa "Tirar uma dúvida sobre esse texto", enviamos a sua pergunta (até 500 caracteres) e o texto do devocional daquele dia ao serviço Gemini, do Google, para gerar a resposta. O Lumi não guarda a pergunta nem a resposta; guarda só a contagem diária (no máximo 15 perguntas por dia). O Google pode guardar a pergunta e a resposta por um tempo, conforme as regras do serviço Gemini. Não escreva dados pessoais ou sensíveis na pergunta.
+- **Avisos no celular.** O identificador do aparelho para avisos (Firebase Cloud Messaging, do Google) e o seu idioma, para enviar os avisos dos círculos. O aviso leva o seu nome (ou o de quem agiu) e o nome do círculo, e passa pelo Google; nunca traz o texto de um pedido de oração.
 - **Métricas de uso.** O nome do evento e o dia (por exemplo "abriu o app" ou "concluiu um devocional"), ligados à sua conta, no máximo uma vez por dia. Nunca o conteúdo do que você escreve.
-- **Relatório de erros.** Quando o app falha, enviamos o erro sem identificar você, com o que estiver entre aspas, e-mails e links apagados.
-- **No seu aparelho.** O app guarda localmente o login, o idioma, a aparência, os itens do Lumi que você escolheu e convites ainda não abertos.
+- **Avisos dos círculos guardados.** Guardamos por 90 dias os avisos do círculo (quem orou ou torceu por você e quando), para você vê-los no app.
+- **Proteção contra abuso.** Guardamos por 1 dia as tentativas de código de convite errado, para impedir adivinhação. Se quem criou um círculo remover você, guardamos esse veto enquanto o círculo existir.
+- **Relatório de erros.** Quando o app falha, enviamos o erro sem identificar você, apagando o que estiver entre aspas duplas, aspas curvas ou crases, e-mails, links e códigos de acesso.
+- **No seu aparelho.** O app guarda localmente o login, o idioma, a aparência, a voz escolhida, os itens do Lumi que você escolheu, um marcador do aparelho para os avisos e convites ainda não abertos.
 
 Não usamos anúncios, não vendemos dados e não fazemos rastreamento publicitário.
 
 ## 3. Com quem os dados passam
 
-- **Supabase** (banco de dados e login): guarda os dados da sua conta. Os servidores ficam nos Estados Unidos.
+- **Supabase** (banco de dados e login): guarda os dados da sua conta. Os servidores ficam nos Estados Unidos. Ele e o Google guardam registros técnicos das conexões (endereço IP e horário).
 - **Google** (Firebase Cloud Messaging para avisos e Gemini para as perguntas à inteligência artificial).
 - **YouVersion** (leitura da Bíblia e login opcional): a aba Bíblia usa a plataforma da YouVersion, que trata os dados conforme a política dela.
-- **GitHub** (distribuição do app Android e hospedagem das páginas de convite e desta política): o GitHub vê o endereço IP de quem abre essas páginas, e o app consulta o GitHub para saber se há versão nova.
+- **GitHub** (distribuição do app Android e hospedagem das páginas de convite e desta política): o GitHub vê o endereço IP de quem abre essas páginas (inclusive o código de um convite, que vai no endereço do link), e o app consulta o GitHub para saber se há versão nova.
 - **Voz do aparelho.** O botão de ouvir usa a voz do seu celular. Algumas vozes "mais naturais" precisam de internet e podem enviar o texto ao fabricante do sistema.
 
-Esses serviços tratam os dados só para prestar o serviço ao Lumi. Quando os dados vão para fora do Brasil, isso acontece por serem necessários para o funcionamento do app, com os cuidados da Lei Geral de Proteção de Dados (LGPD, art. 33).
+Esses serviços usam os dados só para prestar o serviço ao Lumi. Quando os dados vão para fora do Brasil, isso acontece por serem necessários para o funcionamento do app, com os cuidados da lei brasileira de proteção de dados (LGPD, art. 33).
 
 ## 4. Por quanto tempo guardamos
 
-Guardamos os dados da sua conta enquanto ela existir. Reflexões, pedidos de oração e histórico ficam até você apagá-los ou excluir a conta. Os relatórios de erros e as métricas são mantidos só enquanto servem para melhorar o app.
+Guardamos os dados da sua conta enquanto ela existir. Reflexões, pedidos de oração e histórico ficam até você apagá-los ou excluir a conta. Estes dados têm prazo e são apagados sozinhos:
+
+- Relatórios de erros: 60 dias.
+- Tentativas de código de convite errado: 1 dia.
+- Métricas de uso: 12 meses.
+- Avisos do círculo: 90 dias.
+- Identificadores de aviso do aparelho: 30 dias depois de ficarem inativos (ou 180 dias sem uso).
+- Contagem diária de perguntas à inteligência artificial: 7 dias.
+- Desafios abandonados ou vencidos: 180 dias (os concluídos ficam).
+- Denúncias de moderação: 12 meses.
+
+As cópias de segurança do provedor podem guardar dados já excluídos por um período curto.
 
 ## 5. Seus direitos
 
-Pela LGPD (art. 18) você pode pedir: confirmação de que tratamos seus dados, acesso, correção, anonimização, bloqueio ou eliminação, portabilidade, informação sobre com quem compartilhamos, e revogar consentimentos. Também pode se opor a um tratamento.
+Pela lei brasileira de proteção de dados (LGPD, art. 18) você pode pedir: saber se usamos seus dados, ver os dados, corrigi-los, torná-los anônimos, bloquear ou apagar, receber uma cópia, saber com quem compartilhamos e retirar um consentimento. Também pode se opor a um uso.
 
 Para exercer qualquer direito, escreva para [E-MAIL DE CONTATO]. Respondemos em até 15 dias.
 
 - No próprio app você pode mudar o nome, o idioma, os lembretes e os avisos, apagar uma reflexão no histórico, sair de um círculo e desistir de um desafio.
-- **Excluir a conta e os dados:** por enquanto, peça pelo e-mail acima; a exclusão direto no app está em desenvolvimento. Ao excluir, apagamos seus dados pessoais. O que for compartilhado com outras pessoas, como um círculo criado por você, será transferido ou removido de modo que não prejudique os demais membros.
+- **Excluir a conta e os dados:** por enquanto, peça pelo e-mail acima; a exclusão direto no app está em desenvolvimento. Ao excluir, apagamos seus dados pessoais, inclusive os pedidos de oração, "orei" e "torci" que você fez. Se você criou um círculo, ele passa para o membro mais antigo (ou é removido, se ninguém mais estiver nele); um desafio criado por você que outras pessoas fazem passa para quem começou primeiro. Assim ninguém perde o que é seu.
 
 ## 6. Segurança
 
@@ -55,7 +76,7 @@ Usamos conexão protegida (HTTPS), controle de acesso por conta (cada pessoa só
 
 ## 7. Crianças e adolescentes
 
-O Lumi não é voltado a crianças. Se você tem menos de 18 anos, peça a um responsável para ler esta política e acompanhar o seu uso.
+Se você tem menos de 18 anos, peça a um responsável para ler esta política e acompanhar o seu uso.
 
 ## 8. Mudanças nesta política
 

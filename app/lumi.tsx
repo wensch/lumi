@@ -220,7 +220,7 @@ function WardrobeTile({
         )}
       </View>
       {!unlocked && lockedName ? <Text style={styles.wardrobeName}>{lockedName}</Text> : null}
-      <Text style={styles.wardrobeLabel} numberOfLines={3}>
+      <Text style={styles.wardrobeLabel} numberOfLines={4}>
         {label}
       </Text>
     </Pressable>

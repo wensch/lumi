@@ -52,6 +52,19 @@
       li {
         margin-bottom: 8px;
       }
+      ul {
+        padding-left: 20px;
+      }
+      .summary {
+        background: #eaf7e8;
+        border: 2px solid var(--ink);
+        border-radius: 14px;
+        padding: 4px 14px 8px;
+        margin: 14px 0;
+      }
+      .summary h2 {
+        margin: 10px 0 6px;
+      }
       .meta {
         opacity: 0.75;
         margin: 0 0 16px;
@@ -75,18 +88,35 @@
       <p class="meta">Updated 13 Nov 2026 · <a href="../privacidade/">Versão em português</a></p>
       <p class="draft">
         Draft: the controller name and the contact e-mail (in square brackets) will be filled in
-        before the store release.
+        before the store release. The periods in section 4 apply once automatic cleanup is switched
+        on.
       </p>
+      <div class="summary">
+        <h2>In a few lines</h2>
+        <ul>
+          <li>We do not sell your data and there are no ads.</li>
+          <li>Only you see what you write in your reflections. You can delete them in the app.</li>
+          <li>Prayer requests are seen only by the members of the circle where you shared them.</li>
+          <li>
+            If you ask the artificial intelligence a question, the question and the devotional text
+            go to Google.
+          </li>
+          <li>
+            To delete your account and data, for now write to the contact e-mail (deletion inside
+            the app is under development).
+          </li>
+        </ul>
+      </div>
       <h2>1. Who we are</h2>
       <p>
         Lumi is a spiritual consistency app: a short daily devotional, reading plans, challenges and
         prayer circles with friends.
       </p>
       <p>
-        The party responsible for your personal data (the controller) is [CONTROLLER NAME]. For any
-        privacy matter, write to [CONTACT E-MAIL].
+        The party looking after your personal data (the &quot;controller&quot; in the law) is
+        [CONTROLLER NAME]. For any privacy matter, write to [CONTACT E-MAIL].
       </p>
-      <h2>2. What data we process and why</h2>
+      <h2>2. What data we use and why</h2>
       <ul>
         <li>
           <strong>Account.</strong> Your e-mail and the password you choose (the password is
@@ -109,24 +139,27 @@
         <li>
           <strong>Circles.</strong> The circle name, your name as other members see it, the prayer
           requests you share and the &quot;prayed&quot; and &quot;cheered&quot; records. This is
-          visible only to circle members. If someone reports content, we keep the report (who, what
-          and why) for moderation.
+          visible only to circle members. If someone reports content, we keep the report (who
+          reported, who was reported and the reason) for moderation.
         </li>
         <li>
           <strong>Challenge invites.</strong> People doing the same challenge with you see your name
-          and the challenge progress (a count only), nothing else.
+          and the challenge progress (a count only, and whether it is finished). Whoever receives
+          the invite code sees, before accepting, your name and the challenge.
         </li>
         <li>
           <strong>Questions to artificial intelligence.</strong> If you use &quot;Ask about this
           text&quot;, we send your question (up to 500 characters) and that day&#x27;s devotional
           text to the Gemini service from Google to generate the answer. Lumi does not store the
-          question or the answer; it stores only a daily count (at most 15 questions per day). Do
-          not write personal or sensitive data in the question.
+          question or the answer; it stores only a daily count (at most 15 questions per day).
+          Google may keep the question and the answer for a while, under the rules of the Gemini
+          service. Do not write personal or sensitive data in the question.
         </li>
         <li>
           <strong>Phone notifications.</strong> The device identifier for notifications (Firebase
-          Cloud Messaging, from Google) and your language, to send circle notifications. A
-          notification never contains the text of a prayer request.
+          Cloud Messaging, from Google) and your language, to send circle notifications. The
+          notification carries your name (or the name of whoever acted) and the circle name, and
+          goes through Google; it never contains the text of a prayer request.
         </li>
         <li>
           <strong>Usage metrics.</strong> The event name and the day (for example &quot;opened the
@@ -134,12 +167,23 @@
           Never the content of what you write.
         </li>
         <li>
+          <strong>Circle notices kept.</strong> We keep circle notices for 90 days (who prayed or
+          cheered for you, and when), so you can see them in the app.
+        </li>
+        <li>
+          <strong>Abuse protection.</strong> We keep wrong invite-code attempts for 1 day, to
+          prevent guessing. If a circle creator removes you, we keep that ban while the circle
+          exists.
+        </li>
+        <li>
           <strong>Error reports.</strong> When the app fails, we send the error without identifying
-          you, with anything between quotes, e-mails and links removed.
+          you, removing anything between double quotes, curly quotes or backticks, e-mails, links
+          and access codes.
         </li>
         <li>
           <strong>On your device.</strong> The app stores locally your sign-in, language,
-          appearance, the Lumi items you chose and invites not yet opened.
+          appearance, the chosen voice, the Lumi items you chose, a device marker for notifications
+          and invites not yet opened.
         </li>
       </ul>
       <p>We do not use ads, we do not sell data and we do not do advertising tracking.</p>
@@ -147,7 +191,7 @@
       <ul>
         <li>
           <strong>Supabase</strong> (database and sign-in): stores your account data. Servers are in
-          the United States.
+          the United States. It and Google keep technical connection logs (IP address and time).
         </li>
         <li>
           <strong>Google</strong> (Firebase Cloud Messaging for notifications and Gemini for the
@@ -159,8 +203,9 @@
         </li>
         <li>
           <strong>GitHub</strong> (Android app distribution and hosting of the invite pages and this
-          policy): GitHub sees the IP address of people opening those pages, and the app checks
-          GitHub to know if there is a new version.
+          policy): GitHub sees the IP address of people opening those pages (including an invite
+          code, which is in the link address), and the app checks GitHub to know if there is a new
+          version.
         </li>
         <li>
           <strong>Device voice.</strong> The listen button uses your phone&#x27;s voice. Some
@@ -168,21 +213,34 @@
         </li>
       </ul>
       <p>
-        These services handle the data only to provide the service to Lumi. When data leaves Brazil
-        it is because it is needed for the app to work, with the safeguards of the Brazilian General
-        Data Protection Law (LGPD, art. 33).
+        These services use the data only to provide the service to Lumi. When data leaves Brazil it
+        is because it is needed for the app to work, with the safeguards of the Brazilian data
+        protection law (LGPD, art. 33).
       </p>
       <h2>4. How long we keep data</h2>
       <p>
         We keep your account data while the account exists. Reflections, prayer requests and history
-        stay until you delete them or delete the account. Error reports and metrics are kept only
-        while they are useful to improve the app.
+        stay until you delete them or delete the account. These data have a time limit and are
+        deleted automatically:
       </p>
+      <ul>
+        <li>Error reports: 60 days.</li>
+        <li>Wrong invite-code attempts: 1 day.</li>
+        <li>Usage metrics: 12 months.</li>
+        <li>Circle notices: 90 days.</li>
+        <li>
+          Device notification identifiers: 30 days after becoming inactive (or 180 days unused).
+        </li>
+        <li>Daily count of artificial intelligence questions: 7 days.</li>
+        <li>Abandoned or expired challenges: 180 days (finished ones stay).</li>
+        <li>Moderation reports: 12 months.</li>
+      </ul>
+      <p>Provider backups may keep deleted data for a short period.</p>
       <h2>5. Your rights</h2>
       <p>
-        Under the LGPD (art. 18) you can ask for: confirmation that we process your data, access,
-        correction, anonymization, blocking or deletion, portability, information about who we share
-        with, and to withdraw consent. You can also object to a processing activity.
+        Under the Brazilian data protection law (LGPD, art. 18) you can ask to: know whether we use
+        your data, see it, correct it, make it anonymous, block or delete it, receive a copy, know
+        who we share it with, and withdraw consent. You can also object to a use.
       </p>
       <p>To exercise any right, write to [CONTACT E-MAIL]. We answer within 15 days.</p>
       <ul>
@@ -193,8 +251,10 @@
         <li>
           <strong>Deleting your account and data:</strong> for now, ask by the e-mail above;
           deletion directly in the app is under development. When we delete, we erase your personal
-          data. What is shared with other people, such as a circle created by you, will be
-          transferred or removed in a way that does not harm the other members.
+          data, including the prayer requests, &quot;prayed&quot; and &quot;cheered&quot; you made.
+          If you created a circle, it passes to its longest-standing member (or is removed if nobody
+          else is in it); a challenge you created that others are doing passes to whoever started
+          first. That way nobody loses what is theirs.
         </li>
       </ul>
       <h2>6. Security</h2>
@@ -206,8 +266,8 @@
       </p>
       <h2>7. Children and teenagers</h2>
       <p>
-        Lumi is not aimed at children. If you are under 18, please ask a parent or guardian to read
-        this policy and follow your use.
+        If you are under 18, please ask a parent or guardian to read this policy and follow your
+        use.
       </p>
       <h2>8. Changes to this policy</h2>
       <p>

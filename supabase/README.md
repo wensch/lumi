@@ -74,7 +74,7 @@ detectada. Reconhecer/ignorar o aviso no dashboard (Security Advisor →
 clicar no finding) é a ação correta depois de revisar; não há mudança de
 código que faça o aviso desaparecer sem revogar o acesso.
 
-## Migrations 00004 a 00033
+## Migrations 00004 a 00038
 
 Aplique **todas** as migrations em ordem numérica (a tabela acima lista só as três primeiras).
 A `00013_security_and_streak_hardening.sql` fecha a escrita direta do cliente em XP/sequência/
@@ -167,4 +167,10 @@ nome de exibição e título de dia de plano próprio (achados do loop de agente
 A `00033_translation_policies_fix.sql` conserta a leitura das traduções de plano e de desafio: as políticas consultavam
 `reading_plans`/`challenges`, que anon/authenticated não podem ler, e a leitura toda falhava (o app em inglês ficava com
 planos e desafios em português). Agora usam as funções `is_published_plan` e `is_published_challenge`. Teste: `t33.sql`.
+A `00034`/`00035` ajustam o gatilho de texto (emoji composto com U+200D passa; texto vazio não é barrado).
+A `00036_account_deletion_guards.sql` prepara a exclusão de conta: um gatilho BEFORE DELETE em `auth.users` passa o círculo
+ao membro mais antigo, passa o desafio próprio a quem começou primeiro e guarda as denúncias sem identificar a pessoa
+(`circle_reports.reporter_id` vira anulável). A `00037_purge_old_data.sql` cria `purge_old_data()` (limpeza dos prazos da
+política de privacidade, agendada por pg_cron todo dia às 03:17 UTC). A `00038_scrub_error_text_more.sql` limpa também
+aspas curvas, crases e tokens nos relatórios de erro. Teste: `t34.sql`.
 Os cenários de teste (Postgres 16 local, sem tocar o projeto real) estão em `supabase/tests/`.

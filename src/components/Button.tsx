@@ -54,6 +54,7 @@ const getStyles = (theme: Theme) =>
     label: {
       ...theme.typography.button,
       color: theme.colors.ink,
+      textAlign: 'center',
     },
   });
 

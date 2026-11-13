@@ -548,6 +548,7 @@ export default function DevocionalScreen() {
                   maxLength={REFLECTION_MAX_LENGTH}
                   style={styles.reflectionInput}
                 />
+                <Text style={styles.reflectionPrivate}>{t('devotional.reflectPrivate')}</Text>
                 {reflection.length >= REFLECTION_COUNTER_FROM ? (
                   <Text style={styles.reflectionCounter} accessibilityLiveRegion="polite">
                     {t(
@@ -837,6 +838,10 @@ const getStyles = (theme: Theme) =>
     },
     reflectionInput: {
       minHeight: 140,
+    },
+    reflectionPrivate: {
+      ...theme.typography.caption,
+      color: theme.colors.ink,
     },
     reflectionCounter: {
       ...theme.typography.caption,

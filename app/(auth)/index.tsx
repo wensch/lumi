@@ -277,7 +277,7 @@ export default function AuthScreen() {
             hitSlop={8}
             style={styles.privacyLink}
           >
-            <Text style={[theme.typography.caption, styles.privacyLinkText]}>
+            <Text style={[theme.typography.bodyStrong, styles.privacyLinkText]}>
               {t('auth.privacyLink')}
             </Text>
           </Pressable>

@@ -39,7 +39,7 @@ export const en: TranslationSchema = {
     backToLogin: 'Back to sign in',
     alreadyHaveAccount: 'Already have an account?',
     signInWithYouVersion: 'Sign in with YouVersion',
-    privacyLink: 'Privacy policy',
+    privacyLink: 'How we look after your data (privacy policy)',
     youVersionHint:
       'When you sign in with YouVersion, we send a confirmation link to the email on your account.',
     youVersionError: "Couldn't connect to YouVersion. Try again.",
@@ -266,6 +266,7 @@ export const en: TranslationSchema = {
     },
     stepOf: 'Step {{current}} of {{total}}',
     scrollHint: 'Scroll to read more ↓',
+    reflectPrivate: 'Only you see what you write here. You can delete it later, in your history.',
     reflectCounter: '{{count}} of {{max}} characters',
     reflectLimit: 'Limit of {{max}} characters reached: the text stops here.',
     verseUnavailable: "Couldn't load the verse right now.",
@@ -344,9 +345,9 @@ export const en: TranslationSchema = {
     wardrobeHint: 'Tap an item for Lumi to wear. You can mix one of each kind.',
     outfitNone: 'No item',
     outfitLocked: 'At {{days}} days',
-    outfitLockedEvent: 'Complete: {{event}}',
+    outfitLockedEvent: 'Complete:\u00A0{{event}}',
     outfitLockedFirst: 'Complete your 1st devotional',
-    outfitLockedChallenge: 'Challenge: {{name}}',
+    outfitLockedChallenge: 'Challenge:\u00A0{{name}}',
     outfitLockedCustom: 'Finish a challenge of your own',
     outfitLockedCircle: 'Finish a circle challenge',
     challengeNames: {

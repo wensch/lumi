@@ -43,7 +43,7 @@ export const pt = {
     backToLogin: 'Voltar ao login',
     alreadyHaveAccount: 'Já tem conta?',
     signInWithYouVersion: 'Entrar com YouVersion',
-    privacyLink: 'Política de privacidade',
+    privacyLink: 'Como cuidamos dos seus dados (política de privacidade)',
     youVersionHint:
       'Ao entrar com a YouVersion, enviamos um link de confirmação para o email da sua conta.',
     youVersionError: 'Não foi possível conectar com a YouVersion. Tente de novo.',
@@ -270,6 +270,7 @@ export const pt = {
     stepOf: 'Passo {{current}} de {{total}}',
     verseUnavailable: 'Não foi possível carregar o versículo agora.',
     scrollHint: 'Role para ler mais ↓',
+    reflectPrivate: 'Só você vê o que escreve aqui. Pode apagar depois, no histórico.',
     reflectCounter: '{{count}} de {{max}} caracteres',
     reflectLimit: 'Limite de {{max}} caracteres atingido: o texto não passa daqui.',
     aiDisclaimer:
@@ -348,9 +349,9 @@ export const pt = {
     wardrobeHint: 'Toque num item para o Lumi vestir. Dá para combinar um de cada tipo.',
     outfitNone: 'Sem item',
     outfitLocked: 'Com {{days}} dias',
-    outfitLockedEvent: 'Complete: {{event}}',
+    outfitLockedEvent: 'Complete:\u00A0{{event}}',
     outfitLockedFirst: 'Complete o 1º devocional',
-    outfitLockedChallenge: 'Desafio: {{name}}',
+    outfitLockedChallenge: 'Desafio:\u00A0{{name}}',
     outfitLockedCustom: 'Conclua um desafio seu',
     outfitLockedCircle: 'Conclua um desafio do círculo',
     challengeNames: {

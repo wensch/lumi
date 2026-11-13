@@ -253,7 +253,7 @@ export default function ConfiguracoesScreen() {
       </Section>
 
       <Section label={t('settings.privacy')}>
-        <Text style={styles.helperText}>{t('settings.privacyHint')}</Text>
+        <Text style={[styles.helperText, styles.privacyHint]}>{t('settings.privacyHint')}</Text>
         <Button
           variant="secondary"
           label={t('settings.privacyPolicy')}
@@ -320,6 +320,9 @@ const getStyles = (theme: Theme) =>
     },
     rowLabel: {
       flex: 1,
+    },
+    privacyHint: {
+      marginBottom: 12,
     },
     helperText: {
       ...theme.typography.caption,
