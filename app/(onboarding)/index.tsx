@@ -208,14 +208,20 @@ export default function OnboardingScreen() {
             <TextField
               label={t('onboarding.guardianName')}
               value={guardianName}
-              onChangeText={setGuardianName}
+              onChangeText={(value) => {
+                setGuardianName(value);
+                setError(null);
+              }}
               autoCapitalize="words"
               maxLength={100}
             />
             <TextField
               label={t('onboarding.guardianEmail')}
               value={guardianEmail}
-              onChangeText={setGuardianEmail}
+              onChangeText={(value) => {
+                setGuardianEmail(value);
+                setError(null);
+              }}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -223,7 +229,10 @@ export default function OnboardingScreen() {
             />
             <Pressable
               style={styles.consentRow}
-              onPress={() => setConsentChecked((value) => !value)}
+              onPress={() => {
+                setConsentChecked((value) => !value);
+                setError(null);
+              }}
               accessibilityRole="switch"
               accessibilityState={{ checked: consentChecked }}
               accessibilityLabel={t('onboarding.consentCheck')}

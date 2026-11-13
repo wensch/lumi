@@ -40,6 +40,8 @@ export const en: TranslationSchema = {
     alreadyHaveAccount: 'Already have an account?',
     signInWithYouVersion: 'Sign in with YouVersion',
     privacyLink: 'How we look after your data (privacy policy)',
+    accountDeleted:
+      'Your account was deleted and your data was erased. Thank you for walking with Lumi.',
     youVersionHint:
       'When you sign in with YouVersion, we send a confirmation link to the email on your account.',
     youVersionError: "Couldn't connect to YouVersion. Try again.",
@@ -85,19 +87,20 @@ export const en: TranslationSchema = {
     ageQuestion: 'What age range are you in?',
     ageHelper: 'This helps us personalize your experience.',
     ageRequired: 'Choose an age range.',
-    ageKid: 'Kid',
-    ageTeen: 'Teen',
-    ageAdult: 'Adult',
-    ageSenior: 'Senior',
+    ageKid: 'Child (up to 12)',
+    ageTeen: 'Teen (13 to 17)',
+    ageAdult: 'Adult (18 to 59)',
+    ageSenior: 'Senior (60 or older)',
     consentTitle: 'Parental consent',
     consentBody:
-      'For a child to use Lumi, a parent or legal guardian must authorize it. Enter the details of the person authorizing. What we keep and how to ask for deletion is in the privacy policy.',
+      'For a child to use Lumi, a parent or legal guardian (the person who has custody of the child) must authorize it. Grandparents, uncles and aunts and other relatives can only authorize if they are the legal guardians. Enter the details of the person authorizing. What we keep and how to ask for deletion is in the privacy policy.',
     guardianName: 'Name of parent or guardian',
     guardianEmail: 'Guardian e-mail',
     consentCheck:
       "I am this child's parent or legal guardian and I authorize the use of Lumi and the use of the data described in the privacy policy.",
     guardianNameRequired: 'Enter the guardian name.',
-    guardianEmailInvalid: 'Check the guardian e-mail.',
+    guardianEmailInvalid:
+      "Enter the guardian's full e-mail, like name@example.com (with @ and a dot after it).",
     consentCheckRequired: 'The guardian must tick the authorization to continue.',
     consentFailed: "Couldn't record the consent right now. Try again.",
     timeQuestion: 'What time do you want to be reminded?',

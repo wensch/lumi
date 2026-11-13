@@ -2,8 +2,6 @@
 
 Atualizada em 13/11/2026
 
-> Rascunho em revisão: o texto será revisado antes da publicação nas lojas. Os prazos da seção 4 passam a valer quando a limpeza automática for ativada.
-
 ## Em poucas linhas
 
 - Não vendemos os seus dados e não há anúncios.
@@ -40,12 +38,12 @@ Não usamos anúncios, não vendemos dados e não fazemos rastreamento publicit�
 ## 3. Com quem os dados passam
 
 - **Supabase** (banco de dados e login): guarda os dados da sua conta. Os servidores ficam nos Estados Unidos. Ele e o Google guardam registros técnicos das conexões (endereço IP e horário).
-- **Google** (Firebase Cloud Messaging para avisos e Gemini para as perguntas à inteligência artificial).
+- **Google** (o Firebase, serviço que entrega os avisos no seu celular, e o Gemini, a inteligência artificial do Google que responde às perguntas).
 - **YouVersion** (leitura da Bíblia e login opcional): a aba Bíblia usa a plataforma da YouVersion, que trata os dados conforme a política dela.
-- **GitHub** (distribuição do app Android e hospedagem das páginas de convite e desta política): o GitHub vê o endereço IP de quem abre essas páginas (inclusive o código de um convite, que vai no endereço do link), e o app consulta o GitHub para saber se há versão nova.
+- **GitHub** (distribuição do app Android e hospedagem das páginas de convite e desta política): o GitHub vê o endereço IP (o número que identifica a conexão de quem acessa) de quem abre essas páginas (inclusive o código de um convite, que vai no endereço do link), e o app consulta o GitHub para saber se há versão nova.
 - **Voz do aparelho.** O botão de ouvir usa a voz do seu celular. Algumas vozes "mais naturais" precisam de internet e podem enviar o texto ao fabricante do sistema.
 
-Esses serviços usam os dados só para prestar o serviço ao Lumi. Quando os dados vão para fora do Brasil, isso acontece por serem necessários para o funcionamento do app, com os cuidados da lei brasileira de proteção de dados (LGPD, art. 33).
+Esses serviços usam os dados só para prestar o serviço ao Lumi. Quando os dados vão para fora do Brasil, isso acontece por serem necessários para o funcionamento do app, com os cuidados que a lei brasileira de proteção de dados (LGPD) exige.
 
 ## 4. Por quanto tempo guardamos
 
@@ -73,7 +71,7 @@ Para exercer qualquer direito, escreva para wensch22@gmail.com. Respondemos em a
 
 ## 6. Segurança
 
-Usamos conexão protegida (HTTPS), controle de acesso por conta (cada pessoa só lê os próprios dados e o que for compartilhado com ela), limites contra abuso e guardamos a chave da inteligência artificial só no servidor. Nenhum sistema é totalmente seguro; se houver um incidente que possa afetar você, avisaremos como a lei exige.
+Usamos conexão protegida (o cadeado do navegador), controle de acesso por conta (cada pessoa só lê os próprios dados e o que for compartilhado com ela), limites contra abuso e guardamos a chave da inteligência artificial só no servidor. Nenhum sistema é totalmente seguro; se houver um incidente que possa afetar você, avisaremos como a lei exige.
 
 ## 7. Crianças e adolescentes
 

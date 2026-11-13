@@ -36,10 +36,11 @@ export function DeleteAccountPanel() {
   if (!open) {
     return (
       <Button
-        variant="tertiary"
+        variant="ghost"
         label={t('settings.deleteAccount')}
         onPress={() => setOpen(true)}
         accessibilityHint={t('settings.deleteHint')}
+        style={styles.deleteButton}
       />
     );
   }
@@ -76,6 +77,9 @@ export function DeleteAccountPanel() {
 
 const getStyles = (theme: Theme) =>
   StyleSheet.create({
+    deleteButton: {
+      borderColor: theme.colors.danger,
+    },
     panel: {
       gap: theme.spacing.sm,
       borderWidth: 2,

@@ -539,6 +539,7 @@ export default function DevocionalScreen() {
             {currentStep.kind === 'reflect' ? (
               <>
                 <Text style={theme.typography.heading}>{t('devotional.reflectQuestion')}</Text>
+                <Text style={styles.reflectionPrivate}>{t('devotional.reflectPrivate')}</Text>
                 <TextField
                   label={t('devotional.reflectLabel')}
                   placeholder={t('devotional.reflectPlaceholder')}
@@ -548,7 +549,6 @@ export default function DevocionalScreen() {
                   maxLength={REFLECTION_MAX_LENGTH}
                   style={styles.reflectionInput}
                 />
-                <Text style={styles.reflectionPrivate}>{t('devotional.reflectPrivate')}</Text>
                 {reflection.length >= REFLECTION_COUNTER_FROM ? (
                   <Text style={styles.reflectionCounter} accessibilityLiveRegion="polite">
                     {t(

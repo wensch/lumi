@@ -16,6 +16,7 @@ import { LumiMascot } from '@/features/lumi';
 import { useTheme, type Theme } from '@/theme';
 import { useTranslation } from '@/i18n';
 import { openPrivacyPolicy } from '@/lib/privacy';
+import { consumeAccountDeletedNotice } from '@/features/account';
 
 type Mode = 'sign_in' | 'sign_up';
 type Method = 'password' | 'magic_link';
@@ -40,6 +41,10 @@ export default function AuthScreen() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [accountDeleted, setAccountDeleted] = useState(false);
+  useEffect(() => {
+    void consumeAccountDeletedNotice().then(setAccountDeleted);
+  }, []);
   const [youVersionError, setYouVersionError] = useState<string | null>(null);
   const bridgedYvUserId = useRef<string | null>(null);
   // O SDK do YouVersion restaura a sessão dele ao abrir; só continua para o login do Lumi (e-mail) se a
@@ -184,6 +189,18 @@ export default function AuthScreen() {
               {mode === 'sign_in' ? t('auth.signInSubtitle') : t('auth.signUpSubtitle')}
             </Text>
           </FadeIn>
+
+          {accountDeleted ? (
+            <Card style={styles.card}>
+              <Text
+                style={theme.typography.bodyStrong}
+                accessibilityRole="alert"
+                accessibilityLiveRegion="polite"
+              >
+                {t('auth.accountDeleted')}
+              </Text>
+            </Card>
+          ) : null}
 
           <Card style={styles.card}>
             <TextField

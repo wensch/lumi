@@ -44,6 +44,8 @@ export const pt = {
     alreadyHaveAccount: 'Já tem conta?',
     signInWithYouVersion: 'Entrar com YouVersion',
     privacyLink: 'Como cuidamos dos seus dados (política de privacidade)',
+    accountDeleted:
+      'Sua conta foi excluída e os seus dados foram apagados. Obrigado por ter caminhado com o Lumi.',
     youVersionHint:
       'Ao entrar com a YouVersion, enviamos um link de confirmação para o email da sua conta.',
     youVersionError: 'Não foi possível conectar com a YouVersion. Tente de novo.',
@@ -88,19 +90,20 @@ export const pt = {
     ageQuestion: 'Qual sua faixa etária?',
     ageHelper: 'Isso nos ajuda a personalizar sua experiência.',
     ageRequired: 'Escolha uma faixa etária.',
-    ageKid: 'Criança',
-    ageTeen: 'Adolescente',
-    ageAdult: 'Adulto',
-    ageSenior: 'Idoso',
+    ageKid: 'Criança (até 12 anos)',
+    ageTeen: 'Adolescente (13 a 17 anos)',
+    ageAdult: 'Adulto (18 a 59 anos)',
+    ageSenior: 'Idoso (60 anos ou mais)',
     consentTitle: 'Consentimento dos pais',
     consentBody:
-      'Para uma criança usar o Lumi, um dos pais ou o responsável legal precisa autorizar. Informe os dados de quem autoriza. O que guardamos e como pedir a exclusão está na política de privacidade.',
+      'Para uma criança usar o Lumi, um dos pais ou o responsável legal (quem tem a guarda da criança) precisa autorizar. Avós, tios e outros parentes só podem autorizar se forem os responsáveis legais. Informe os dados de quem autoriza. O que guardamos e como pedir a exclusão está na política de privacidade.',
     guardianName: 'Nome do pai, mãe ou responsável',
     guardianEmail: 'E-mail do responsável',
     consentCheck:
       'Sou o pai, a mãe ou o responsável legal desta criança e autorizo o uso do Lumi e o uso dos dados descritos na política de privacidade.',
     guardianNameRequired: 'Escreva o nome do responsável.',
-    guardianEmailInvalid: 'Confira o e-mail do responsável.',
+    guardianEmailInvalid:
+      'Escreva o e-mail completo do responsável, como nome@exemplo.com (com @ e um ponto depois dele).',
     consentCheckRequired: 'O responsável precisa marcar a autorização para continuar.',
     consentFailed: 'Não foi possível registrar o consentimento agora. Tente de novo.',
     timeQuestion: 'Que horas você quer ser lembrado?',
