@@ -45,7 +45,10 @@ Deno.serve(async (req) => {
   } catch {
     return jsonResponse({ error: 'invalid_body' }, 400);
   }
-  if (body.confirm !== true) return jsonResponse({ error: 'confirmation_required' }, 400);
+  // O corpo pode vir como JSON válido porém nulo ou de outro tipo (ex.: null): trata como pedido sem confirmação.
+  if (typeof body !== 'object' || body === null || body.confirm !== true) {
+    return jsonResponse({ error: 'confirmation_required' }, 400);
+  }
 
   const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const { error } = await admin.auth.admin.deleteUser(user.id);

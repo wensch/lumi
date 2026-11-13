@@ -69,7 +69,7 @@ Pela lei brasileira de proteção de dados (LGPD, art. 18) você pode pedir: sab
 Para exercer qualquer direito, escreva para wensch22@gmail.com. Respondemos em até 15 dias.
 
 - No próprio app você pode mudar o nome, o idioma, os lembretes e os avisos, apagar uma reflexão no histórico, sair de um círculo e desistir de um desafio.
-- **Excluir a conta e os dados:** no app, em Configurações > Conta > Excluir minha conta e meus dados, ou pelo e-mail acima. Ao excluir, apagamos seus dados pessoais, inclusive os pedidos de oração, "orei" e "torci" que você fez. Se você criou um círculo, ele passa para o membro mais antigo (ou é removido, se ninguém mais estiver nele); um desafio criado por você que outras pessoas fazem passa para quem começou primeiro. Assim ninguém perde o que é seu.
+- **Excluir a conta e os dados:** no app, em Configurações > Conta > Excluir minha conta e meus dados, ou pelo e-mail acima. Ao excluir, apagamos seus dados pessoais, inclusive os pedidos de oração, "orei" e "torci" que você fez. Se você criou um círculo, ele passa para o membro mais antigo (ou é removido, se ninguém mais estiver nele); um desafio criado por você que outras pessoas fazem passa para quem começou primeiro. Assim ninguém perde o que é seu. As denúncias de moderação que você fez ou que citam você ficam guardadas até o prazo da seção 4 (12 meses), sem identificar você.
 
 ## 6. Segurança
 
